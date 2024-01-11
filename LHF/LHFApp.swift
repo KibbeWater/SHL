@@ -6,12 +6,18 @@
 //
 
 import SwiftUI
+import HockeyKit
 
 @main
 struct LHFApp: App {
+    var matchInfo: MatchInfo = MatchInfo()
+    var leagueStandings: LeagueStandings = LeagueStandings()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(matchInfo)
+                .environmentObject(leagueStandings)
         }
     }
 }

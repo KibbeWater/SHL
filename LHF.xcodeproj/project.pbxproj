@@ -3,40 +3,130 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BC425E452B4706CC00D82CFB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC425E442B4706CC00D82CFB /* WidgetKit.framework */; };
+		BC425E472B4706CC00D82CFB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC425E462B4706CC00D82CFB /* SwiftUI.framework */; };
+		BC425E4A2B4706CC00D82CFB /* LHFWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E492B4706CC00D82CFB /* LHFWidgetBundle.swift */; };
+		BC425E4C2B4706CC00D82CFB /* LHFWidgetLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4B2B4706CC00D82CFB /* LHFWidgetLiveActivity.swift */; };
+		BC425E4E2B4706CC00D82CFB /* LHFWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4D2B4706CC00D82CFB /* LHFWidget.swift */; };
+		BC425E502B4706CC00D82CFB /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4F2B4706CC00D82CFB /* AppIntent.swift */; };
+		BC425E522B4706CD00D82CFB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC425E512B4706CD00D82CFB /* Assets.xcassets */; };
+		BC425E562B4706CD00D82CFB /* LHFWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC425E432B4706CC00D82CFB /* LHFWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7645B52B46054A0000B7AB /* DebugView.swift */; };
+		BC81B6512B40ACE5007B2E90 /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = BC81B6502B40ACE5007B2E90 /* HockeyKit */; };
 		BCAFE2CE2B4095170044225A /* LHFApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CD2B4095170044225A /* LHFApp.swift */; };
 		BCAFE2D02B4095170044225A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CF2B4095170044225A /* ContentView.swift */; };
 		BCAFE2D22B4095180044225A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCAFE2D12B4095180044225A /* Assets.xcassets */; };
 		BCAFE2D52B4095180044225A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCAFE2D42B4095180044225A /* Preview Assets.xcassets */; };
+		BCEDF4122B47191C002C0DB4 /* SVGImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEDF4112B47191C002C0DB4 /* SVGImageView.swift */; };
+		BCF54B542B40E1F800960F47 /* SVGKit in Frameworks */ = {isa = PBXBuildFile; productRef = BCF54B532B40E1F800960F47 /* SVGKit */; };
+		BCF54B562B40E1F800960F47 /* SVGKitSwift in Frameworks */ = {isa = PBXBuildFile; productRef = BCF54B552B40E1F800960F47 /* SVGKitSwift */; };
+		BCFA44AB2B44C06700B4358C /* StandingsTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFA44AA2B44C06700B4358C /* StandingsTable.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		BC425E542B4706CD00D82CFB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BCAFE2C22B4095170044225A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BC425E422B4706CC00D82CFB;
+			remoteInfo = LHFWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BC425E5A2B4706CD00D82CFB /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BC425E562B4706CD00D82CFB /* LHFWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		BC425E3E2B4702F900D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		BC425E432B4706CC00D82CFB /* LHFWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LHFWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC425E442B4706CC00D82CFB /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		BC425E462B4706CC00D82CFB /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		BC425E492B4706CC00D82CFB /* LHFWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHFWidgetBundle.swift; sourceTree = "<group>"; };
+		BC425E4B2B4706CC00D82CFB /* LHFWidgetLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHFWidgetLiveActivity.swift; sourceTree = "<group>"; };
+		BC425E4D2B4706CC00D82CFB /* LHFWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHFWidget.swift; sourceTree = "<group>"; };
+		BC425E4F2B4706CC00D82CFB /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
+		BC425E512B4706CD00D82CFB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BC425E532B4706CD00D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BC5B96602B40962700D4E621 /* HockeyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HockeyKit; path = ../HockeyKit; sourceTree = "<group>"; };
+		BC7645B52B46054A0000B7AB /* DebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugView.swift; sourceTree = "<group>"; };
 		BCAFE2CA2B4095170044225A /* LHF.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LHF.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCAFE2CD2B4095170044225A /* LHFApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHFApp.swift; sourceTree = "<group>"; };
 		BCAFE2CF2B4095170044225A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BCAFE2D12B4095180044225A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BCAFE2D42B4095180044225A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		BCEDF4112B47191C002C0DB4 /* SVGImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGImageView.swift; sourceTree = "<group>"; };
+		BCFA44AA2B44C06700B4358C /* StandingsTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingsTable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		BC425E402B4706CC00D82CFB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC425E472B4706CC00D82CFB /* SwiftUI.framework in Frameworks */,
+				BC425E452B4706CC00D82CFB /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BCAFE2C72B4095170044225A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BCF54B562B40E1F800960F47 /* SVGKitSwift in Frameworks */,
+				BCF54B542B40E1F800960F47 /* SVGKit in Frameworks */,
+				BC81B6512B40ACE5007B2E90 /* HockeyKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6BD7AA263289D7097A35F2B2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BC425E442B4706CC00D82CFB /* WidgetKit.framework */,
+				BC425E462B4706CC00D82CFB /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BC425E482B4706CC00D82CFB /* LHFWidget */ = {
+			isa = PBXGroup;
+			children = (
+				BCEDF4132B471A01002C0DB4 /* Components */,
+				BC425E492B4706CC00D82CFB /* LHFWidgetBundle.swift */,
+				BC425E4B2B4706CC00D82CFB /* LHFWidgetLiveActivity.swift */,
+				BC425E4D2B4706CC00D82CFB /* LHFWidget.swift */,
+				BC425E4F2B4706CC00D82CFB /* AppIntent.swift */,
+				BC425E512B4706CD00D82CFB /* Assets.xcassets */,
+				BC425E532B4706CD00D82CFB /* Info.plist */,
+			);
+			path = LHFWidget;
+			sourceTree = "<group>";
+		};
 		BCAFE2C12B4095170044225A = {
 			isa = PBXGroup;
 			children = (
+				BC5B96602B40962700D4E621 /* HockeyKit */,
 				BCAFE2CC2B4095170044225A /* LHF */,
+				BC425E482B4706CC00D82CFB /* LHFWidget */,
 				BCAFE2CB2B4095170044225A /* Products */,
+				6BD7AA263289D7097A35F2B2 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -44,6 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				BCAFE2CA2B4095170044225A /* LHF.app */,
+				BC425E432B4706CC00D82CFB /* LHFWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -51,6 +142,8 @@
 		BCAFE2CC2B4095170044225A /* LHF */ = {
 			isa = PBXGroup;
 			children = (
+				BC425E3E2B4702F900D82CFB /* Info.plist */,
+				BCF54B572B40E44200960F47 /* Components */,
 				BCAFE2CD2B4095170044225A /* LHFApp.swift */,
 				BCAFE2CF2B4095170044225A /* ContentView.swift */,
 				BCAFE2D12B4095180044225A /* Assets.xcassets */,
@@ -67,9 +160,45 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		BCEDF4132B471A01002C0DB4 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		BCF54B572B40E44200960F47 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				BCFA44AA2B44C06700B4358C /* StandingsTable.swift */,
+				BC7645B52B46054A0000B7AB /* DebugView.swift */,
+				BCEDF4112B47191C002C0DB4 /* SVGImageView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		BC425E422B4706CC00D82CFB /* LHFWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BC425E572B4706CD00D82CFB /* Build configuration list for PBXNativeTarget "LHFWidgetExtension" */;
+			buildPhases = (
+				BC425E3F2B4706CC00D82CFB /* Sources */,
+				BC425E402B4706CC00D82CFB /* Frameworks */,
+				BC425E412B4706CC00D82CFB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LHFWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = LHFWidgetExtension;
+			productReference = BC425E432B4706CC00D82CFB /* LHFWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		BCAFE2C92B4095170044225A /* LHF */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BCAFE2D82B4095180044225A /* Build configuration list for PBXNativeTarget "LHF" */;
@@ -77,12 +206,19 @@
 				BCAFE2C62B4095170044225A /* Sources */,
 				BCAFE2C72B4095170044225A /* Frameworks */,
 				BCAFE2C82B4095170044225A /* Resources */,
+				BC425E5A2B4706CD00D82CFB /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				BC425E552B4706CD00D82CFB /* PBXTargetDependency */,
 			);
 			name = LHF;
+			packageProductDependencies = (
+				BC81B6502B40ACE5007B2E90 /* HockeyKit */,
+				BCF54B532B40E1F800960F47 /* SVGKit */,
+				BCF54B552B40E1F800960F47 /* SVGKitSwift */,
+			);
 			productName = LHF;
 			productReference = BCAFE2CA2B4095170044225A /* LHF.app */;
 			productType = "com.apple.product-type.application";
@@ -97,6 +233,9 @@
 				LastSwiftUpdateCheck = 1510;
 				LastUpgradeCheck = 1510;
 				TargetAttributes = {
+					BC425E422B4706CC00D82CFB = {
+						CreatedOnToolsVersion = 15.1;
+					};
 					BCAFE2C92B4095170044225A = {
 						CreatedOnToolsVersion = 15.1;
 					};
@@ -111,16 +250,29 @@
 				Base,
 			);
 			mainGroup = BCAFE2C12B4095170044225A;
+			packageReferences = (
+				BC81B64F2B40ACE5007B2E90 /* XCLocalSwiftPackageReference "../HockeyKit" */,
+				BCF54B522B40E1F800960F47 /* XCRemoteSwiftPackageReference "SVGKit" */,
+			);
 			productRefGroup = BCAFE2CB2B4095170044225A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				BCAFE2C92B4095170044225A /* LHF */,
+				BC425E422B4706CC00D82CFB /* LHFWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		BC425E412B4706CC00D82CFB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC425E522B4706CD00D82CFB /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BCAFE2C82B4095170044225A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -133,18 +285,94 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		BC425E3F2B4706CC00D82CFB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC425E4A2B4706CC00D82CFB /* LHFWidgetBundle.swift in Sources */,
+				BC425E502B4706CC00D82CFB /* AppIntent.swift in Sources */,
+				BC425E4E2B4706CC00D82CFB /* LHFWidget.swift in Sources */,
+				BC425E4C2B4706CC00D82CFB /* LHFWidgetLiveActivity.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BCAFE2C62B4095170044225A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BCEDF4122B47191C002C0DB4 /* SVGImageView.swift in Sources */,
 				BCAFE2D02B4095170044225A /* ContentView.swift in Sources */,
+				BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */,
 				BCAFE2CE2B4095170044225A /* LHFApp.swift in Sources */,
+				BCFA44AB2B44C06700B4358C /* StandingsTable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		BC425E552B4706CD00D82CFB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BC425E422B4706CC00D82CFB /* LHFWidgetExtension */;
+			targetProxy = BC425E542B4706CD00D82CFB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		BC425E582B4706CD00D82CFB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 89625ZHN6X;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LHFWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LHFWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.lhf.LHFWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BC425E592B4706CD00D82CFB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 89625ZHN6X;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LHFWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LHFWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.lhf.LHFWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		BCAFE2D62B4095180044225A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -267,6 +495,7 @@
 		BCAFE2D92B4095180044225A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
@@ -275,17 +504,21 @@
 				DEVELOPMENT_TEAM = 89625ZHN6X;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LHF/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Luleå Hockey";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.LHF;
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.lhf;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -296,6 +529,7 @@
 		BCAFE2DA2B4095180044225A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
@@ -304,17 +538,21 @@
 				DEVELOPMENT_TEAM = 89625ZHN6X;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LHF/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Luleå Hockey";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.LHF;
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.lhf;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -325,6 +563,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		BC425E572B4706CD00D82CFB /* Build configuration list for PBXNativeTarget "LHFWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC425E582B4706CD00D82CFB /* Debug */,
+				BC425E592B4706CD00D82CFB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		BCAFE2C52B4095170044225A /* Build configuration list for PBXProject "LHF" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -344,6 +591,41 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		BC81B64F2B40ACE5007B2E90 /* XCLocalSwiftPackageReference "../HockeyKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../HockeyKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BCF54B522B40E1F800960F47 /* XCRemoteSwiftPackageReference "SVGKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SVGKit/SVGKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BC81B6502B40ACE5007B2E90 /* HockeyKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HockeyKit;
+		};
+		BCF54B532B40E1F800960F47 /* SVGKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BCF54B522B40E1F800960F47 /* XCRemoteSwiftPackageReference "SVGKit" */;
+			productName = SVGKit;
+		};
+		BCF54B552B40E1F800960F47 /* SVGKitSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BCF54B522B40E1F800960F47 /* XCRemoteSwiftPackageReference "SVGKit" */;
+			productName = SVGKitSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BCAFE2C22B4095170044225A /* Project object */;
 }
