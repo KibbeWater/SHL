@@ -168,7 +168,9 @@ struct ContentView: View {
                                         }
                                     }
                                 } else {
-                                    Text("Played on \(lastPlayed.date.formatted(date: .abbreviated, time: .omitted))")
+                                    if !IsLive(lastPlayed) {
+                                        Text("Played on \(lastPlayed.date.formatted(date: .abbreviated, time: .omitted))")
+                                    }
                                 }
                             }
                             if let _live = liveGame {
@@ -190,7 +192,6 @@ struct ContentView: View {
                                             .fontWeight(.bold)
                                             .foregroundStyle(.red)
                                     }
-                                    
                                 case .onbreak:
                                     Text("Paused")
                                         .fontWeight(.bold)
@@ -225,7 +226,7 @@ struct ContentView: View {
                         TabView(selection: $selectedLeaderboard) {
                             StandingsTable(title: "SHL", items: selectedLeaderboard == LeaguePages.SHL ? $standingObjs : Binding.constant(nil), onRefresh: {
                                 let startTime = DispatchTime.now()
-                                if let _standings = await leagueStandings.fetchLeague(league: .SHL, skipCache: true) {
+                                if let _standings = await leagueStandings.fetchLeague(league: .SHL) {
                                     do {
                                         let endTime = DispatchTime.now()
                                         let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
@@ -243,7 +244,7 @@ struct ContentView: View {
                             
                             StandingsTable(title: "SDHL", items: selectedLeaderboard == LeaguePages.SDHL ? $standingObjs : Binding.constant(nil), onRefresh: {
                                 let startTime = DispatchTime.now()
-                                if let _standings = await leagueStandings.fetchLeague(league: .SDHL, skipCache: true) {
+                                if let _standings = await leagueStandings.fetchLeague(league: .SDHL) {
                                     do {
                                         let endTime = DispatchTime.now()
                                         let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds

@@ -36,6 +36,13 @@ struct StandingsTable: View {
     
     public var onRefresh: (() async -> Void)? = nil
     
+    init(title: String, items: Binding<[StandingObj]?> = .constant(nil)) {
+        self.title = title
+        self._items = items
+    }
+    
+    init(title: String)
+    
     var body: some View {
         VStack {
             HStack {
