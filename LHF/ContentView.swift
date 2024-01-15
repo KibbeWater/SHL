@@ -9,16 +9,6 @@ import UIKit
 import SwiftUI
 import HockeyKit
 
-struct StandingObj: Identifiable {
-    public var id: String
-    public var position: Int
-    public var logo: String
-    public var team: String
-    public var matches: String
-    public var diff: String
-    public var points: String
-}
-
 struct PageControlView<T: RawRepresentable>: UIViewRepresentable where T.RawValue == Int {
     @Environment(\.colorScheme) private var colorScheme
     
@@ -224,7 +214,7 @@ struct ContentView: View {
                     
                     VStack(spacing: 12) {
                         TabView(selection: $selectedLeaderboard) {
-                            StandingsTable(title: "SHL", items: selectedLeaderboard == LeaguePages.SHL ? $standingObjs : Binding.constant(nil), onRefresh: {
+                            StandingsTable(title: "SHL", league: .SHL, dictionary: $leagueStandings.standings, onRefresh: {
                                 let startTime = DispatchTime.now()
                                 if let _standings = await leagueStandings.fetchLeague(league: .SHL) {
                                     do {
@@ -242,7 +232,7 @@ struct ContentView: View {
                             .padding(.horizontal)
                             .tag(LeaguePages.SHL)
                             
-                            StandingsTable(title: "SDHL", items: selectedLeaderboard == LeaguePages.SDHL ? $standingObjs : Binding.constant(nil), onRefresh: {
+                            StandingsTable(title: "SDHL", league: .SDHL, dictionary: $leagueStandings.standings, onRefresh: {
                                 let startTime = DispatchTime.now()
                                 if let _standings = await leagueStandings.fetchLeague(league: .SDHL) {
                                     do {
@@ -300,10 +290,7 @@ struct ContentView: View {
                 }
             }
             Task {
-                let standings = await leagueStandings.fetchLeague(league: .SHL)
-                if let _standings = standings {
-                    standingObjs = ReformatStandings(_standings)
-                }
+                leagueStandings.fetchLeagues(skipCache: true)
             }
         }
         .onChange(of: matchInfo.latestMatches, { oldMatches, newMatches in
@@ -351,14 +338,12 @@ struct ContentView: View {
             return
         }
         guard let _game = game?.game.gameOverview else { return }
-        print("Received")
         guard _game.gameUuid == gamePoller?.matchId else {
             return
         }
         
         DispatchQueue.main.async {
             liveGame = _game
-            print("Passed check \(liveGame?.time.periodTime ?? "123") / \(_game.time.periodTime )")
         }
         
     }
