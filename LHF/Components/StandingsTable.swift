@@ -9,7 +9,7 @@ import SwiftUI
 import HockeyKit
 import SVGKit
 
-struct StandingObj: Identifiable {
+struct StandingObj: Identifiable, Equatable {
     public var id: String
     public var position: Int
     public var logo: String
@@ -44,6 +44,7 @@ struct StandingsTable: View {
     public var title: String
     @Binding public var items: [StandingObj]?
     @Binding public var dict: Dictionary<Leagues, CacheItem<StandingResults?>>
+    @State private var _intItems: [StandingObj]?
     private var league: Leagues
     
     public var onRefresh: (() async -> Void)? = nil
@@ -85,7 +86,7 @@ struct StandingsTable: View {
             .frame(minWidth: 0, maxWidth: .infinity)
             .background(.accent)
             
-            if let _items = items {
+            if let _items = _intItems {
                 List {
                     ForEach(_items) { item in
                         StandingView(standing: item)
@@ -116,11 +117,10 @@ struct StandingsTable: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .onChange(of: dict) { _, _ in
             let _s = formatStandings(dict)
-            items = _s
+            _intItems = _s
         }
-        .onAppear {
-            let _s = formatStandings(dict)
-            items = _s
+        .onChange(of: items) { _, _ in
+            _intItems = items
         }
     }
 }
