@@ -98,7 +98,6 @@ struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme
     
     @State private var sortOrder = [KeyPathComparator(\StandingObj.position)]
-    @State private var standingObjs: [StandingObj]? = nil
     
     @State private var liveGame: GameOverview? = nil
     
@@ -212,18 +211,37 @@ struct ContentView: View {
                     .padding()
                     .background(IsLive(lastPlayed) && (liveGame?.state != .ended && liveGame != nil) ? nil : (liveGame?.homeGoals ?? lastPlayed.homeTeam.result > liveGame?.awayGoals ?? lastPlayed.awayTeam.result ? LinearGradient(gradient: Gradient(colors: [.green, .red]), startPoint: .topLeading, endPoint: .bottomTrailing).opacity(0.4) : LinearGradient(gradient: Gradient(colors: [.green, .red]), startPoint: .topTrailing, endPoint: .bottomLeading).opacity(0.4)))
                     
+                    VStack {
+                        HStack {
+                            Text("Match Dates")
+                                .multilineTextAlignment(.leading)
+                                .font(.title)
+                            Spacer()
+                        }
+                        ScrollView(.horizontal) {
+                            VStack {
+                                Text("Luleå Coop Arena")
+                                    .font(.footnote)
+                            }
+                        }
+                        .padding()
+                        .background(.primary.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .padding()
+                    
                     VStack(spacing: 12) {
                         TabView(selection: $selectedLeaderboard) {
                             StandingsTable(title: "SHL", league: .SHL, dictionary: $leagueStandings.standings, onRefresh: {
                                 let startTime = DispatchTime.now()
-                                if let _standings = await leagueStandings.fetchLeague(league: .SHL) {
+                                
+                                if let _standings = await leagueStandings.fetchLeague(league: .SHL, skipCache: true, clearExisting: true) {
                                     do {
                                         let endTime = DispatchTime.now()
                                         let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
                                         let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
                                         
                                         try await Task.sleep(nanoseconds: UInt64(remainingTime))
-                                        standingObjs = ReformatStandings(_standings)
                                     } catch {
                                         fatalError("Should be impossible")
                                     }
@@ -234,14 +252,13 @@ struct ContentView: View {
                             
                             StandingsTable(title: "SDHL", league: .SDHL, dictionary: $leagueStandings.standings, onRefresh: {
                                 let startTime = DispatchTime.now()
-                                if let _standings = await leagueStandings.fetchLeague(league: .SDHL) {
+                                if let _standings = await leagueStandings.fetchLeague(league: .SDHL, skipCache: true, clearExisting: true) {
                                     do {
                                         let endTime = DispatchTime.now()
                                         let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
                                         let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
                                         
                                         try await Task.sleep(nanoseconds: UInt64(remainingTime))
-                                        standingObjs = ReformatStandings(_standings)
                                     } catch {
                                         fatalError("Should be impossible")
                                     }
@@ -257,13 +274,6 @@ struct ContentView: View {
                             .padding(.top, 12)
                     }
                     .padding(.vertical)
-                    .onChange(of: selectedLeaderboard) { _, leaderboard in
-                        standingObjs = nil
-                        Task {
-                            guard let _standings = await leagueStandings.fetchLeague(league: leaderboard == LeaguePages.SHL ? Leagues.SHL : Leagues.SDHL) else { return }
-                            standingObjs = ReformatStandings(_standings) as [StandingObj]?
-                        }
-                    }
                 }
             }
             Button("Debug") {
