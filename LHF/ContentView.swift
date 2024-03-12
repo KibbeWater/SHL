@@ -111,26 +111,6 @@ struct ContentView: View {
             if let lastPlayed = SelectFeaturedMatch() {
                 VStack(spacing: 0) {
                     HStack {
-                        Spacer()
-                        ForEach(matchInfo.latestMatches.filter({!$0.played})) { match in
-                            VStack {
-                                Text(FormatDate(match.date))
-                                    .font(.footnote)
-                                Text(match.date.formatted(date: .omitted, time: .shortened))
-                                    .font(.footnote)
-                            }
-                            .onAppear {
-                                Logging.shared.log("[ContentView] Date: \(match.date.ISO8601Format())    Formatted: \(FormatDate(match.date))")
-                            }
-                            
-                            .padding(.vertical, 6)
-                            Spacer()
-                            
-                        }
-                    }
-                    .background(.secondary.opacity(0.4))
-                    
-                    HStack {
                         VStack {
                             SVGImageView(url: URL(string: lastPlayed.homeTeam.logo)!, size: CGSize(width: 50, height: 50))
                                 .frame(width: 50, height: 50)
@@ -209,24 +189,54 @@ struct ContentView: View {
                         }
                     }
                     .padding()
+                    .ignoresSafeArea()
                     .background(IsLive(lastPlayed) && (liveGame?.state != .ended && liveGame != nil) ? nil : (liveGame?.homeGoals ?? lastPlayed.homeTeam.result > liveGame?.awayGoals ?? lastPlayed.awayTeam.result ? LinearGradient(gradient: Gradient(colors: [.green, .red]), startPoint: .topLeading, endPoint: .bottomTrailing).opacity(0.4) : LinearGradient(gradient: Gradient(colors: [.green, .red]), startPoint: .topTrailing, endPoint: .bottomLeading).opacity(0.4)))
                     
                     VStack {
                         HStack {
-                            Text("Match Dates")
+                            Text("Match Calendar")
                                 .multilineTextAlignment(.leading)
                                 .font(.title)
                             Spacer()
                         }
                         ScrollView(.horizontal) {
-                            VStack {
-                                Text("Luleå Coop Arena")
-                                    .font(.footnote)
+                            HStack {
+                                ForEach(matchInfo.latestMatches.filter({!$0.played})) { match in
+                                    VStack(spacing: 6) {
+                                        HStack {
+                                            SVGImageView(url: URL(string: match.homeTeam.logo)!, size: CGSize(width: 50, height: 50))
+                                                .frame(width: 50, height: 50)
+                                            Spacer()
+                                            VStack {
+                                                Text(FormatDate(match.date))
+                                                    .font(.callout)
+                                                    .fontWeight(.semibold)
+                                                Text("vs.")
+                                                    .font(.callout)
+                                                Spacer()
+                                            }
+                                            Spacer()
+                                            SVGImageView(url: URL(string: match.awayTeam.logo)!, size: CGSize(width: 50, height: 50))
+                                                .frame(width: 50, height: 50)
+                                        }
+                                        HStack {
+                                            Spacer()
+                                            Text(match.venue)
+                                                .font(.footnote)
+                                            Spacer()
+                                        }
+                                    }
+                                    .padding(12)
+                                    .frame(width:200)
+                                    .background(Color(UIColor.systemBackground))
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                }
                             }
+
                         }
-                        .padding()
+                        .padding(8)
                         .background(.primary.opacity(0.1))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     .padding()
                     
