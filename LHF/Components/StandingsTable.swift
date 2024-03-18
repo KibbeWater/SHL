@@ -7,13 +7,13 @@
 
 import SwiftUI
 import HockeyKit
-import SVGKit
 
 struct StandingObj: Identifiable, Equatable {
     public var id: String
     public var position: Int
     public var logo: String
     public var team: String
+    public var teamCode: String
     public var matches: String
     public var diff: String
     public var points: String
@@ -34,7 +34,8 @@ struct StandingView: View {
             Text("\(standing.points)p")
                 .padding(.trailing, 24)
             
-            SVGImageView(url: URL(string: standing.logo)!, size: CGSize(width: 32, height: 32))
+            Image("Team/\(standing.teamCode)")
+                .resizable()
                 .frame(width: 32, height: 32)
         }
     }
@@ -68,7 +69,7 @@ struct StandingsTable: View {
     func formatStandings(_ dictionary: Dictionary<Leagues, CacheItem<StandingResults?>>) -> [StandingObj]? {
         if let _league = dictionary[league]?.cacheItem {
             return _league.leagueStandings.map { standing in
-                return StandingObj(id: UUID().uuidString, position: standing.Rank, logo: standing.info.teamInfo.teamMedia, team: standing.info.teamInfo.teamNames.long, matches: String(standing.GP), diff: String(standing.Diff), points: String(standing.Points))
+                return StandingObj(id: UUID().uuidString, position: standing.Rank, logo: standing.info.teamInfo.teamMedia, team: standing.info.teamInfo.teamNames.long, teamCode: standing.info.code ?? "UNK", matches: String(standing.GP), diff: String(standing.Diff), points: String(standing.Points))
             }
         }
         return nil
@@ -128,7 +129,7 @@ struct StandingsTable: View {
 #Preview {
     VStack {
         Spacer()
-        StandingsTable(title: "SHL", league: .SHL, items: .constant([StandingObj(id: "1", position: 1, logo: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg", team: "Luleå Hockey", matches: "123", diff: "69", points: "59")])) {
+        StandingsTable(title: "SHL", league: .SHL, items: .constant([StandingObj(id: "1", position: 1, logo: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg", team: "Luleå Hockey", teamCode: "LHF", matches: "123", diff: "69", points: "59")])) {
             do {
                 try await Task.sleep(nanoseconds: 1_000_000_000)
             } catch {

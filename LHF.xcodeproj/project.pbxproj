@@ -21,9 +21,6 @@
 		BCAFE2D02B4095170044225A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CF2B4095170044225A /* ContentView.swift */; };
 		BCAFE2D22B4095180044225A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCAFE2D12B4095180044225A /* Assets.xcassets */; };
 		BCAFE2D52B4095180044225A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCAFE2D42B4095180044225A /* Preview Assets.xcassets */; };
-		BCEDF4122B47191C002C0DB4 /* SVGImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEDF4112B47191C002C0DB4 /* SVGImageView.swift */; };
-		BCF54B542B40E1F800960F47 /* SVGKit in Frameworks */ = {isa = PBXBuildFile; productRef = BCF54B532B40E1F800960F47 /* SVGKit */; };
-		BCF54B562B40E1F800960F47 /* SVGKitSwift in Frameworks */ = {isa = PBXBuildFile; productRef = BCF54B552B40E1F800960F47 /* SVGKitSwift */; };
 		BCFA44AB2B44C06700B4358C /* StandingsTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFA44AA2B44C06700B4358C /* StandingsTable.swift */; };
 /* End PBXBuildFile section */
 
@@ -69,7 +66,6 @@
 		BCAFE2CF2B4095170044225A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BCAFE2D12B4095180044225A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BCAFE2D42B4095180044225A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		BCEDF4112B47191C002C0DB4 /* SVGImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGImageView.swift; sourceTree = "<group>"; };
 		BCFA44AA2B44C06700B4358C /* StandingsTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingsTable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -87,8 +83,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BCF54B562B40E1F800960F47 /* SVGKitSwift in Frameworks */,
-				BCF54B542B40E1F800960F47 /* SVGKit in Frameworks */,
 				BC81B6512B40ACE5007B2E90 /* HockeyKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -172,7 +166,6 @@
 			children = (
 				BCFA44AA2B44C06700B4358C /* StandingsTable.swift */,
 				BC7645B52B46054A0000B7AB /* DebugView.swift */,
-				BCEDF4112B47191C002C0DB4 /* SVGImageView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -216,8 +209,6 @@
 			name = LHF;
 			packageProductDependencies = (
 				BC81B6502B40ACE5007B2E90 /* HockeyKit */,
-				BCF54B532B40E1F800960F47 /* SVGKit */,
-				BCF54B552B40E1F800960F47 /* SVGKitSwift */,
 			);
 			productName = LHF;
 			productReference = BCAFE2CA2B4095170044225A /* LHF.app */;
@@ -252,7 +243,6 @@
 			mainGroup = BCAFE2C12B4095170044225A;
 			packageReferences = (
 				BC81B64F2B40ACE5007B2E90 /* XCLocalSwiftPackageReference "../HockeyKit" */,
-				BCF54B522B40E1F800960F47 /* XCRemoteSwiftPackageReference "SVGKit" */,
 			);
 			productRefGroup = BCAFE2CB2B4095170044225A /* Products */;
 			projectDirPath = "";
@@ -300,7 +290,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BCEDF4122B47191C002C0DB4 /* SVGImageView.swift in Sources */,
 				BCAFE2D02B4095170044225A /* ContentView.swift in Sources */,
 				BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */,
 				BCAFE2CE2B4095170044225A /* LHFApp.swift in Sources */,
@@ -336,7 +325,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.lhf.LHFWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -363,7 +352,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.lhf.LHFWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -601,31 +590,10 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		BCF54B522B40E1F800960F47 /* XCRemoteSwiftPackageReference "SVGKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SVGKit/SVGKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.0.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
 		BC81B6502B40ACE5007B2E90 /* HockeyKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HockeyKit;
-		};
-		BCF54B532B40E1F800960F47 /* SVGKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BCF54B522B40E1F800960F47 /* XCRemoteSwiftPackageReference "SVGKit" */;
-			productName = SVGKit;
-		};
-		BCF54B552B40E1F800960F47 /* SVGKitSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BCF54B522B40E1F800960F47 /* XCRemoteSwiftPackageReference "SVGKit" */;
-			productName = SVGKitSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

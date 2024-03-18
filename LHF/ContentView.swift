@@ -112,7 +112,8 @@ struct ContentView: View {
                 VStack(spacing: 0) {
                     HStack {
                         VStack {
-                            SVGImageView(url: URL(string: lastPlayed.homeTeam.logo)!, size: CGSize(width: 50, height: 50))
+                            Image("Team/\(lastPlayed.homeTeam.code)")
+                                .resizable()
                                 .frame(width: 50, height: 50)
                             if let _live = liveGame {
                                 Text("\(_live.homeGoals)")
@@ -179,7 +180,8 @@ struct ContentView: View {
                         Spacer()
                         
                         VStack {
-                            SVGImageView(url: URL(string: lastPlayed.awayTeam.logo)!, size: CGSize(width: 50, height: 50))
+                            Image("Team/\(lastPlayed.awayTeam.code)")
+                                .resizable()
                                 .frame(width: 50, height: 50)
                             if let _live = liveGame {
                                 Text("\(_live.awayGoals)")
@@ -204,7 +206,8 @@ struct ContentView: View {
                                 ForEach(matchInfo.latestMatches.filter({!$0.played})) { match in
                                     VStack(spacing: 6) {
                                         HStack {
-                                            SVGImageView(url: URL(string: match.homeTeam.logo)!, size: CGSize(width: 50, height: 50))
+                                            Image("Team/\(match.homeTeam.code)")
+                                                .resizable()
                                                 .frame(width: 50, height: 50)
                                             Spacer()
                                             VStack {
@@ -216,7 +219,8 @@ struct ContentView: View {
                                                 Spacer()
                                             }
                                             Spacer()
-                                            SVGImageView(url: URL(string: match.awayTeam.logo)!, size: CGSize(width: 50, height: 50))
+                                            Image("Team/\(match.awayTeam.code)")
+                                                .resizable()
                                                 .frame(width: 50, height: 50)
                                         }
                                         HStack {
@@ -376,7 +380,7 @@ struct ContentView: View {
     
     func ReformatStandings(_ standings: StandingResults) -> [StandingObj] {
         return standings.leagueStandings.map { standing in
-            return StandingObj(id: UUID().uuidString, position: standing.Rank, logo: standing.info.teamInfo.teamMedia, team: standing.info.teamInfo.teamNames.long, matches: String(standing.GP), diff: String(standing.Diff), points: String(standing.Points))
+            return StandingObj(id: UUID().uuidString, position: standing.Rank, logo: standing.info.teamInfo.teamMedia, team: standing.info.teamInfo.teamNames.long, teamCode: standing.info.code ?? "UNK", matches: String(standing.GP), diff: String(standing.Diff), points: String(standing.Points))
         }
     }
     
