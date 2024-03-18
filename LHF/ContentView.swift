@@ -249,7 +249,7 @@ struct ContentView: View {
                             StandingsTable(title: "SHL", league: .SHL, dictionary: $leagueStandings.standings, onRefresh: {
                                 let startTime = DispatchTime.now()
                                 
-                                if let _standings = await leagueStandings.fetchLeague(league: .SHL, skipCache: true, clearExisting: true) {
+                                if (await leagueStandings.fetchLeague(league: .SHL, skipCache: true, clearExisting: true)) != nil {
                                     do {
                                         let endTime = DispatchTime.now()
                                         let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
@@ -266,7 +266,7 @@ struct ContentView: View {
                             
                             StandingsTable(title: "SDHL", league: .SDHL, dictionary: $leagueStandings.standings, onRefresh: {
                                 let startTime = DispatchTime.now()
-                                if let _standings = await leagueStandings.fetchLeague(league: .SDHL, skipCache: true, clearExisting: true) {
+                                if (await leagueStandings.fetchLeague(league: .SDHL, skipCache: true, clearExisting: true)) != nil {
                                     do {
                                         let endTime = DispatchTime.now()
                                         let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
