@@ -17,6 +17,7 @@
 		BC425E562B4706CD00D82CFB /* LHFWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC425E432B4706CC00D82CFB /* LHFWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7645B52B46054A0000B7AB /* DebugView.swift */; };
 		BC81B6512B40ACE5007B2E90 /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = BC81B6502B40ACE5007B2E90 /* HockeyKit */; };
+		BC8C15112BAC787B0010AB59 /* PrevMatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8C15102BAC787B0010AB59 /* PrevMatch.swift */; };
 		BCAFE2CE2B4095170044225A /* LHFApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CD2B4095170044225A /* LHFApp.swift */; };
 		BCAFE2D02B4095170044225A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CF2B4095170044225A /* ContentView.swift */; };
 		BCAFE2D22B4095180044225A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCAFE2D12B4095180044225A /* Assets.xcassets */; };
@@ -61,6 +62,7 @@
 		BC425E532B4706CD00D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BC5B96602B40962700D4E621 /* HockeyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HockeyKit; path = ../HockeyKit; sourceTree = "<group>"; };
 		BC7645B52B46054A0000B7AB /* DebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugView.swift; sourceTree = "<group>"; };
+		BC8C15102BAC787B0010AB59 /* PrevMatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrevMatch.swift; sourceTree = "<group>"; };
 		BCAFE2CA2B4095170044225A /* LHF.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LHF.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCAFE2CD2B4095170044225A /* LHFApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHFApp.swift; sourceTree = "<group>"; };
 		BCAFE2CF2B4095170044225A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -111,6 +113,14 @@
 				BC425E532B4706CD00D82CFB /* Info.plist */,
 			);
 			path = LHFWidget;
+			sourceTree = "<group>";
+		};
+		BC8C150F2BAC780F0010AB59 /* GameDisplays */ = {
+			isa = PBXGroup;
+			children = (
+				BC8C15102BAC787B0010AB59 /* PrevMatch.swift */,
+			);
+			path = GameDisplays;
 			sourceTree = "<group>";
 		};
 		BCAFE2C12B4095170044225A = {
@@ -164,6 +174,7 @@
 		BCF54B572B40E44200960F47 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				BC8C150F2BAC780F0010AB59 /* GameDisplays */,
 				BCFA44AA2B44C06700B4358C /* StandingsTable.swift */,
 				BC7645B52B46054A0000B7AB /* DebugView.swift */,
 			);
@@ -291,6 +302,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BCAFE2D02B4095170044225A /* ContentView.swift in Sources */,
+				BC8C15112BAC787B0010AB59 /* PrevMatch.swift in Sources */,
 				BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */,
 				BCAFE2CE2B4095170044225A /* LHFApp.swift in Sources */,
 				BCFA44AB2B44C06700B4358C /* StandingsTable.swift in Sources */,
