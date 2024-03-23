@@ -108,121 +108,135 @@ struct ContentView: View {
     
     var body: some View {
         ScrollView {
-            if let lastPlayed = SelectFeaturedMatch() {
-                VStack(spacing: 0) {
-                    
-                    
-                    VStack {
+            NavigationLink(destination: {
+                MatchView()
+            }, label: {
+                if let featured = SelectFeaturedMatch() {
+                    PrevMatch(game: featured)
+                } else {
+                    HStack {
+                        
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 96)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                }
+            })
+            .buttonStyle(PlainButtonStyle())
+            .padding(.horizontal)
+            VStack(spacing: 0) {
+                VStack {
+                    HStack {
+                        Text("Match Calendar")
+                            .multilineTextAlignment(.leading)
+                            .font(.title)
+                        Spacer()
+                    }
+                    ScrollView(.horizontal) {
                         HStack {
-                            Text("Match Calendar")
-                                .multilineTextAlignment(.leading)
-                                .font(.title)
-                            Spacer()
-                        }
-                        ScrollView(.horizontal) {
-                            HStack {
-                                ForEach(matchInfo.latestMatches.filter({!$0.played})) { match in
-                                    VStack(spacing: 6) {
-                                        HStack {
-                                            Image("Team/\(match.homeTeam.code)")
-                                                .resizable()
-                                                .frame(width: 50, height: 50)
-                                            Spacer()
-                                            VStack {
-                                                Text(FormatDate(match.date))
-                                                    .font(.callout)
-                                                    .fontWeight(.semibold)
-                                                Text("vs.")
-                                                    .font(.callout)
-                                                Spacer()
-                                            }
-                                            Spacer()
-                                            Image("Team/\(match.awayTeam.code)")
-                                                .resizable()
-                                                .frame(width: 50, height: 50)
-                                        }
-                                        HStack {
-                                            Spacer()
-                                            Text(match.venue)
-                                                .font(.footnote)
+                            ForEach(matchInfo.latestMatches.filter({!$0.played})) { match in
+                                VStack(spacing: 6) {
+                                    HStack {
+                                        Image("Team/\(match.homeTeam.code)")
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                            .frame(width: 50, height: 50)
+                                        Spacer()
+                                        VStack {
+                                            Text(FormatDate(match.date))
+                                                .font(.callout)
+                                                .fontWeight(.semibold)
+                                            Text("vs.")
+                                                .font(.callout)
                                             Spacer()
                                         }
+                                        Spacer()
+                                        Image("Team/\(match.awayTeam.code)")
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                            .frame(width: 50, height: 50)
                                     }
-                                    .padding(12)
-                                    .frame(width:200)
-                                    .background(Color(UIColor.systemBackground))
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    HStack {
+                                        Spacer()
+                                        Text(match.venue)
+                                            .font(.footnote)
+                                        Spacer()
+                                    }
+                                }
+                                .padding(12)
+                                .frame(width:200)
+                                .background(Color(UIColor.systemBackground))
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                            }
+                        }
+                        
+                    }
+                    .padding(8)
+                    .background(.primary.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+                .padding()
+                
+                VStack(spacing: 12) {
+                    TabView(selection: $selectedLeaderboard) {
+                        StandingsTable(title: "SHL", league: .SHL, dictionary: $leagueStandings.standings, onRefresh: {
+                            let startTime = DispatchTime.now()
+                            
+                            if (await leagueStandings.fetchLeague(league: .SHL, skipCache: true, clearExisting: true)) != nil {
+                                do {
+                                    let endTime = DispatchTime.now()
+                                    let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
+                                    let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
+                                    
+                                    try await Task.sleep(nanoseconds: UInt64(remainingTime))
+                                } catch {
+                                    fatalError("Should be impossible")
                                 }
                             }
-
-                        }
-                        .padding(8)
-                        .background(.primary.opacity(0.1))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                    .padding()
-                    
-                    VStack(spacing: 12) {
-                        TabView(selection: $selectedLeaderboard) {
-                            StandingsTable(title: "SHL", league: .SHL, dictionary: $leagueStandings.standings, onRefresh: {
-                                let startTime = DispatchTime.now()
-                                
-                                if (await leagueStandings.fetchLeague(league: .SHL, skipCache: true, clearExisting: true)) != nil {
-                                    do {
-                                        let endTime = DispatchTime.now()
-                                        let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
-                                        let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
-                                        
-                                        try await Task.sleep(nanoseconds: UInt64(remainingTime))
-                                    } catch {
-                                        fatalError("Should be impossible")
-                                    }
+                        })
+                        .padding(.horizontal)
+                        .tag(LeaguePages.SHL)
+                        
+                        StandingsTable(title: "SDHL", league: .SDHL, dictionary: $leagueStandings.standings, onRefresh: {
+                            let startTime = DispatchTime.now()
+                            if (await leagueStandings.fetchLeague(league: .SDHL, skipCache: true, clearExisting: true)) != nil {
+                                do {
+                                    let endTime = DispatchTime.now()
+                                    let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
+                                    let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
+                                    
+                                    try await Task.sleep(nanoseconds: UInt64(remainingTime))
+                                } catch {
+                                    fatalError("Should be impossible")
                                 }
-                            })
-                            .padding(.horizontal)
-                            .tag(LeaguePages.SHL)
-                            
-                            StandingsTable(title: "SDHL", league: .SDHL, dictionary: $leagueStandings.standings, onRefresh: {
-                                let startTime = DispatchTime.now()
-                                if (await leagueStandings.fetchLeague(league: .SDHL, skipCache: true, clearExisting: true)) != nil {
-                                    do {
-                                        let endTime = DispatchTime.now()
-                                        let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
-                                        let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
-                                        
-                                        try await Task.sleep(nanoseconds: UInt64(remainingTime))
-                                    } catch {
-                                        fatalError("Should be impossible")
-                                    }
-                                }
-                            })
-                            .padding(.horizontal)
-                            .tag(LeaguePages.SDHL)
-                        }
-                        .tabViewStyle(.page(indexDisplayMode: .never))
-                        .frame(height: 350)
-                        PageControlView(currentPage: $selectedLeaderboard, numberOfPages: .constant(2))
-                            .frame(maxWidth: 0, maxHeight: 0)
-                            .padding(.top, 12)
+                            }
+                        })
+                        .padding(.horizontal)
+                        .tag(LeaguePages.SDHL)
                     }
-                    .padding(.vertical)
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .frame(height: 350)
+                    PageControlView(currentPage: $selectedLeaderboard, numberOfPages: .constant(2))
+                        .frame(maxWidth: 0, maxHeight: 0)
+                        .padding(.top, 12)
                 }
+                .padding(.vertical)
             }
             Button("Debug") {
                 debugOpen = true
             }
             .buttonStyle(.borderedProminent)
-            .sheet(isPresented: $debugOpen, content: {
+            .sheet(isPresented: $debugOpen) {
                 Capsule()
                     .fill(.primary)
                     .frame(width: 64, height: 6, alignment: .center)
                 
                     .padding()
                 DebugView()
-            })
+            }
             
         }
-        .padding(.vertical)
         .onAppear {
             Task {
                 do {

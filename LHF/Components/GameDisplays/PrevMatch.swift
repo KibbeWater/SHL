@@ -11,6 +11,21 @@ import HockeyKit
 struct PrevMatch: View {
     var game: Game
     
+    private var homeColor: Color
+    private var awayColor: Color
+    
+    func FormatDate(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM dd"
+        return dateFormatter.string(from: date)
+    }
+    
+    init(game: Game) {
+        self.game = game
+        self.homeColor = Color(UIImage(named: "Team/\(game.homeTeam.code)")?.dominantColor() ?? UIColor.black)
+        self.awayColor = Color(UIImage(named: "Team/\(game.awayTeam.code)")?.dominantColor() ?? UIColor.black)
+    }
+    
     var body: some View {
         HStack {
             VStack {
@@ -28,7 +43,7 @@ struct PrevMatch: View {
                         .font(.system(size: 48))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(game.homeTeam.result > game.awayTeam.result ? .primary : .secondary)
                 }
                 .overlay(alignment: .bottomLeading) {
                     Text(game.homeTeam.name)
@@ -50,7 +65,7 @@ struct PrevMatch: View {
             Spacer()
             VStack {
                 Spacer()
-                Text("Full-Time")
+                Text(game.shootout ? "Shootout" : game.overtime ? "Overtime" : game.played ? "Full-Time" : FormatDate(game.date))
                     .fontWeight(.medium)
                 Spacer()
             }
@@ -67,7 +82,7 @@ struct PrevMatch: View {
                         .font(.system(size: 48))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(game.awayTeam.result > game.homeTeam.result ? .primary : .secondary)
                     Spacer()
                     VStack {
                         Spacer()
@@ -91,15 +106,24 @@ struct PrevMatch: View {
             .padding(.vertical, 8)
             .background(LinearGradient(gradient:
                         Gradient(
-                                    colors: [.yellow.opacity(0.5), .clear]),
+                            colors: [.yellow.opacity(0.5), .clear]),
                                        startPoint: .trailing, endPoint: .leading
                         )
             )
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 96)
+        .frame(height: 102)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12.0))
+        .overlay(alignment: .topLeading) {
+            Text(game.venue)
+                .font(.caption2)
+                .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+                .padding(.leading)
+                .padding(.top, 8)
+
+        }
     }
 }
 
