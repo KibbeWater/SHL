@@ -20,6 +20,12 @@ struct PrevMatch: View {
         return dateFormatter.string(from: date)
     }
     
+    func FormatTime(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "h:mm a"
+        return dateFormatter.string(from: date)
+    }
+    
     init(game: Game) {
         self.game = game
         self.homeColor = Color(UIImage(named: "Team/\(game.homeTeam.code)")?.dominantColor() ?? UIColor.black)
@@ -58,14 +64,14 @@ struct PrevMatch: View {
             .padding(.vertical, 8)
             .background(LinearGradient(gradient:
                         Gradient(
-                            colors: [.blue.opacity(0.5), .clear]),
+                            colors: [homeColor.opacity(0.5), .clear]),
                             startPoint: .leading, endPoint: .trailing
                         )
             )
             Spacer()
             VStack {
                 Spacer()
-                Text(game.shootout ? "Shootout" : game.overtime ? "Overtime" : game.played ? "Full-Time" : FormatDate(game.date))
+                Text(game.shootout ? "Shootout" : game.overtime ? "Overtime" : game.played ? "Full-Time" : Calendar.current.isDate(game.date, inSameDayAs: Date()) ? FormatTime(game.date) : FormatDate(game.date))
                     .fontWeight(.medium)
                 Spacer()
             }
@@ -106,7 +112,7 @@ struct PrevMatch: View {
             .padding(.vertical, 8)
             .background(LinearGradient(gradient:
                         Gradient(
-                            colors: [.yellow.opacity(0.5), .clear]),
+                            colors: [awayColor.opacity(0.5), .clear]),
                                        startPoint: .trailing, endPoint: .leading
                         )
             )
