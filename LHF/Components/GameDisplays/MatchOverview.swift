@@ -10,6 +10,7 @@ import HockeyKit
 
 struct MatchOverview: View {
     var game: Game
+    var liveGame: GameOverview?
     
     @State private var homeColor: Color = .black // Default color, updated on appear
     @State private var awayColor: Color = .black // Default color, updated on appear
@@ -36,8 +37,11 @@ struct MatchOverview: View {
         }
     }
     
-    init(game: Game) {
+    init(game: Game, liveGame: GameOverview? = nil) {
         self.game = game
+        if game.id == liveGame?.gameUuid {
+            self.liveGame = liveGame
+        }
     }
     
     var body: some View {
@@ -53,11 +57,11 @@ struct MatchOverview: View {
                         Spacer()
                     }
                     Spacer()
-                    Text(String(game.homeTeam.result))
+                    Text(String(liveGame?.homeGoals ?? game.homeTeam.result))
                         .font(.system(size: 48))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
-                        .foregroundStyle(game.homeTeam.result > game.awayTeam.result ? .primary : .secondary)
+                        .foregroundStyle(liveGame?.homeGoals ?? game.homeTeam.result > liveGame?.awayGoals ?? game.awayTeam.result ? .primary : .secondary)
                 }
                 .overlay(alignment: .bottomLeading) {
                     Text(game.homeTeam.name)
@@ -92,11 +96,11 @@ struct MatchOverview: View {
             Spacer()
             VStack {
                 HStack {
-                    Text(String(game.awayTeam.result))
+                    Text(String(liveGame?.awayGoals ?? game.awayTeam.result))
                         .font(.system(size: 48))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
-                        .foregroundStyle(game.awayTeam.result > game.homeTeam.result ? .primary : .secondary)
+                        .foregroundStyle(liveGame?.awayGoals ?? game.awayTeam.result > liveGame?.homeGoals ?? game.homeTeam.result ? .primary : .secondary)
                     Spacer()
                     VStack {
                         Spacer()

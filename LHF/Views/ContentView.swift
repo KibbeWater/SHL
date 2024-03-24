@@ -112,7 +112,7 @@ struct ContentView: View {
                 MatchListView()
             }, label: {
                 if let featured = SelectFeaturedMatch() {
-                    MatchOverview(game: featured)
+                    MatchOverview(game: featured, liveGame: liveGame)
                 } else {
                     HStack {
                         
