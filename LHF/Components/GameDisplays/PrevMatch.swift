@@ -11,8 +11,8 @@ import HockeyKit
 struct PrevMatch: View {
     var game: Game
     
-    private var homeColor: Color
-    private var awayColor: Color
+    @State private var homeColor: Color = .black // Default color, updated on appear
+    @State private var awayColor: Color = .black // Default color, updated on appear
     
     func FormatDate(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
@@ -26,10 +26,18 @@ struct PrevMatch: View {
         return dateFormatter.string(from: date)
     }
     
+    private func loadTeamColors() {
+        let _homeColor = Color(UIImage(named: "Team/\(game.homeTeam.code)")?.getColors(quality: .low)?.background ?? UIColor.black)
+        let _awayColor = Color(UIImage(named: "Team/\(game.awayTeam.code)")?.getColors(quality: .low)?.background ?? UIColor.black)
+        
+        withAnimation {
+            self.homeColor = _homeColor
+            self.awayColor = _awayColor
+        }
+    }
+    
     init(game: Game) {
         self.game = game
-        self.homeColor = Color(UIImage(named: "Team/\(game.homeTeam.code)")?.getColors()?.background ?? UIColor.black)
-        self.awayColor = Color(UIImage(named: "Team/\(game.awayTeam.code)")?.getColors()?.background ?? UIColor.black)
     }
     
     var body: some View {
@@ -63,10 +71,10 @@ struct PrevMatch: View {
             .padding(.leading)
             .padding(.vertical, 8)
             .background(LinearGradient(gradient:
-                        Gradient(
-                            colors: [homeColor.opacity(0.5), .clear]),
-                            startPoint: .leading, endPoint: .trailing
-                        )
+                                        Gradient(
+                                            colors: [homeColor.opacity(0.5), .clear]),
+                                       startPoint: .leading, endPoint: .trailing
+                                      )
             )
             Spacer()
             VStack {
@@ -111,10 +119,10 @@ struct PrevMatch: View {
             .padding(.trailing)
             .padding(.vertical, 8)
             .background(LinearGradient(gradient:
-                        Gradient(
-                            colors: [awayColor.opacity(0.5), .clear]),
+                                        Gradient(
+                                            colors: [awayColor.opacity(0.5), .clear]),
                                        startPoint: .trailing, endPoint: .leading
-                        )
+                                      )
             )
         }
         .frame(maxWidth: .infinity)
@@ -128,7 +136,10 @@ struct PrevMatch: View {
                 .foregroundStyle(.secondary)
                 .padding(.leading)
                 .padding(.top, 8)
-
+            
+        }
+        .onAppear {
+            loadTeamColors()
         }
     }
 }
