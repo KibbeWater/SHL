@@ -83,8 +83,22 @@ struct MatchOverview: View {
             Spacer()
             VStack {
                 Spacer()
-                Text(game.shootout ? "Shootout" : game.overtime ? "Overtime" : game.played ? "Full-Time" : Calendar.current.isDate(game.date, inSameDayAs: Date()) ? FormatTime(game.date) : FormatDate(game.date))
-                    .fontWeight(.medium)
+                if let _liveGame = liveGame {
+                    if _liveGame.state == .starting {
+                        Text("Starting")
+                    } else if _liveGame.state == .ongoing {
+                        Text("P\(_liveGame.time.period): \(_liveGame.time.periodTime)")
+                    } else if _liveGame.state == .onbreak {
+                        Text("P\(_liveGame.time.period): Pause")
+                    } else if _liveGame.state == .overtime {
+                        Text("OT: \(_liveGame.time.periodTime)")
+                    } else if _liveGame.state == .ended {
+                        Text("Ended")
+                    }
+                } else {
+                    Text(game.shootout ? "Shootout" : game.overtime ? "Overtime" : game.played ? "Full-Time" : Calendar.current.isDate(game.date, inSameDayAs: Date()) ? FormatTime(game.date) : FormatDate(game.date))
+                        .fontWeight(.medium)
+                }
                 Spacer()
             }
             .overlay(alignment: .top) {
