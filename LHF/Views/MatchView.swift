@@ -1,76 +1,66 @@
+//
+//  PrevMatchView.swift
+//  LHF
+//
+//  Created by user242911 on 3/24/24.
+//
+
 import SwiftUI
 import HockeyKit
 
-enum Tabs: String, CaseIterable {
-    case previous = "Previous"
-    case today = "Today"
-    case upcoming = "Upcoming"
-}
-
 struct MatchView: View {
     @EnvironmentObject var matchInfo: MatchInfo
-    @State private var selectedTab: Tabs = .today
-    @State private var previousMatches: [Game] = []
-    @State private var todayMatches: [Game] = []
-    @State private var upcomingMatches: [Game] = []
-
-    // When matchInfo changes, re-filter the matches
-    private func filterMatches() {
-        let now = Date()
-        let calendar = Calendar.current
-        previousMatches = matchInfo.latestMatches.filter { $0.date < calendar.startOfDay(for: now) }
-        todayMatches = matchInfo.latestMatches.filter { calendar.isDateInToday($0.date) }
-        upcomingMatches = matchInfo.latestMatches.filter { calendar.startOfDay(for: $0.date) >= calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now))! }
-    }
+    
+    let match: Game
+    
+    @State private var pbpEvents: [PBPEventProtocol] = []
     
     var body: some View {
         VStack {
-            tabSelectionView
+            Text(match.id)
+                .padding(.bottom)
+            
+            ScrollView {
+                ForEach(pbpEvents.indices, id: \.self) { _ev in
+                    let ev = pbpEvents[_ev]
+                    
+                    if let _goalkeeperEvent = ev as? GoalkeeperEvent {
+                        Text("Goalkeeper Event \(_goalkeeperEvent.gameId)")
+                    } else if let _penaltyEvent = ev as? PenaltyEvent {
+                        Text("Penalty Event \(_penaltyEvent.gameId)")
+                    } else if let _shotEvent = ev as? ShotEvent {
+                        Text("Shot Event \(_shotEvent.gameId)")
+                    } else if let _periodEvent = ev as? PeriodEvent {
+                        if _periodEvent.finished {
+                            Text("Period \(_periodEvent.period) ended")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                                .padding(.vertical)
+                        } else if _periodEvent.started {
+                            Text("Period \(_periodEvent.period) started")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                                .padding(.vertical)
+                        }
+                    } else if let _goalEvent = ev as? GoalEvent {
+                        Text("Goal Event \(_goalEvent.gameId)")
+                    }
+                }
+            }
+        }
+        .task {
+            do {
+                if let events = try await matchInfo.getMatchPBP(match.id) {
+                    pbpEvents = events
+                }
+            } catch {
+                print("Failed to get play-by-play events")
+            }
+        }
+    }
+}
 
-            TabView(selection: $selectedTab) {
-                matchesScrollView(for: previousMatches)
-                    .id(Tabs.previous)
-                    .tag(Tabs.previous)
-                
-                matchesScrollView(for: todayMatches)
-                    .id(Tabs.today)
-                    .tag(Tabs.today)
-                
-                matchesScrollView(for: upcomingMatches)
-                    .id(Tabs.upcoming)
-                    .tag(Tabs.upcoming)
-            }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
-        }
-        .onAppear {
-            filterMatches()
-        }
-    }
-    
-    private var tabSelectionView: some View {
-        HStack {
-            Spacer()
-            ForEach(Tabs.allCases, id: \.self) { tab in
-                Button(action: {
-                    selectedTab = tab
-                }, label: {
-                    Text(tab.rawValue)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(selectedTab == tab ? .primary : .secondary)
-                })
-                .buttonStyle(PlainButtonStyle())
-                Spacer()
-            }
-        }
-    }
-    
-    private func matchesScrollView(for matches: [Game]) -> some View {
-        ScrollView {
-            ForEach(matches, id: \.id) { match in
-                PrevMatch(game: match)
-                    .id("pm-\(match.id)")
-            }
-        }
-        .padding(.horizontal)
-    }
+#Preview {
+    MatchView(match: Game.fakeData())
+        .environmentObject(MatchInfo())
 }

@@ -16,15 +16,16 @@
 		BC425E502B4706CC00D82CFB /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4F2B4706CC00D82CFB /* AppIntent.swift */; };
 		BC425E522B4706CD00D82CFB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC425E512B4706CD00D82CFB /* Assets.xcassets */; };
 		BC425E562B4706CD00D82CFB /* LHFWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC425E432B4706CC00D82CFB /* LHFWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6212E42BB05B81003CCB45 /* MatchView.swift */; };
 		BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7645B52B46054A0000B7AB /* DebugView.swift */; };
 		BC81B6512B40ACE5007B2E90 /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = BC81B6502B40ACE5007B2E90 /* HockeyKit */; };
-		BC8C15112BAC787B0010AB59 /* PrevMatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8C15102BAC787B0010AB59 /* PrevMatch.swift */; };
+		BC8C15112BAC787B0010AB59 /* MatchOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8C15102BAC787B0010AB59 /* MatchOverview.swift */; };
 		BCAFE2CE2B4095170044225A /* LHFApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CD2B4095170044225A /* LHFApp.swift */; };
 		BCAFE2D02B4095170044225A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CF2B4095170044225A /* ContentView.swift */; };
 		BCAFE2D22B4095180044225A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCAFE2D12B4095180044225A /* Assets.xcassets */; };
 		BCAFE2D52B4095180044225A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCAFE2D42B4095180044225A /* Preview Assets.xcassets */; };
 		BCD7BC152BAF69D500E208B3 /* Root.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD7BC142BAF69D500E208B3 /* Root.swift */; };
-		BCD7BC182BAF6B9800E208B3 /* MatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD7BC172BAF6B9800E208B3 /* MatchView.swift */; };
+		BCD7BC182BAF6B9800E208B3 /* MatchListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD7BC172BAF6B9800E208B3 /* MatchListView.swift */; };
 		BCFA44AB2B44C06700B4358C /* StandingsTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFA44AA2B44C06700B4358C /* StandingsTable.swift */; };
 /* End PBXBuildFile section */
 
@@ -65,15 +66,16 @@
 		BC425E512B4706CD00D82CFB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BC425E532B4706CD00D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BC5B96602B40962700D4E621 /* HockeyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HockeyKit; path = ../HockeyKit; sourceTree = "<group>"; };
+		BC6212E42BB05B81003CCB45 /* MatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchView.swift; sourceTree = "<group>"; };
 		BC7645B52B46054A0000B7AB /* DebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugView.swift; sourceTree = "<group>"; };
-		BC8C15102BAC787B0010AB59 /* PrevMatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrevMatch.swift; sourceTree = "<group>"; };
+		BC8C15102BAC787B0010AB59 /* MatchOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverview.swift; sourceTree = "<group>"; };
 		BCAFE2CA2B4095170044225A /* LHF.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LHF.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCAFE2CD2B4095170044225A /* LHFApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHFApp.swift; sourceTree = "<group>"; };
 		BCAFE2CF2B4095170044225A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BCAFE2D12B4095180044225A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BCAFE2D42B4095180044225A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		BCD7BC142BAF69D500E208B3 /* Root.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Root.swift; sourceTree = "<group>"; };
-		BCD7BC172BAF6B9800E208B3 /* MatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchView.swift; sourceTree = "<group>"; };
+		BCD7BC172BAF6B9800E208B3 /* MatchListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchListView.swift; sourceTree = "<group>"; };
 		BCFA44AA2B44C06700B4358C /* StandingsTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingsTable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -132,7 +134,7 @@
 		BC8C150F2BAC780F0010AB59 /* GameDisplays */ = {
 			isa = PBXGroup;
 			children = (
-				BC8C15102BAC787B0010AB59 /* PrevMatch.swift */,
+				BC8C15102BAC787B0010AB59 /* MatchOverview.swift */,
 			);
 			path = GameDisplays;
 			sourceTree = "<group>";
@@ -184,7 +186,8 @@
 			isa = PBXGroup;
 			children = (
 				BCAFE2CF2B4095170044225A /* ContentView.swift */,
-				BCD7BC172BAF6B9800E208B3 /* MatchView.swift */,
+				BCD7BC172BAF6B9800E208B3 /* MatchListView.swift */,
+				BC6212E42BB05B81003CCB45 /* MatchView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -327,12 +330,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				BCAFE2D02B4095170044225A /* ContentView.swift in Sources */,
-				BC8C15112BAC787B0010AB59 /* PrevMatch.swift in Sources */,
-				BCD7BC182BAF6B9800E208B3 /* MatchView.swift in Sources */,
+				BC8C15112BAC787B0010AB59 /* MatchOverview.swift in Sources */,
+				BCD7BC182BAF6B9800E208B3 /* MatchListView.swift in Sources */,
 				BCD7BC152BAF69D500E208B3 /* Root.swift in Sources */,
 				BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */,
 				BCAFE2CE2B4095170044225A /* LHFApp.swift in Sources */,
 				BCFA44AB2B44C06700B4358C /* StandingsTable.swift in Sources */,
+				BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */,
 				BC374DFA2BAD922000378412 /* UIImageExt.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

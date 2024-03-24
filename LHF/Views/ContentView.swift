@@ -109,10 +109,10 @@ struct ContentView: View {
     var body: some View {
         ScrollView {
             NavigationLink(destination: {
-                MatchView()
+                MatchListView()
             }, label: {
                 if let featured = SelectFeaturedMatch() {
-                    PrevMatch(game: featured)
+                    MatchOverview(game: featured)
                 } else {
                     HStack {
                         

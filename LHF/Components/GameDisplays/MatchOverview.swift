@@ -8,7 +8,7 @@
 import SwiftUI
 import HockeyKit
 
-struct PrevMatch: View {
+struct MatchOverview: View {
     var game: Game
     
     @State private var homeColor: Color = .black // Default color, updated on appear
@@ -145,5 +145,5 @@ struct PrevMatch: View {
 }
 
 #Preview {
-    PrevMatch(game: Game.fakeData())
+    MatchOverview(game: Game.fakeData())
 }
