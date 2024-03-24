@@ -62,6 +62,7 @@ struct MatchView: View {
             .padding(.horizontal)
             .tag(Tabs.upcoming)
         }
+        .tabViewStyle(.page(indexDisplayMode: .always))
     }
 }
 

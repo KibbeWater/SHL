@@ -28,8 +28,8 @@ struct PrevMatch: View {
     
     init(game: Game) {
         self.game = game
-        self.homeColor = Color(UIImage(named: "Team/\(game.homeTeam.code)")?.dominantColor() ?? UIColor.black)
-        self.awayColor = Color(UIImage(named: "Team/\(game.awayTeam.code)")?.dominantColor() ?? UIColor.black)
+        self.homeColor = Color(UIImage(named: "Team/\(game.homeTeam.code)")?.getColors()?.background ?? UIColor.black)
+        self.awayColor = Color(UIImage(named: "Team/\(game.awayTeam.code)")?.getColors()?.background ?? UIColor.black)
     }
     
     var body: some View {
