@@ -21,6 +21,7 @@ struct ContentView: View {
     @State private var debugOpen: Bool = false
     
     var body: some View {
+        PromotionBanner()
         ScrollView {
             if let featured = SelectFeaturedMatch() {
                 MatchOverview(game: featured)
@@ -247,4 +248,6 @@ extension PageControlView {
 
 #Preview {
     ContentView()
+        .environmentObject(MatchInfo())
+        .environmentObject(LeagueStandings())
 }

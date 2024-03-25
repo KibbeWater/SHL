@@ -29,6 +29,7 @@
 		BC88481E2BB1660700844DBB /* UIImageColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88481D2BB1660700844DBB /* UIImageColors.swift */; };
 		BC8848202BB166FC00844DBB /* StandingsTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88481F2BB166FC00844DBB /* StandingsTable.swift */; };
 		BC8C15112BAC787B0010AB59 /* MatchOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8C15102BAC787B0010AB59 /* MatchOverview.swift */; };
+		BC9490732BB19F63009047E4 /* PromotionBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC9490722BB19F63009047E4 /* PromotionBanner.swift */; };
 		BCAFE2CE2B4095170044225A /* LHFApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CD2B4095170044225A /* LHFApp.swift */; };
 		BCAFE2D02B4095170044225A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CF2B4095170044225A /* ContentView.swift */; };
 		BCAFE2D22B4095180044225A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCAFE2D12B4095180044225A /* Assets.xcassets */; };
@@ -107,6 +108,7 @@
 		BC88481F2BB166FC00844DBB /* StandingsTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingsTable.swift; sourceTree = "<group>"; };
 		BC8848252BB1714800844DBB /* LHF.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LHF.entitlements; sourceTree = "<group>"; };
 		BC8C15102BAC787B0010AB59 /* MatchOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverview.swift; sourceTree = "<group>"; };
+		BC9490722BB19F63009047E4 /* PromotionBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionBanner.swift; sourceTree = "<group>"; };
 		BCAFE2CA2B4095170044225A /* LHF.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LHF.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCAFE2CD2B4095170044225A /* LHFApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHFApp.swift; sourceTree = "<group>"; };
 		BCAFE2CF2B4095170044225A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -205,6 +207,7 @@
 			children = (
 				BC88481A2BB1642E00844DBB /* MatchOverview.swift */,
 				BC88481F2BB166FC00844DBB /* StandingsTable.swift */,
+				BC9490722BB19F63009047E4 /* PromotionBanner.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -456,6 +459,7 @@
 				BC8848082BB15F4E00844DBB /* ContentView.swift in Sources */,
 				BC8848202BB166FC00844DBB /* StandingsTable.swift in Sources */,
 				BC88481E2BB1660700844DBB /* UIImageColors.swift in Sources */,
+				BC9490732BB19F63009047E4 /* PromotionBanner.swift in Sources */,
 				BC8848062BB15F4E00844DBB /* LHF_DemoApp.swift in Sources */,
 				BC88481B2BB1642E00844DBB /* MatchOverview.swift in Sources */,
 			);
