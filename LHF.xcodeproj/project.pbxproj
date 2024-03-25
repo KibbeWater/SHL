@@ -19,6 +19,15 @@
 		BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6212E42BB05B81003CCB45 /* MatchView.swift */; };
 		BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7645B52B46054A0000B7AB /* DebugView.swift */; };
 		BC81B6512B40ACE5007B2E90 /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = BC81B6502B40ACE5007B2E90 /* HockeyKit */; };
+		BC8848062BB15F4E00844DBB /* LHF_DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8848052BB15F4E00844DBB /* LHF_DemoApp.swift */; };
+		BC8848082BB15F4E00844DBB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8848072BB15F4E00844DBB /* ContentView.swift */; };
+		BC88480A2BB15F4F00844DBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC8848092BB15F4F00844DBB /* Assets.xcassets */; };
+		BC88480D2BB15F4F00844DBB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC88480C2BB15F4F00844DBB /* Preview Assets.xcassets */; };
+		BC8848122BB15F4F00844DBB /* LHF Demo.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = BC8848032BB15F4E00844DBB /* LHF Demo.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BC8848182BB1637F00844DBB /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = BC8848172BB1637F00844DBB /* HockeyKit */; };
+		BC88481B2BB1642E00844DBB /* MatchOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88481A2BB1642E00844DBB /* MatchOverview.swift */; };
+		BC88481E2BB1660700844DBB /* UIImageColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88481D2BB1660700844DBB /* UIImageColors.swift */; };
+		BC8848202BB166FC00844DBB /* StandingsTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88481F2BB166FC00844DBB /* StandingsTable.swift */; };
 		BC8C15112BAC787B0010AB59 /* MatchOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8C15102BAC787B0010AB59 /* MatchOverview.swift */; };
 		BCAFE2CE2B4095170044225A /* LHFApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CD2B4095170044225A /* LHFApp.swift */; };
 		BCAFE2D02B4095170044225A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CF2B4095170044225A /* ContentView.swift */; };
@@ -37,6 +46,13 @@
 			remoteGlobalIDString = BC425E422B4706CC00D82CFB;
 			remoteInfo = LHFWidgetExtension;
 		};
+		BC8848102BB15F4F00844DBB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BCAFE2C22B4095170044225A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BC8848022BB15F4E00844DBB;
+			remoteInfo = "LHF Demo";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -49,6 +65,17 @@
 				BC425E562B4706CD00D82CFB /* LHFWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC8848132BB15F4F00844DBB /* Embed App Clips */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
+			dstSubfolderSpec = 16;
+			files = (
+				BC8848122BB15F4F00844DBB /* LHF Demo.app in Embed App Clips */,
+			);
+			name = "Embed App Clips";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -68,6 +95,17 @@
 		BC5B96602B40962700D4E621 /* HockeyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HockeyKit; path = ../HockeyKit; sourceTree = "<group>"; };
 		BC6212E42BB05B81003CCB45 /* MatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchView.swift; sourceTree = "<group>"; };
 		BC7645B52B46054A0000B7AB /* DebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugView.swift; sourceTree = "<group>"; };
+		BC8848032BB15F4E00844DBB /* LHF Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LHF Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC8848052BB15F4E00844DBB /* LHF_DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHF_DemoApp.swift; sourceTree = "<group>"; };
+		BC8848072BB15F4E00844DBB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		BC8848092BB15F4F00844DBB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BC88480C2BB15F4F00844DBB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		BC88480E2BB15F4F00844DBB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BC88480F2BB15F4F00844DBB /* LHF_Demo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LHF_Demo.entitlements; sourceTree = "<group>"; };
+		BC88481A2BB1642E00844DBB /* MatchOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverview.swift; sourceTree = "<group>"; };
+		BC88481D2BB1660700844DBB /* UIImageColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageColors.swift; sourceTree = "<group>"; };
+		BC88481F2BB166FC00844DBB /* StandingsTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingsTable.swift; sourceTree = "<group>"; };
+		BC8848252BB1714800844DBB /* LHF.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LHF.entitlements; sourceTree = "<group>"; };
 		BC8C15102BAC787B0010AB59 /* MatchOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverview.swift; sourceTree = "<group>"; };
 		BCAFE2CA2B4095170044225A /* LHF.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LHF.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCAFE2CD2B4095170044225A /* LHFApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHFApp.swift; sourceTree = "<group>"; };
@@ -86,6 +124,14 @@
 			files = (
 				BC425E472B4706CC00D82CFB /* SwiftUI.framework in Frameworks */,
 				BC425E452B4706CC00D82CFB /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC8848002BB15F4E00844DBB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC8848182BB1637F00844DBB /* HockeyKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,6 +177,46 @@
 			path = LHFWidget;
 			sourceTree = "<group>";
 		};
+		BC8848042BB15F4E00844DBB /* LHF Demo */ = {
+			isa = PBXGroup;
+			children = (
+				BC88481C2BB165F500844DBB /* Extensions */,
+				BC8848192BB163FD00844DBB /* Components */,
+				BC8848052BB15F4E00844DBB /* LHF_DemoApp.swift */,
+				BC8848072BB15F4E00844DBB /* ContentView.swift */,
+				BC8848092BB15F4F00844DBB /* Assets.xcassets */,
+				BC88480E2BB15F4F00844DBB /* Info.plist */,
+				BC88480F2BB15F4F00844DBB /* LHF_Demo.entitlements */,
+				BC88480B2BB15F4F00844DBB /* Preview Content */,
+			);
+			path = "LHF Demo";
+			sourceTree = "<group>";
+		};
+		BC88480B2BB15F4F00844DBB /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				BC88480C2BB15F4F00844DBB /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		BC8848192BB163FD00844DBB /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				BC88481A2BB1642E00844DBB /* MatchOverview.swift */,
+				BC88481F2BB166FC00844DBB /* StandingsTable.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		BC88481C2BB165F500844DBB /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				BC88481D2BB1660700844DBB /* UIImageColors.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		BC8C150F2BAC780F0010AB59 /* GameDisplays */ = {
 			isa = PBXGroup;
 			children = (
@@ -145,6 +231,7 @@
 				BC5B96602B40962700D4E621 /* HockeyKit */,
 				BCAFE2CC2B4095170044225A /* LHF */,
 				BC425E482B4706CC00D82CFB /* LHFWidget */,
+				BC8848042BB15F4E00844DBB /* LHF Demo */,
 				BCAFE2CB2B4095170044225A /* Products */,
 				6BD7AA263289D7097A35F2B2 /* Frameworks */,
 			);
@@ -155,6 +242,7 @@
 			children = (
 				BCAFE2CA2B4095170044225A /* LHF.app */,
 				BC425E432B4706CC00D82CFB /* LHFWidgetExtension.appex */,
+				BC8848032BB15F4E00844DBB /* LHF Demo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -162,6 +250,7 @@
 		BCAFE2CC2B4095170044225A /* LHF */ = {
 			isa = PBXGroup;
 			children = (
+				BC8848252BB1714800844DBB /* LHF.entitlements */,
 				BCD7BC162BAF69E000E208B3 /* Views */,
 				BC374DF82BAD920F00378412 /* Extensions */,
 				BC425E3E2B4702F900D82CFB /* Info.plist */,
@@ -231,6 +320,26 @@
 			productReference = BC425E432B4706CC00D82CFB /* LHFWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		BC8848022BB15F4E00844DBB /* LHF Demo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BC8848162BB15F4F00844DBB /* Build configuration list for PBXNativeTarget "LHF Demo" */;
+			buildPhases = (
+				BC8847FF2BB15F4E00844DBB /* Sources */,
+				BC8848002BB15F4E00844DBB /* Frameworks */,
+				BC8848012BB15F4E00844DBB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "LHF Demo";
+			packageProductDependencies = (
+				BC8848172BB1637F00844DBB /* HockeyKit */,
+			);
+			productName = "LHF Demo";
+			productReference = BC8848032BB15F4E00844DBB /* LHF Demo.app */;
+			productType = "com.apple.product-type.application.on-demand-install-capable";
+		};
 		BCAFE2C92B4095170044225A /* LHF */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BCAFE2D82B4095180044225A /* Build configuration list for PBXNativeTarget "LHF" */;
@@ -239,11 +348,13 @@
 				BCAFE2C72B4095170044225A /* Frameworks */,
 				BCAFE2C82B4095170044225A /* Resources */,
 				BC425E5A2B4706CD00D82CFB /* Embed Foundation Extensions */,
+				BC8848132BB15F4F00844DBB /* Embed App Clips */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				BC425E552B4706CD00D82CFB /* PBXTargetDependency */,
+				BC8848112BB15F4F00844DBB /* PBXTargetDependency */,
 			);
 			name = LHF;
 			packageProductDependencies = (
@@ -260,11 +371,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1510;
+				LastSwiftUpdateCheck = 1520;
 				LastUpgradeCheck = 1510;
 				TargetAttributes = {
 					BC425E422B4706CC00D82CFB = {
 						CreatedOnToolsVersion = 15.1;
+					};
+					BC8848022BB15F4E00844DBB = {
+						CreatedOnToolsVersion = 15.2;
 					};
 					BCAFE2C92B4095170044225A = {
 						CreatedOnToolsVersion = 15.1;
@@ -289,6 +403,7 @@
 			targets = (
 				BCAFE2C92B4095170044225A /* LHF */,
 				BC425E422B4706CC00D82CFB /* LHFWidgetExtension */,
+				BC8848022BB15F4E00844DBB /* LHF Demo */,
 			);
 		};
 /* End PBXProject section */
@@ -299,6 +414,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				BC425E522B4706CD00D82CFB /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC8848012BB15F4E00844DBB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC88480D2BB15F4F00844DBB /* Preview Assets.xcassets in Resources */,
+				BC88480A2BB15F4F00844DBB /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -322,6 +446,18 @@
 				BC425E502B4706CC00D82CFB /* AppIntent.swift in Sources */,
 				BC425E4E2B4706CC00D82CFB /* LHFWidget.swift in Sources */,
 				BC425E4C2B4706CC00D82CFB /* LHFWidgetLiveActivity.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC8847FF2BB15F4E00844DBB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC8848082BB15F4E00844DBB /* ContentView.swift in Sources */,
+				BC8848202BB166FC00844DBB /* StandingsTable.swift in Sources */,
+				BC88481E2BB1660700844DBB /* UIImageColors.swift in Sources */,
+				BC8848062BB15F4E00844DBB /* LHF_DemoApp.swift in Sources */,
+				BC88481B2BB1642E00844DBB /* MatchOverview.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -349,6 +485,11 @@
 			target = BC425E422B4706CC00D82CFB /* LHFWidgetExtension */;
 			targetProxy = BC425E542B4706CD00D82CFB /* PBXContainerItemProxy */;
 		};
+		BC8848112BB15F4F00844DBB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BC8848022BB15F4E00844DBB /* LHF Demo */;
+			targetProxy = BC8848102BB15F4F00844DBB /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -357,6 +498,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = LHFWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 89625ZHN6X;
@@ -384,6 +526,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = LHFWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 89625ZHN6X;
@@ -403,6 +546,74 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BC8848142BB15F4F00844DBB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "LHF Demo/LHF_Demo.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"LHF Demo/Preview Content\"";
+				DEVELOPMENT_TEAM = 89625ZHN6X;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "LHF Demo/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = LHF;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.lhf.Clip;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		BC8848152BB15F4F00844DBB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "LHF Demo/LHF_Demo.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"LHF Demo/Preview Content\"";
+				DEVELOPMENT_TEAM = 89625ZHN6X;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "LHF Demo/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = LHF;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.lhf.Clip;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -531,6 +742,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LHF/LHF.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"LHF/Preview Content\"";
@@ -566,6 +778,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LHF/LHF.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"LHF/Preview Content\"";
@@ -607,6 +820,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		BC8848162BB15F4F00844DBB /* Build configuration list for PBXNativeTarget "LHF Demo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC8848142BB15F4F00844DBB /* Debug */,
+				BC8848152BB15F4F00844DBB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		BCAFE2C52B4095170044225A /* Build configuration list for PBXProject "LHF" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -636,6 +858,10 @@
 
 /* Begin XCSwiftPackageProductDependency section */
 		BC81B6502B40ACE5007B2E90 /* HockeyKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HockeyKit;
+		};
+		BC8848172BB1637F00844DBB /* HockeyKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HockeyKit;
 		};
