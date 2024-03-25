@@ -27,6 +27,15 @@ struct LHFWidgetAttributes: ActivityAttributes {
     var name: String
 }
 
+extension AnyTransition {
+    static var moveDown: AnyTransition {
+        .asymmetric(
+            insertion: .move(edge: .top),
+            removal: .move(edge: .bottom)
+        )
+    }
+}
+
 struct LHFWidgetLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: LHFWidgetAttributes.self) { context in
@@ -34,7 +43,7 @@ struct LHFWidgetLiveActivity: Widget {
             HStack {
                 Text("Hello \(String(context.state.homeTeam.score))")
             }
-            .activityBackgroundTint(Color.cyan)
+            .activityBackgroundTint(Color.clear)
             .activitySystemActionForegroundColor(Color.black)
 
         } dynamicIsland: { context in
@@ -42,21 +51,79 @@ struct LHFWidgetLiveActivity: Widget {
                 // Expanded UI goes here.  Compose the expanded UI through
                 // various regions, like leading/trailing/center/bottom
                 DynamicIslandExpandedRegion(.leading) {
-                    Image("Leagues/LHF")
-                        .renderingMode(.original)
-                        .resizable().frame(width: 500, height: 500)
+                    HStack {
+                        VStack {
+                            Spacer()
+                            Image("Team/\(context.state.homeTeam.teamCode)")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 52, height: 52)
+                            Spacer()
+                        }
+                        Spacer()
+                        Text(String(context.state.homeTeam.score))
+                            .font(.system(size: 48))
+                            .fontWidth(.compressed)
+                            .fontWeight(.bold)
+                            .foregroundStyle(context.state.homeTeam.score >= context.state.awayTeam.score ? .primary : .secondary)
+                    }
+                    .frame(width: 96)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text("Trailing")
+                    HStack {
+                        Text(String(context.state.awayTeam.score))
+                            .font(.system(size: 48))
+                            .fontWidth(.compressed)
+                            .fontWeight(.bold)
+                            .transition(.moveDown)
+                            .foregroundStyle(context.state.awayTeam.score >= context.state.homeTeam.score ? .primary : .secondary)
+                        Spacer()
+                        VStack {
+                            Spacer()
+                            Image("Team/\(context.state.awayTeam.teamCode)")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 52, height: 52)
+                            Spacer()
+                        }
+                    }
+                    .frame(width: 96)
                 }
-                DynamicIslandExpandedRegion(.bottom) {
-                    Text("Bottom \(String(context.state.homeTeam.score))")
-                    // more content
+                DynamicIslandExpandedRegion(.center) {
+                    HStack {
+                        Text(Date(), style: .timer)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .multilineTextAlignment(.center)
+                            .font(.title)
+                    }
+                    Label("P1", systemImage: "clock")
+                        .foregroundColor(.secondary)
+                        .font(.subheadline)
                 }
             } compactLeading: {
-                Text("L")
+                HStack {
+                    Image("Team/\(context.state.homeTeam.teamCode)")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 24, height: 24)
+                    Text(String(context.state.homeTeam.score))
+                        .fontWeight(.semibold)
+                        .fontWidth(.compressed)
+                        .font(.system(size: 22))
+                        .foregroundStyle(context.state.homeTeam.score >= context.state.awayTeam.score ? .primary : .secondary)
+                }
             } compactTrailing: {
-                Text("T \(String(context.state.homeTeam.score))")
+                HStack {
+                    Text(String(context.state.awayTeam.score))
+                        .fontWeight(.semibold)
+                        .fontWidth(.compressed)
+                        .font(.system(size: 22))
+                        .foregroundStyle(context.state.awayTeam.score >= context.state.homeTeam.score ? .primary : .secondary)
+                    Image("Team/\(context.state.awayTeam.teamCode)")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 24, height: 24)
+                }
             } minimal: {
                 if context.state.homeTeam.score > context.state.awayTeam.score {
                     Text("B")
