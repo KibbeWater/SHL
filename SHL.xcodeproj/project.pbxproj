@@ -232,12 +232,12 @@
 		BCAFE2C12B4095170044225A = {
 			isa = PBXGroup;
 			children = (
-				BC9490742BB1AAF6009047E4 /* SHLWidgetExtension.entitlements */,
 				BC5B96602B40962700D4E621 /* HockeyKit */,
 				BCAFE2CC2B4095170044225A /* SHL */,
 				BC425E482B4706CC00D82CFB /* SHLWidget */,
 				BC8848042BB15F4E00844DBB /* SHL Demo */,
 				BCAFE2CB2B4095170044225A /* Products */,
+				BC9490742BB1AAF6009047E4 /* SHLWidgetExtension.entitlements */,
 				6BD7AA263289D7097A35F2B2 /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -508,7 +508,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 89625ZHN6X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SHLWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SHLWidget;
@@ -538,7 +538,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 89625ZHN6X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SHLWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SHLWidget;
