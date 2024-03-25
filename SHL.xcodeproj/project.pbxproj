@@ -10,12 +10,12 @@
 		BC374DFA2BAD922000378412 /* UIImageExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC374DF92BAD922000378412 /* UIImageExt.swift */; };
 		BC425E452B4706CC00D82CFB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC425E442B4706CC00D82CFB /* WidgetKit.framework */; };
 		BC425E472B4706CC00D82CFB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC425E462B4706CC00D82CFB /* SwiftUI.framework */; };
-		BC425E4A2B4706CC00D82CFB /* LHFWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E492B4706CC00D82CFB /* LHFWidgetBundle.swift */; };
-		BC425E4C2B4706CC00D82CFB /* LHFWidgetLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4B2B4706CC00D82CFB /* LHFWidgetLiveActivity.swift */; };
-		BC425E4E2B4706CC00D82CFB /* LHFWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4D2B4706CC00D82CFB /* LHFWidget.swift */; };
+		BC425E4A2B4706CC00D82CFB /* SHLWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E492B4706CC00D82CFB /* SHLWidgetBundle.swift */; };
+		BC425E4C2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4B2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift */; };
+		BC425E4E2B4706CC00D82CFB /* SHLWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4D2B4706CC00D82CFB /* SHLWidget.swift */; };
 		BC425E502B4706CC00D82CFB /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4F2B4706CC00D82CFB /* AppIntent.swift */; };
 		BC425E522B4706CD00D82CFB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC425E512B4706CD00D82CFB /* Assets.xcassets */; };
-		BC425E562B4706CD00D82CFB /* LHFWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC425E432B4706CC00D82CFB /* LHFWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BC425E562B4706CD00D82CFB /* SHLWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC425E432B4706CC00D82CFB /* SHLWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6212E42BB05B81003CCB45 /* MatchView.swift */; };
 		BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7645B52B46054A0000B7AB /* DebugView.swift */; };
 		BC81B6512B40ACE5007B2E90 /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = BC81B6502B40ACE5007B2E90 /* HockeyKit */; };
@@ -23,14 +23,14 @@
 		BC8848082BB15F4E00844DBB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8848072BB15F4E00844DBB /* ContentView.swift */; };
 		BC88480A2BB15F4F00844DBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC8848092BB15F4F00844DBB /* Assets.xcassets */; };
 		BC88480D2BB15F4F00844DBB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC88480C2BB15F4F00844DBB /* Preview Assets.xcassets */; };
-		BC8848122BB15F4F00844DBB /* LHF Demo.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = BC8848032BB15F4E00844DBB /* LHF Demo.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BC8848122BB15F4F00844DBB /* SHL Demo.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = BC8848032BB15F4E00844DBB /* SHL Demo.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BC8848182BB1637F00844DBB /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = BC8848172BB1637F00844DBB /* HockeyKit */; };
 		BC88481B2BB1642E00844DBB /* MatchOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88481A2BB1642E00844DBB /* MatchOverview.swift */; };
 		BC88481E2BB1660700844DBB /* UIImageColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88481D2BB1660700844DBB /* UIImageColors.swift */; };
 		BC8848202BB166FC00844DBB /* StandingsTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88481F2BB166FC00844DBB /* StandingsTable.swift */; };
 		BC8C15112BAC787B0010AB59 /* MatchOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8C15102BAC787B0010AB59 /* MatchOverview.swift */; };
 		BC9490732BB19F63009047E4 /* PromotionBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC9490722BB19F63009047E4 /* PromotionBanner.swift */; };
-		BCAFE2CE2B4095170044225A /* LHFApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CD2B4095170044225A /* LHFApp.swift */; };
+		BCAFE2CE2B4095170044225A /* SHLApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CD2B4095170044225A /* SHLApp.swift */; };
 		BCAFE2D02B4095170044225A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CF2B4095170044225A /* ContentView.swift */; };
 		BCAFE2D22B4095180044225A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCAFE2D12B4095180044225A /* Assets.xcassets */; };
 		BCAFE2D52B4095180044225A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCAFE2D42B4095180044225A /* Preview Assets.xcassets */; };
@@ -63,7 +63,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				BC425E562B4706CD00D82CFB /* LHFWidgetExtension.appex in Embed Foundation Extensions */,
+				BC425E562B4706CD00D82CFB /* SHLWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -74,7 +74,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
 			dstSubfolderSpec = 16;
 			files = (
-				BC8848122BB15F4F00844DBB /* LHF Demo.app in Embed App Clips */,
+				BC8848122BB15F4F00844DBB /* SHL Demo.app in Embed App Clips */,
 			);
 			name = "Embed App Clips";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -84,33 +84,34 @@
 /* Begin PBXFileReference section */
 		BC374DF92BAD922000378412 /* UIImageExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExt.swift; sourceTree = "<group>"; };
 		BC425E3E2B4702F900D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		BC425E432B4706CC00D82CFB /* LHFWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LHFWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC425E432B4706CC00D82CFB /* SHLWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SHLWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC425E442B4706CC00D82CFB /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		BC425E462B4706CC00D82CFB /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		BC425E492B4706CC00D82CFB /* LHFWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHFWidgetBundle.swift; sourceTree = "<group>"; };
-		BC425E4B2B4706CC00D82CFB /* LHFWidgetLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHFWidgetLiveActivity.swift; sourceTree = "<group>"; };
-		BC425E4D2B4706CC00D82CFB /* LHFWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHFWidget.swift; sourceTree = "<group>"; };
+		BC425E492B4706CC00D82CFB /* SHLWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetBundle.swift; sourceTree = "<group>"; };
+		BC425E4B2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetLiveActivity.swift; sourceTree = "<group>"; };
+		BC425E4D2B4706CC00D82CFB /* SHLWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidget.swift; sourceTree = "<group>"; };
 		BC425E4F2B4706CC00D82CFB /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
 		BC425E512B4706CD00D82CFB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BC425E532B4706CD00D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BC5B96602B40962700D4E621 /* HockeyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HockeyKit; path = ../HockeyKit; sourceTree = "<group>"; };
 		BC6212E42BB05B81003CCB45 /* MatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchView.swift; sourceTree = "<group>"; };
 		BC7645B52B46054A0000B7AB /* DebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugView.swift; sourceTree = "<group>"; };
-		BC8848032BB15F4E00844DBB /* LHF Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LHF Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC8848032BB15F4E00844DBB /* SHL Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SHL Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC8848052BB15F4E00844DBB /* LHF_DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHF_DemoApp.swift; sourceTree = "<group>"; };
 		BC8848072BB15F4E00844DBB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BC8848092BB15F4F00844DBB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BC88480C2BB15F4F00844DBB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		BC88480E2BB15F4F00844DBB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		BC88480F2BB15F4F00844DBB /* LHF_Demo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LHF_Demo.entitlements; sourceTree = "<group>"; };
+		BC88480F2BB15F4F00844DBB /* SHL_Demo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SHL_Demo.entitlements; sourceTree = "<group>"; };
 		BC88481A2BB1642E00844DBB /* MatchOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverview.swift; sourceTree = "<group>"; };
 		BC88481D2BB1660700844DBB /* UIImageColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageColors.swift; sourceTree = "<group>"; };
 		BC88481F2BB166FC00844DBB /* StandingsTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingsTable.swift; sourceTree = "<group>"; };
-		BC8848252BB1714800844DBB /* LHF.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LHF.entitlements; sourceTree = "<group>"; };
+		BC8848252BB1714800844DBB /* SHL.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SHL.entitlements; sourceTree = "<group>"; };
 		BC8C15102BAC787B0010AB59 /* MatchOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverview.swift; sourceTree = "<group>"; };
 		BC9490722BB19F63009047E4 /* PromotionBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionBanner.swift; sourceTree = "<group>"; };
-		BCAFE2CA2B4095170044225A /* LHF.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LHF.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		BCAFE2CD2B4095170044225A /* LHFApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHFApp.swift; sourceTree = "<group>"; };
+		BC9490742BB1AAF6009047E4 /* SHLWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SHLWidgetExtension.entitlements; sourceTree = "<group>"; };
+		BCAFE2CA2B4095170044225A /* SHL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SHL.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BCAFE2CD2B4095170044225A /* SHLApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLApp.swift; sourceTree = "<group>"; };
 		BCAFE2CF2B4095170044225A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BCAFE2D12B4095180044225A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BCAFE2D42B4095180044225A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -165,21 +166,21 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
-		BC425E482B4706CC00D82CFB /* LHFWidget */ = {
+		BC425E482B4706CC00D82CFB /* SHLWidget */ = {
 			isa = PBXGroup;
 			children = (
 				BCEDF4132B471A01002C0DB4 /* Components */,
-				BC425E492B4706CC00D82CFB /* LHFWidgetBundle.swift */,
-				BC425E4B2B4706CC00D82CFB /* LHFWidgetLiveActivity.swift */,
-				BC425E4D2B4706CC00D82CFB /* LHFWidget.swift */,
+				BC425E492B4706CC00D82CFB /* SHLWidgetBundle.swift */,
+				BC425E4B2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift */,
+				BC425E4D2B4706CC00D82CFB /* SHLWidget.swift */,
 				BC425E4F2B4706CC00D82CFB /* AppIntent.swift */,
 				BC425E512B4706CD00D82CFB /* Assets.xcassets */,
 				BC425E532B4706CD00D82CFB /* Info.plist */,
 			);
-			path = LHFWidget;
+			path = SHLWidget;
 			sourceTree = "<group>";
 		};
-		BC8848042BB15F4E00844DBB /* LHF Demo */ = {
+		BC8848042BB15F4E00844DBB /* SHL Demo */ = {
 			isa = PBXGroup;
 			children = (
 				BC88481C2BB165F500844DBB /* Extensions */,
@@ -188,10 +189,10 @@
 				BC8848072BB15F4E00844DBB /* ContentView.swift */,
 				BC8848092BB15F4F00844DBB /* Assets.xcassets */,
 				BC88480E2BB15F4F00844DBB /* Info.plist */,
-				BC88480F2BB15F4F00844DBB /* LHF_Demo.entitlements */,
+				BC88480F2BB15F4F00844DBB /* SHL_Demo.entitlements */,
 				BC88480B2BB15F4F00844DBB /* Preview Content */,
 			);
-			path = "LHF Demo";
+			path = "SHL Demo";
 			sourceTree = "<group>";
 		};
 		BC88480B2BB15F4F00844DBB /* Preview Content */ = {
@@ -231,10 +232,11 @@
 		BCAFE2C12B4095170044225A = {
 			isa = PBXGroup;
 			children = (
+				BC9490742BB1AAF6009047E4 /* SHLWidgetExtension.entitlements */,
 				BC5B96602B40962700D4E621 /* HockeyKit */,
-				BCAFE2CC2B4095170044225A /* LHF */,
-				BC425E482B4706CC00D82CFB /* LHFWidget */,
-				BC8848042BB15F4E00844DBB /* LHF Demo */,
+				BCAFE2CC2B4095170044225A /* SHL */,
+				BC425E482B4706CC00D82CFB /* SHLWidget */,
+				BC8848042BB15F4E00844DBB /* SHL Demo */,
 				BCAFE2CB2B4095170044225A /* Products */,
 				6BD7AA263289D7097A35F2B2 /* Frameworks */,
 			);
@@ -243,27 +245,27 @@
 		BCAFE2CB2B4095170044225A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BCAFE2CA2B4095170044225A /* LHF.app */,
-				BC425E432B4706CC00D82CFB /* LHFWidgetExtension.appex */,
-				BC8848032BB15F4E00844DBB /* LHF Demo.app */,
+				BCAFE2CA2B4095170044225A /* SHL.app */,
+				BC425E432B4706CC00D82CFB /* SHLWidgetExtension.appex */,
+				BC8848032BB15F4E00844DBB /* SHL Demo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		BCAFE2CC2B4095170044225A /* LHF */ = {
+		BCAFE2CC2B4095170044225A /* SHL */ = {
 			isa = PBXGroup;
 			children = (
-				BC8848252BB1714800844DBB /* LHF.entitlements */,
+				BC8848252BB1714800844DBB /* SHL.entitlements */,
 				BCD7BC162BAF69E000E208B3 /* Views */,
 				BC374DF82BAD920F00378412 /* Extensions */,
 				BC425E3E2B4702F900D82CFB /* Info.plist */,
 				BCF54B572B40E44200960F47 /* Components */,
-				BCAFE2CD2B4095170044225A /* LHFApp.swift */,
+				BCAFE2CD2B4095170044225A /* SHLApp.swift */,
 				BCD7BC142BAF69D500E208B3 /* Root.swift */,
 				BCAFE2D12B4095180044225A /* Assets.xcassets */,
 				BCAFE2D32B4095180044225A /* Preview Content */,
 			);
-			path = LHF;
+			path = SHL;
 			sourceTree = "<group>";
 		};
 		BCAFE2D32B4095180044225A /* Preview Content */ = {
@@ -304,9 +306,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		BC425E422B4706CC00D82CFB /* LHFWidgetExtension */ = {
+		BC425E422B4706CC00D82CFB /* SHLWidgetExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BC425E572B4706CD00D82CFB /* Build configuration list for PBXNativeTarget "LHFWidgetExtension" */;
+			buildConfigurationList = BC425E572B4706CD00D82CFB /* Build configuration list for PBXNativeTarget "SHLWidgetExtension" */;
 			buildPhases = (
 				BC425E3F2B4706CC00D82CFB /* Sources */,
 				BC425E402B4706CC00D82CFB /* Frameworks */,
@@ -316,16 +318,16 @@
 			);
 			dependencies = (
 			);
-			name = LHFWidgetExtension;
+			name = SHLWidgetExtension;
 			packageProductDependencies = (
 			);
 			productName = LHFWidgetExtension;
-			productReference = BC425E432B4706CC00D82CFB /* LHFWidgetExtension.appex */;
+			productReference = BC425E432B4706CC00D82CFB /* SHLWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		BC8848022BB15F4E00844DBB /* LHF Demo */ = {
+		BC8848022BB15F4E00844DBB /* SHL Demo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BC8848162BB15F4F00844DBB /* Build configuration list for PBXNativeTarget "LHF Demo" */;
+			buildConfigurationList = BC8848162BB15F4F00844DBB /* Build configuration list for PBXNativeTarget "SHL Demo" */;
 			buildPhases = (
 				BC8847FF2BB15F4E00844DBB /* Sources */,
 				BC8848002BB15F4E00844DBB /* Frameworks */,
@@ -335,17 +337,17 @@
 			);
 			dependencies = (
 			);
-			name = "LHF Demo";
+			name = "SHL Demo";
 			packageProductDependencies = (
 				BC8848172BB1637F00844DBB /* HockeyKit */,
 			);
 			productName = "LHF Demo";
-			productReference = BC8848032BB15F4E00844DBB /* LHF Demo.app */;
+			productReference = BC8848032BB15F4E00844DBB /* SHL Demo.app */;
 			productType = "com.apple.product-type.application.on-demand-install-capable";
 		};
-		BCAFE2C92B4095170044225A /* LHF */ = {
+		BCAFE2C92B4095170044225A /* SHL */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BCAFE2D82B4095180044225A /* Build configuration list for PBXNativeTarget "LHF" */;
+			buildConfigurationList = BCAFE2D82B4095180044225A /* Build configuration list for PBXNativeTarget "SHL" */;
 			buildPhases = (
 				BCAFE2C62B4095170044225A /* Sources */,
 				BCAFE2C72B4095170044225A /* Frameworks */,
@@ -359,12 +361,12 @@
 				BC425E552B4706CD00D82CFB /* PBXTargetDependency */,
 				BC8848112BB15F4F00844DBB /* PBXTargetDependency */,
 			);
-			name = LHF;
+			name = SHL;
 			packageProductDependencies = (
 				BC81B6502B40ACE5007B2E90 /* HockeyKit */,
 			);
 			productName = LHF;
-			productReference = BCAFE2CA2B4095170044225A /* LHF.app */;
+			productReference = BCAFE2CA2B4095170044225A /* SHL.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -388,7 +390,7 @@
 					};
 				};
 			};
-			buildConfigurationList = BCAFE2C52B4095170044225A /* Build configuration list for PBXProject "LHF" */;
+			buildConfigurationList = BCAFE2C52B4095170044225A /* Build configuration list for PBXProject "SHL" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -404,9 +406,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				BCAFE2C92B4095170044225A /* LHF */,
-				BC425E422B4706CC00D82CFB /* LHFWidgetExtension */,
-				BC8848022BB15F4E00844DBB /* LHF Demo */,
+				BCAFE2C92B4095170044225A /* SHL */,
+				BC425E422B4706CC00D82CFB /* SHLWidgetExtension */,
+				BC8848022BB15F4E00844DBB /* SHL Demo */,
 			);
 		};
 /* End PBXProject section */
@@ -445,10 +447,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BC425E4A2B4706CC00D82CFB /* LHFWidgetBundle.swift in Sources */,
+				BC425E4A2B4706CC00D82CFB /* SHLWidgetBundle.swift in Sources */,
 				BC425E502B4706CC00D82CFB /* AppIntent.swift in Sources */,
-				BC425E4E2B4706CC00D82CFB /* LHFWidget.swift in Sources */,
-				BC425E4C2B4706CC00D82CFB /* LHFWidgetLiveActivity.swift in Sources */,
+				BC425E4E2B4706CC00D82CFB /* SHLWidget.swift in Sources */,
+				BC425E4C2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -474,7 +476,7 @@
 				BCD7BC182BAF6B9800E208B3 /* MatchListView.swift in Sources */,
 				BCD7BC152BAF69D500E208B3 /* Root.swift in Sources */,
 				BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */,
-				BCAFE2CE2B4095170044225A /* LHFApp.swift in Sources */,
+				BCAFE2CE2B4095170044225A /* SHLApp.swift in Sources */,
 				BCFA44AB2B44C06700B4358C /* StandingsTable.swift in Sources */,
 				BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */,
 				BC374DFA2BAD922000378412 /* UIImageExt.swift in Sources */,
@@ -486,12 +488,12 @@
 /* Begin PBXTargetDependency section */
 		BC425E552B4706CD00D82CFB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = BC425E422B4706CC00D82CFB /* LHFWidgetExtension */;
+			target = BC425E422B4706CC00D82CFB /* SHLWidgetExtension */;
 			targetProxy = BC425E542B4706CD00D82CFB /* PBXContainerItemProxy */;
 		};
 		BC8848112BB15F4F00844DBB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = BC8848022BB15F4E00844DBB /* LHF Demo */;
+			target = BC8848022BB15F4E00844DBB /* SHL Demo */;
 			targetProxy = BC8848102BB15F4F00844DBB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -502,13 +504,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_ENTITLEMENTS = LHFWidgetExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = SHLWidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 89625ZHN6X;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = LHFWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = LHFWidget;
+				INFOPLIST_FILE = SHLWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = SHLWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -516,8 +519,9 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.lhf.LHFWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.SHLWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -530,13 +534,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_ENTITLEMENTS = LHFWidgetExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = SHLWidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 89625ZHN6X;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = LHFWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = LHFWidget;
+				INFOPLIST_FILE = SHLWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = SHLWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -544,8 +549,9 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.lhf.LHFWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.SHLWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -558,15 +564,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "LHF Demo/LHF_Demo.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "SHL Demo/SHL_Demo.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"LHF Demo/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"SHL Demo/Preview Content\"";
 				DEVELOPMENT_TEAM = 89625ZHN6X;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "LHF Demo/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = LHF;
+				INFOPLIST_FILE = "SHL Demo/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = SHL;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -577,7 +583,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.lhf.Clip;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.Clip;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -592,15 +598,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "LHF Demo/LHF_Demo.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "SHL Demo/SHL_Demo.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"LHF Demo/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"SHL Demo/Preview Content\"";
 				DEVELOPMENT_TEAM = 89625ZHN6X;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "LHF Demo/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = LHF;
+				INFOPLIST_FILE = "SHL Demo/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = SHL;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -611,7 +617,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.lhf.Clip;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.Clip;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -746,15 +752,15 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LHF/LHF.entitlements;
+				CODE_SIGN_ENTITLEMENTS = SHL/SHL.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"LHF/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"SHL/Preview Content\"";
 				DEVELOPMENT_TEAM = 89625ZHN6X;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = LHF/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Luleå Hockey";
+				INFOPLIST_FILE = SHL/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = SHL;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -766,7 +772,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.lhf;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -782,15 +788,15 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LHF/LHF.entitlements;
+				CODE_SIGN_ENTITLEMENTS = SHL/SHL.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"LHF/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"SHL/Preview Content\"";
 				DEVELOPMENT_TEAM = 89625ZHN6X;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = LHF/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Luleå Hockey";
+				INFOPLIST_FILE = SHL/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = SHL;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -802,7 +808,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.lhf;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -815,7 +821,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		BC425E572B4706CD00D82CFB /* Build configuration list for PBXNativeTarget "LHFWidgetExtension" */ = {
+		BC425E572B4706CD00D82CFB /* Build configuration list for PBXNativeTarget "SHLWidgetExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BC425E582B4706CD00D82CFB /* Debug */,
@@ -824,7 +830,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BC8848162BB15F4F00844DBB /* Build configuration list for PBXNativeTarget "LHF Demo" */ = {
+		BC8848162BB15F4F00844DBB /* Build configuration list for PBXNativeTarget "SHL Demo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BC8848142BB15F4F00844DBB /* Debug */,
@@ -833,7 +839,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BCAFE2C52B4095170044225A /* Build configuration list for PBXProject "LHF" */ = {
+		BCAFE2C52B4095170044225A /* Build configuration list for PBXProject "SHL" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BCAFE2D62B4095180044225A /* Debug */,
@@ -842,7 +848,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BCAFE2D82B4095180044225A /* Build configuration list for PBXNativeTarget "LHF" */ = {
+		BCAFE2D82B4095180044225A /* Build configuration list for PBXNativeTarget "SHL" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BCAFE2D92B4095180044225A /* Debug */,
