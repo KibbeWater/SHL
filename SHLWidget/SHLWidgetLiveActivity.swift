@@ -45,7 +45,7 @@ struct SHLWidgetLiveActivity: Widget {
                 
                 VStack {
                     HStack {
-                        Text(context.state.period.periodEnd, style: .timer)
+                        Text(ISODateToStr(dateString: context.state.period.periodEnd), style: .timer)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .multilineTextAlignment(.center)
                             .font(.largeTitle)
@@ -130,7 +130,7 @@ struct SHLWidgetLiveActivity: Widget {
                 }
                 DynamicIslandExpandedRegion(.center) {
                     HStack {
-                        Text(context.state.period.periodEnd, style: .timer)
+                        Text(ISODateToStr(dateString: context.state.period.periodEnd), style: .timer)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .multilineTextAlignment(.center)
                             .font(.title)
@@ -184,6 +184,13 @@ struct SHLWidgetLiveActivity: Widget {
             .keylineTint(Color.red)
         }
     }
+    
+    func ISODateToStr(dateString: String) -> Date {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        return formatter.date(from: dateString) ?? Date()
+    }
 }
 
 extension SHLWidgetAttributes {
@@ -195,23 +202,23 @@ extension SHLWidgetAttributes {
 #Preview("Notification", as: .content, using: SHLWidgetAttributes.preview) {
    SHLWidgetLiveActivity()
 } contentStates: {
-    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)!))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format() ?? "2024-03-27T19:55:54.364Z"))
 }
 
 #Preview("Minimal", as: .dynamicIsland(.minimal), using: SHLWidgetAttributes.preview) {
    SHLWidgetLiveActivity()
 } contentStates: {
-    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)!))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format() ?? "2024-03-27T19:55:54.364Z"))
 }
 
 #Preview("Compact", as: .dynamicIsland(.compact), using: SHLWidgetAttributes.preview) {
    SHLWidgetLiveActivity()
 } contentStates: {
-    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)!))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format() ?? "2024-03-27T19:55:54.364Z"))
 }
 
 #Preview("Expanded", as: .dynamicIsland(.expanded), using: SHLWidgetAttributes.preview) {
    SHLWidgetLiveActivity()
 } contentStates: {
-    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)!))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format() ?? "2024-03-27T19:55:54.364Z"))
 }
