@@ -8,30 +8,7 @@
 import ActivityKit
 import WidgetKit
 import SwiftUI
-
-struct LHFWidgetAttributes: ActivityAttributes {
-    public struct ContentState: Codable, Hashable {
-        // Dynamic stateful properties about your activity go here!
-        public var homeTeam: ActivityTeam
-        public var awayTeam: ActivityTeam
-        public var period: ActivityPeriod
-        
-        public struct ActivityTeam: Codable, Hashable {
-            public var score: Int
-            public var name: String
-            public var teamCode: String
-            public var icon: URL
-        }
-        
-        public struct ActivityPeriod: Codable, Hashable {
-            public var period: Int
-            public var periodEnd: Date
-        }
-    }
-
-    // Fixed non-changing properties about your activity go here!
-    var name: String
-}
+import HockeyKit
 
 extension AnyTransition {
     static var moveDown: AnyTransition {
@@ -42,25 +19,25 @@ extension AnyTransition {
     }
 }
 
-struct LHFWidgetLiveActivity: Widget {
+struct SHLWidgetLiveActivity: Widget {
     var body: some WidgetConfiguration {
-        ActivityConfiguration(for: LHFWidgetAttributes.self) { context in
+        ActivityConfiguration(for: SHLWidgetAttributes.self) { context in
             HStack {
                 HStack {
                     VStack {
                         Spacer()
-                        Image("Team/\(context.state.homeTeam.teamCode)")
+                        Image("Team/\(context.homeTeam.teamCode)")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 52, height: 52)
                         Spacer()
                     }
                     Spacer()
-                    Text(String(context.state.homeTeam.score))
+                    Text(String(context.state.homeScore))
                         .font(.system(size: 48))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
-                        .foregroundStyle(context.state.homeTeam.score >= context.state.awayTeam.score ? .primary : .secondary)
+                        .foregroundStyle(context.state.homeScore >= context.state.awayScore ? .primary : .secondary)
                 }
                 .frame(width: 96)
                 
@@ -85,16 +62,16 @@ struct LHFWidgetLiveActivity: Widget {
                 Spacer()
                 
                 HStack {
-                    Text(String(context.state.awayTeam.score))
+                    Text(String(context.state.awayScore))
                         .font(.system(size: 48))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
                         .transition(.moveDown)
-                        .foregroundStyle(context.state.awayTeam.score >= context.state.homeTeam.score ? .primary : .secondary)
+                        .foregroundStyle(context.state.awayScore >= context.state.homeScore ? .primary : .secondary)
                     Spacer()
                     VStack {
                         Spacer()
-                        Image("Team/\(context.state.awayTeam.teamCode)")
+                        Image("Team/\(context.awayTeam.teamCode)")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 52, height: 52)
@@ -116,33 +93,33 @@ struct LHFWidgetLiveActivity: Widget {
                     HStack {
                         VStack {
                             Spacer()
-                            Image("Team/\(context.state.homeTeam.teamCode)")
+                            Image("Team/\(context.homeTeam.teamCode)")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 52, height: 52)
                             Spacer()
                         }
                         Spacer()
-                        Text(String(context.state.homeTeam.score))
+                        Text(String(context.state.homeScore))
                             .font(.system(size: 48))
                             .fontWidth(.compressed)
                             .fontWeight(.bold)
-                            .foregroundStyle(context.state.homeTeam.score >= context.state.awayTeam.score ? .primary : .secondary)
+                            .foregroundStyle(context.state.homeScore >= context.state.awayScore ? .primary : .secondary)
                     }
                     .frame(width: 96)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     HStack {
-                        Text(String(context.state.awayTeam.score))
+                        Text(String(context.state.awayScore))
                             .font(.system(size: 48))
                             .fontWidth(.compressed)
                             .fontWeight(.bold)
                             .transition(.moveDown)
-                            .foregroundStyle(context.state.awayTeam.score >= context.state.homeTeam.score ? .primary : .secondary)
+                            .foregroundStyle(context.state.awayScore >= context.state.homeScore ? .primary : .secondary)
                         Spacer()
                         VStack {
                             Spacer()
-                            Image("Team/\(context.state.awayTeam.teamCode)")
+                            Image("Team/\(context.awayTeam.teamCode)")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 52, height: 52)
@@ -165,36 +142,36 @@ struct LHFWidgetLiveActivity: Widget {
                 }
             } compactLeading: {
                 HStack {
-                    Image("Team/\(context.state.homeTeam.teamCode)")
+                    Image("Team/\(context.homeTeam.teamCode)")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 24, height: 24)
-                    Text(String(context.state.homeTeam.score))
+                    Text(String(context.state.homeScore))
                         .fontWeight(.semibold)
                         .fontWidth(.compressed)
                         .font(.system(size: 22))
-                        .foregroundStyle(context.state.homeTeam.score >= context.state.awayTeam.score ? .primary : .secondary)
+                        .foregroundStyle(context.state.homeScore >= context.state.awayScore ? .primary : .secondary)
                 }
             } compactTrailing: {
                 HStack {
-                    Text(String(context.state.awayTeam.score))
+                    Text(String(context.state.awayScore))
                         .fontWeight(.semibold)
                         .fontWidth(.compressed)
                         .font(.system(size: 22))
-                        .foregroundStyle(context.state.awayTeam.score >= context.state.homeTeam.score ? .primary : .secondary)
-                    Image("Team/\(context.state.awayTeam.teamCode)")
+                        .foregroundStyle(context.state.awayScore >= context.state.homeScore ? .primary : .secondary)
+                    Image("Team/\(context.awayTeam.teamCode)")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 24, height: 24)
                 }
             } minimal: {
-                if context.state.homeTeam.score > context.state.awayTeam.score {
-                    Image("Team/\(context.state.homeTeam.teamCode)")
+                if context.state.homeScore > context.state.awayScore {
+                    Image("Team/\(context.homeTeam.teamCode)")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 24, height: 24)
-                } else if context.state.homeTeam.score < context.state.awayTeam.score {
-                    Image("Team/\(context.state.awayTeam.teamCode)")
+                } else if context.state.homeScore < context.state.awayScore {
+                    Image("Team/\(context.awayTeam.teamCode)")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 24, height: 24)
@@ -209,32 +186,32 @@ struct LHFWidgetLiveActivity: Widget {
     }
 }
 
-extension LHFWidgetAttributes {
-    fileprivate static var preview: LHFWidgetAttributes {
-        LHFWidgetAttributes(name: "World")
+extension SHLWidgetAttributes {
+    fileprivate static var preview: SHLWidgetAttributes {
+        SHLWidgetAttributes(homeTeam: ActivityTeam(name: "Luleå Hockey", teamCode: "LHF"), awayTeam: ActivityTeam(name: "MODO Hockey", teamCode: "MODO"))
     }
 }
 
-#Preview("Notification", as: .content, using: LHFWidgetAttributes.preview) {
-   LHFWidgetLiveActivity()
+#Preview("Notification", as: .content, using: SHLWidgetAttributes.preview) {
+   SHLWidgetLiveActivity()
 } contentStates: {
-    LHFWidgetAttributes.ContentState(homeTeam: LHFWidgetAttributes.ContentState.ActivityTeam(score: 5, name: "Luleå Hockey", teamCode: "LHF", icon: URL(string: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg")!), awayTeam: LHFWidgetAttributes.ContentState.ActivityTeam(score: 3, name: "MoDo Hockey", teamCode: "MODO", icon: URL(string: "https://sportality.cdn.s8y.se/team-logos/modo1_modo.svg")!), period: LHFWidgetAttributes.ContentState.ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)!))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)!))
 }
 
-#Preview("Minimal", as: .dynamicIsland(.minimal), using: LHFWidgetAttributes.preview) {
-   LHFWidgetLiveActivity()
+#Preview("Minimal", as: .dynamicIsland(.minimal), using: SHLWidgetAttributes.preview) {
+   SHLWidgetLiveActivity()
 } contentStates: {
-    LHFWidgetAttributes.ContentState(homeTeam: LHFWidgetAttributes.ContentState.ActivityTeam(score: 5, name: "Luleå Hockey", teamCode: "LHF", icon: URL(string: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg")!), awayTeam: LHFWidgetAttributes.ContentState.ActivityTeam(score: 3, name: "MoDo Hockey", teamCode: "MODO", icon: URL(string: "https://sportality.cdn.s8y.se/team-logos/modo1_modo.svg")!), period: LHFWidgetAttributes.ContentState.ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 20, to: Date.now)!))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)!))
 }
 
-#Preview("Compact", as: .dynamicIsland(.compact), using: LHFWidgetAttributes.preview) {
-   LHFWidgetLiveActivity()
+#Preview("Compact", as: .dynamicIsland(.compact), using: SHLWidgetAttributes.preview) {
+   SHLWidgetLiveActivity()
 } contentStates: {
-    LHFWidgetAttributes.ContentState(homeTeam: LHFWidgetAttributes.ContentState.ActivityTeam(score: 5, name: "Luleå Hockey", teamCode: "LHF", icon: URL(string: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg")!), awayTeam: LHFWidgetAttributes.ContentState.ActivityTeam(score: 3, name: "MoDo Hockey", teamCode: "MODO", icon: URL(string: "https://sportality.cdn.s8y.se/team-logos/modo1_modo.svg")!), period: LHFWidgetAttributes.ContentState.ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 20, to: Date.now)!))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)!))
 }
 
-#Preview("Expanded", as: .dynamicIsland(.expanded), using: LHFWidgetAttributes.preview) {
-   LHFWidgetLiveActivity()
+#Preview("Expanded", as: .dynamicIsland(.expanded), using: SHLWidgetAttributes.preview) {
+   SHLWidgetLiveActivity()
 } contentStates: {
-    LHFWidgetAttributes.ContentState(homeTeam: LHFWidgetAttributes.ContentState.ActivityTeam(score: 5, name: "Luleå Hockey", teamCode: "LHF", icon: URL(string: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg")!), awayTeam: LHFWidgetAttributes.ContentState.ActivityTeam(score: 3, name: "MoDo Hockey", teamCode: "MODO", icon: URL(string: "https://sportality.cdn.s8y.se/team-logos/modo1_modo.svg")!), period: LHFWidgetAttributes.ContentState.ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 20, to: Date.now)!))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)!))
 }

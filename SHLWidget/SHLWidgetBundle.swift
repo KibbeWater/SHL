@@ -9,9 +9,8 @@ import WidgetKit
 import SwiftUI
 
 @main
-struct LHFWidgetBundle: WidgetBundle {
+struct SHLWidgetBundle: WidgetBundle {
     var body: some Widget {
-        LHFWidget()
-        LHFWidgetLiveActivity()
+        SHLWidgetLiveActivity()
     }
 }

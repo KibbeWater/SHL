@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BC044CEA2BB43F9A0058B12B /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = BC044CE92BB43F9A0058B12B /* HockeyKit */; };
 		BC374DFA2BAD922000378412 /* UIImageExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC374DF92BAD922000378412 /* UIImageExt.swift */; };
 		BC425E452B4706CC00D82CFB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC425E442B4706CC00D82CFB /* WidgetKit.framework */; };
 		BC425E472B4706CC00D82CFB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC425E462B4706CC00D82CFB /* SwiftUI.framework */; };
 		BC425E4A2B4706CC00D82CFB /* SHLWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E492B4706CC00D82CFB /* SHLWidgetBundle.swift */; };
 		BC425E4C2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4B2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift */; };
-		BC425E4E2B4706CC00D82CFB /* SHLWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4D2B4706CC00D82CFB /* SHLWidget.swift */; };
 		BC425E502B4706CC00D82CFB /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4F2B4706CC00D82CFB /* AppIntent.swift */; };
 		BC425E522B4706CD00D82CFB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC425E512B4706CD00D82CFB /* Assets.xcassets */; };
 		BC425E562B4706CD00D82CFB /* SHLWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC425E432B4706CC00D82CFB /* SHLWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -89,7 +89,6 @@
 		BC425E462B4706CC00D82CFB /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		BC425E492B4706CC00D82CFB /* SHLWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetBundle.swift; sourceTree = "<group>"; };
 		BC425E4B2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetLiveActivity.swift; sourceTree = "<group>"; };
-		BC425E4D2B4706CC00D82CFB /* SHLWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidget.swift; sourceTree = "<group>"; };
 		BC425E4F2B4706CC00D82CFB /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
 		BC425E512B4706CD00D82CFB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BC425E532B4706CD00D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -127,6 +126,7 @@
 			files = (
 				BC425E472B4706CC00D82CFB /* SwiftUI.framework in Frameworks */,
 				BC425E452B4706CC00D82CFB /* WidgetKit.framework in Frameworks */,
+				BC044CEA2BB43F9A0058B12B /* HockeyKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -172,7 +172,6 @@
 				BCEDF4132B471A01002C0DB4 /* Components */,
 				BC425E492B4706CC00D82CFB /* SHLWidgetBundle.swift */,
 				BC425E4B2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift */,
-				BC425E4D2B4706CC00D82CFB /* SHLWidget.swift */,
 				BC425E4F2B4706CC00D82CFB /* AppIntent.swift */,
 				BC425E512B4706CD00D82CFB /* Assets.xcassets */,
 				BC425E532B4706CD00D82CFB /* Info.plist */,
@@ -320,6 +319,7 @@
 			);
 			name = SHLWidgetExtension;
 			packageProductDependencies = (
+				BC044CE92BB43F9A0058B12B /* HockeyKit */,
 			);
 			productName = LHFWidgetExtension;
 			productReference = BC425E432B4706CC00D82CFB /* SHLWidgetExtension.appex */;
@@ -449,7 +449,6 @@
 			files = (
 				BC425E4A2B4706CC00D82CFB /* SHLWidgetBundle.swift in Sources */,
 				BC425E502B4706CC00D82CFB /* AppIntent.swift in Sources */,
-				BC425E4E2B4706CC00D82CFB /* SHLWidget.swift in Sources */,
 				BC425E4C2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -867,6 +866,10 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		BC044CE92BB43F9A0058B12B /* HockeyKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HockeyKit;
+		};
 		BC81B6502B40ACE5007B2E90 /* HockeyKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HockeyKit;
