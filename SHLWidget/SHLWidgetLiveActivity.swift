@@ -26,7 +26,7 @@ struct SHLWidgetLiveActivity: Widget {
                 HStack {
                     VStack {
                         Spacer()
-                        Image("Team/\(context.homeTeam.teamCode)")
+                        Image("Team/\(context.attributes.homeTeam.teamCode)")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 52, height: 52)
@@ -71,7 +71,7 @@ struct SHLWidgetLiveActivity: Widget {
                     Spacer()
                     VStack {
                         Spacer()
-                        Image("Team/\(context.awayTeam.teamCode)")
+                        Image("Team/\(context.attributes.awayTeam.teamCode)")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 52, height: 52)
@@ -93,7 +93,7 @@ struct SHLWidgetLiveActivity: Widget {
                     HStack {
                         VStack {
                             Spacer()
-                            Image("Team/\(context.homeTeam.teamCode)")
+                            Image("Team/\(context.attributes.homeTeam.teamCode)")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 52, height: 52)
@@ -119,7 +119,7 @@ struct SHLWidgetLiveActivity: Widget {
                         Spacer()
                         VStack {
                             Spacer()
-                            Image("Team/\(context.awayTeam.teamCode)")
+                            Image("Team/\(context.attributes.awayTeam.teamCode)")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 52, height: 52)
@@ -142,7 +142,7 @@ struct SHLWidgetLiveActivity: Widget {
                 }
             } compactLeading: {
                 HStack {
-                    Image("Team/\(context.homeTeam.teamCode)")
+                    Image("Team/\(context.attributes.homeTeam.teamCode)")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 24, height: 24)
@@ -159,19 +159,19 @@ struct SHLWidgetLiveActivity: Widget {
                         .fontWidth(.compressed)
                         .font(.system(size: 22))
                         .foregroundStyle(context.state.awayScore >= context.state.homeScore ? .primary : .secondary)
-                    Image("Team/\(context.awayTeam.teamCode)")
+                    Image("Team/\(context.attributes.awayTeam.teamCode)")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 24, height: 24)
                 }
             } minimal: {
                 if context.state.homeScore > context.state.awayScore {
-                    Image("Team/\(context.homeTeam.teamCode)")
+                    Image("Team/\(context.attributes.homeTeam.teamCode)")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 24, height: 24)
                 } else if context.state.homeScore < context.state.awayScore {
-                    Image("Team/\(context.awayTeam.teamCode)")
+                    Image("Team/\(context.attributes.awayTeam.teamCode)")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 24, height: 24)
