@@ -130,15 +130,40 @@ struct SHLWidgetLiveActivity: Widget {
                 }
                 DynamicIslandExpandedRegion(.center) {
                     HStack {
-                        Text(ISODateToStr(dateString: context.state.period.periodEnd), style: .timer)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .multilineTextAlignment(.center)
-                            .font(.title)
-                            .fontWeight(.semibold)
+                        let _periodEnd = ISODateToStr(dateString: context.state.period.periodEnd)
+                        switch context.state.period.state {
+                        case .ended:
+                            Text("Ended")
+                                .font(.title)
+                                .fontWeight(.semibold)
+                        case .onbreak:
+                            Text(_periodEnd, style: .timer)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .multilineTextAlignment(.center)
+                                .font(.title)
+                                .fontWeight(.semibold)
+                        case .ongoing, .overtime:
+                            Text(_periodEnd, style: .timer)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .multilineTextAlignment(.center)
+                                .font(.title)
+                                .fontWeight(.semibold)
+                        case .starting:
+                            Text("0:00")
+                                .font(.title)
+                                .fontWeight(.semibold)
+                        }
+                        
                     }
-                    Label("P\(context.state.period.period)", systemImage: "clock")
-                        .foregroundColor(.secondary)
-                        .font(.subheadline)
+                    if context.state.period.state == .onbreak {
+                        Label("Pause", systemImage: "clock")
+                            .foregroundColor(.secondary)
+                            .font(.subheadline)
+                    } else {
+                        Label("P\(context.state.period.period)", systemImage: "clock")
+                            .foregroundColor(.secondary)
+                            .font(.subheadline)
+                    }
                 }
             } compactLeading: {
                 HStack {
@@ -202,23 +227,23 @@ extension SHLWidgetAttributes {
 #Preview("Notification", as: .content, using: SHLWidgetAttributes.preview) {
    SHLWidgetLiveActivity()
 } contentStates: {
-    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format() ?? "2024-03-27T19:55:54.364Z"))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format(.Strategy(includingFractionalSeconds: true)) ?? "2024-03-27T19:55:54.364Z", state: .ongoing))
 }
 
 #Preview("Minimal", as: .dynamicIsland(.minimal), using: SHLWidgetAttributes.preview) {
    SHLWidgetLiveActivity()
 } contentStates: {
-    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format() ?? "2024-03-27T19:55:54.364Z"))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format(.Strategy(includingFractionalSeconds: true)) ?? "2024-03-27T19:55:54.364Z", state: .ongoing))
 }
 
 #Preview("Compact", as: .dynamicIsland(.compact), using: SHLWidgetAttributes.preview) {
    SHLWidgetLiveActivity()
 } contentStates: {
-    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format() ?? "2024-03-27T19:55:54.364Z"))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format(.Strategy(includingFractionalSeconds: true)) ?? "2024-03-27T19:55:54.364Z", state: .ongoing))
 }
 
 #Preview("Expanded", as: .dynamicIsland(.expanded), using: SHLWidgetAttributes.preview) {
    SHLWidgetLiveActivity()
 } contentStates: {
-    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format() ?? "2024-03-27T19:55:54.364Z"))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format(.Strategy(includingFractionalSeconds: true)) ?? "2024-03-27T19:55:54.364Z", state: .ongoing))
 }
