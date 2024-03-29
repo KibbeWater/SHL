@@ -45,18 +45,42 @@ struct SHLWidgetLiveActivity: Widget {
                 
                 VStack {
                     HStack {
-                        Text(ISODateToStr(dateString: context.state.period.periodEnd), style: .timer)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .multilineTextAlignment(.center)
-                            .font(.largeTitle)
-                            .fontWeight(.semibold)
+                        let _periodEnd = ISODateToStr(dateString: context.state.period.periodEnd)
+                        switch context.state.period.state {
+                        case .ended:
+                            Text("Ended")
+                                .font(.largeTitle)
+                                .fontWeight(.semibold)
+                        case .onbreak:
+                            Text(_periodEnd, style: .timer)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .multilineTextAlignment(.center)
+                                .font(.largeTitle)
+                                .fontWeight(.semibold)
+                        case .ongoing, .overtime:
+                            Text(_periodEnd, style: .timer)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .multilineTextAlignment(.center)
+                                .font(.largeTitle)
+                                .fontWeight(.semibold)
+                        case .starting:
+                            Text("0:00")
+                                .font(.largeTitle)
+                                .fontWeight(.semibold)
+                        }
                     }
                 }
                 .padding(.vertical, 10)
                 .overlay(alignment: .top) {
-                    Label("P\(context.state.period.period)", systemImage: "clock")
-                        .foregroundColor(.secondary)
-                        .font(.footnote)
+                    if context.state.period.state == .onbreak {
+                        Label("Pause", systemImage: "clock")
+                            .foregroundColor(.secondary)
+                            .font(.footnote)
+                    } else {
+                        Label("P\(context.state.period.period)", systemImage: "clock")
+                            .foregroundColor(.secondary)
+                            .font(.footnote)
+                    }
                 }
                 
                 Spacer()
@@ -153,7 +177,6 @@ struct SHLWidgetLiveActivity: Widget {
                                 .font(.title)
                                 .fontWeight(.semibold)
                         }
-                        
                     }
                     if context.state.period.state == .onbreak {
                         Label("Pause", systemImage: "clock")
