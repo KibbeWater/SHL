@@ -145,7 +145,12 @@ struct ContentView: View {
             do {
                 let startTime = DispatchTime.now()
                 
-                try await matchInfo.getLatest()
+                do {
+                    try await matchInfo.getLatest()
+                } catch let _err {
+                    print(_err)
+                }
+                
                 let endTime = DispatchTime.now()
                 let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
                 let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))

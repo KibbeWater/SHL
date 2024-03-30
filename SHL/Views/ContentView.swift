@@ -93,13 +93,11 @@ public struct LiveGame {
 struct ContentView: View {
     @EnvironmentObject var matchInfo: MatchInfo
     @EnvironmentObject var leagueStandings: LeagueStandings
-    @State var gamePoller: GamePoller?
+    @State var gameListener: GameUpdater?
     
     @Environment(\.colorScheme) private var colorScheme
     
     @State private var sortOrder = [KeyPathComparator(\StandingObj.position)]
-    
-    @State private var liveGame: GameOverview? = nil
     
     @State private var selectedLeaderboard: LeaguePages = .SHL
     @State private var numberOfPages = LeaguePages.allCases.count
@@ -112,7 +110,7 @@ struct ContentView: View {
                 MatchListView()
             }, label: {
                 if let featured = SelectFeaturedMatch() {
-                    MatchOverview(game: featured, liveGame: liveGame)
+                    MatchOverview(game: featured, liveGame: gameListener?.game)
                 } else {
                     HStack {
                         
@@ -250,10 +248,6 @@ struct ContentView: View {
             }
         }
         .onChange(of: matchInfo.latestMatches, { oldMatches, newMatches in
-            /*gamePoller = GamePoller(url: URL(string: "https://game-broadcaster.s8y.se/live/game")!, gameId: "qcz-3SKH6QA9t") { _game, _err in
-                GameUpdate(game: _game, err: _err)
-            }*/
-            
             let oldGame = oldMatches.last(where: { IsLive($0) })
             guard let newGame = newMatches.last(where: { IsLive($0) }) else { return }
             
@@ -261,21 +255,13 @@ struct ContentView: View {
                 return
             }
             
-            gamePoller = GamePoller(url: URL(string: "https://game-broadcaster.s8y.se/live/game")!, gameId: newGame.id, dataReceivedCallback: { _game, _err in
-                GameUpdate(game: _game, err: _err)
-            })
+            gameListener = GameUpdater(gameId: newGame.id)
         })
         .refreshable {
             do {
                 let startTime = DispatchTime.now()
                 
-                if let _poller = gamePoller {
-                    gamePoller = GamePoller(url: URL(string: "https://game-broadcaster.s8y.se/live/game")!, gameId: _poller.matchId, dataReceivedCallback: { _game, _err in
-                        GameUpdate(game: _game, err: _err)
-                    })
-                }
-                
-                liveGame = nil
+                gameListener?.refreshPoller()
                 
                 try await matchInfo.getLatest()
                 let endTime = DispatchTime.now()
@@ -287,21 +273,6 @@ struct ContentView: View {
                 fatalError("This should be impossible, please report this issue")
             }
         }
-    }
-    
-    func GameUpdate(game: GameEvent?, err: Error?) {
-        guard err == nil else {
-            return
-        }
-        guard let _game = game?.game.gameOverview else { return }
-        guard _game.gameUuid == gamePoller?.matchId else {
-            return
-        }
-        
-        DispatchQueue.main.async {
-            liveGame = _game
-        }
-        
     }
     
     func FormatDate(_ date: Date) -> String {

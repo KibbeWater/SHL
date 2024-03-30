@@ -14,6 +14,8 @@ struct MatchListView: View {
     @State private var previousMatches: [Game] = []
     @State private var todayMatches: [Game] = []
     @State private var upcomingMatches: [Game] = []
+    
+    @State private var matchListeners: [GameUpdater] = []
 
     // When matchInfo changes, re-filter the matches
     private func filterMatches() {
@@ -22,6 +24,21 @@ struct MatchListView: View {
         previousMatches = matchInfo.latestMatches.filter { $0.date < calendar.startOfDay(for: now) }
         todayMatches = matchInfo.latestMatches.filter { calendar.isDateInToday($0.date) }
         upcomingMatches = matchInfo.latestMatches.filter { calendar.startOfDay(for: $0.date) >= calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now))! }
+        
+        matchListeners.removeAll(where: { _listener in
+            return !todayMatches.contains(where: { $0.id == _listener.gameId })
+        })
+        let missingListeners = todayMatches.filter({ _match in
+            return !matchListeners.contains(where: { $0.gameId == _match.id })
+        })
+        
+        matchListeners.append(contentsOf: missingListeners.map({ _match in
+            return GameUpdater(gameId: _match.id)
+        }))
+    }
+    
+    private func getLiveMatch(gameId: String) -> GameOverview? {
+        return matchListeners.first(where: { $0.gameId == gameId })?.game
     }
     
     var body: some View {
@@ -44,7 +61,7 @@ struct MatchListView: View {
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
         }
         .onAppear {
-            filterMatches()
+            self.filterMatches()
         }
     }
     
@@ -72,7 +89,7 @@ struct MatchListView: View {
                     NavigationLink {
                         MatchView(match: match)
                     } label: {
-                        MatchOverview(game: match)
+                        MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
                             .id("pm-\(match.id)")
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -80,6 +97,14 @@ struct MatchListView: View {
                     MatchOverview(game: match)
                         .id("pm-\(match.id)")
                 }
+            }
+        }
+        .refreshable {
+            matchListeners.forEach({ $0.refreshPoller() })
+            do {
+                try await matchInfo.getLatest()
+            } catch {
+                print("Unable to refresh matches")
             }
         }
         .padding(.horizontal)
