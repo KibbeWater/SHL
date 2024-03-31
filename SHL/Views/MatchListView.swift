@@ -1,7 +1,7 @@
 import SwiftUI
 import HockeyKit
 
-enum Tabs: String, CaseIterable {
+private enum Tabs: String, CaseIterable {
     case previous = "Previous"
     case today = "Today"
     case upcoming = "Upcoming"
@@ -44,7 +44,7 @@ struct MatchListView: View {
     var body: some View {
         VStack {
             tabSelectionView
-
+            
             TabView(selection: $selectedTab) {
                 matchesScrollView(for: previousMatches)
                     .id(Tabs.previous)
@@ -58,7 +58,7 @@ struct MatchListView: View {
                     .id(Tabs.upcoming)
                     .tag(Tabs.upcoming)
             }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
         }
         .onAppear {
             self.filterMatches()
@@ -82,31 +82,44 @@ struct MatchListView: View {
         }
     }
     
+    private func refresh() async {
+        matchListeners.forEach({ $0.refreshPoller() })
+        do {
+            try await matchInfo.getLatest()
+        } catch {
+            print("Unable to refresh matches")
+        }
+    }
+    
     private func matchesScrollView(for matches: [Game]) -> some View {
-        ScrollView {
-            ForEach(matches, id: \.id) { match in
-                if match.date < Date.now {
-                    NavigationLink {
-                        MatchView(match: match)
-                    } label: {
-                        MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
+        VStack {
+            ScrollView {
+                ForEach(matches, id: \.id) { match in
+                    if match.date < Date.now {
+                        NavigationLink {
+                            MatchView(match: match)
+                        } label: {
+                            MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
+                                .id("pm-\(match.id)")
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    } else {
+                        MatchOverview(game: match)
                             .id("pm-\(match.id)")
                     }
-                    .buttonStyle(PlainButtonStyle())
-                } else {
-                    MatchOverview(game: match)
-                        .id("pm-\(match.id)")
                 }
             }
+            .padding(.horizontal)
+            Spacer()
         }
-        .refreshable {
-            matchListeners.forEach({ $0.refreshPoller() })
-            do {
-                try await matchInfo.getLatest()
-            } catch {
-                print("Unable to refresh matches")
+        .frame(maxWidth: .infinity)
+        .overlay(alignment: .center, content: {
+            if (matches.isEmpty) {
+                Text("No matches")
             }
+        })
+        .refreshable {
+            await refresh()
         }
-        .padding(.horizontal)
     }
 }

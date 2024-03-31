@@ -27,6 +27,9 @@ struct DebugView: View {
                     }
                 }
             }
+            ScrollView {
+                Text(Logging.shared.getLogs())
+            }
         }
         .padding()
     }

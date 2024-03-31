@@ -16,6 +16,7 @@
 		BC425E502B4706CC00D82CFB /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4F2B4706CC00D82CFB /* AppIntent.swift */; };
 		BC425E522B4706CD00D82CFB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC425E512B4706CD00D82CFB /* Assets.xcassets */; };
 		BC425E562B4706CD00D82CFB /* SHLWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC425E432B4706CC00D82CFB /* SHLWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BC457B1B2BB9BB9100227D75 /* PBPView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC457B1A2BB9BB9100227D75 /* PBPView.swift */; };
 		BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6212E42BB05B81003CCB45 /* MatchView.swift */; };
 		BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7645B52B46054A0000B7AB /* DebugView.swift */; };
 		BC81B6512B40ACE5007B2E90 /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = BC81B6502B40ACE5007B2E90 /* HockeyKit */; };
@@ -92,6 +93,7 @@
 		BC425E4F2B4706CC00D82CFB /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
 		BC425E512B4706CD00D82CFB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BC425E532B4706CD00D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BC457B1A2BB9BB9100227D75 /* PBPView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PBPView.swift; sourceTree = "<group>"; };
 		BC5B96602B40962700D4E621 /* HockeyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HockeyKit; path = ../HockeyKit; sourceTree = "<group>"; };
 		BC6212E42BB05B81003CCB45 /* MatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchView.swift; sourceTree = "<group>"; };
 		BC7645B52B46054A0000B7AB /* DebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugView.swift; sourceTree = "<group>"; };
@@ -298,6 +300,7 @@
 				BC8C150F2BAC780F0010AB59 /* GameDisplays */,
 				BCFA44AA2B44C06700B4358C /* StandingsTable.swift */,
 				BC7645B52B46054A0000B7AB /* DebugView.swift */,
+				BC457B1A2BB9BB9100227D75 /* PBPView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -473,6 +476,7 @@
 				BCAFE2D02B4095170044225A /* ContentView.swift in Sources */,
 				BC8C15112BAC787B0010AB59 /* MatchOverview.swift in Sources */,
 				BCD7BC182BAF6B9800E208B3 /* MatchListView.swift in Sources */,
+				BC457B1B2BB9BB9100227D75 /* PBPView.swift in Sources */,
 				BCD7BC152BAF69D500E208B3 /* Root.swift in Sources */,
 				BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */,
 				BCAFE2CE2B4095170044225A /* SHLApp.swift in Sources */,

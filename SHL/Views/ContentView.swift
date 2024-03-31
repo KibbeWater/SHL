@@ -96,6 +96,7 @@ struct ContentView: View {
     @State var gameListener: GameUpdater?
     
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.scenePhase) private var scenePhase
     
     @State private var sortOrder = [KeyPathComparator(\StandingObj.position)]
     
@@ -127,7 +128,6 @@ struct ContentView: View {
                 VStack {
                     HStack {
                         Text("Match Calendar")
-                            .multilineTextAlignment(.leading)
                             .font(.title)
                         Spacer()
                     }
@@ -257,20 +257,27 @@ struct ContentView: View {
             
             gameListener = GameUpdater(gameId: newGame.id)
         })
+        .onChange(of: scenePhase, { _oldPhase, _newPhase in
+            guard _newPhase != .active else {
+                return
+            }
+            
+            gameListener?.refreshPoller()
+        })
         .refreshable {
             do {
                 let startTime = DispatchTime.now()
-                
-                gameListener?.refreshPoller()
                 
                 try await matchInfo.getLatest()
                 let endTime = DispatchTime.now()
                 let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
                 let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
                 
+                gameListener?.refreshPoller()
+                
                 try await Task.sleep(nanoseconds: UInt64(remainingTime))
-            } catch {
-                fatalError("This should be impossible, please report this issue")
+            } catch let _err {
+                Logging.shared.log("This should be impossible, please report this issue \(_err)")
             }
         }
     }
