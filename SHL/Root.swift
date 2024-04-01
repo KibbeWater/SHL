@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import HockeyKit
 
 struct Root: View {
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ContentView()
         }
     }
@@ -17,4 +18,6 @@ struct Root: View {
 
 #Preview {
     Root()
+        .environmentObject(MatchInfo())
+        .environmentObject(LeagueStandings())
 }

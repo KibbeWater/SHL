@@ -16,9 +16,80 @@ struct PBPView: View {
             let ev = events[_ev]
             
             if let _goalkeeperEvent = ev as? GoalkeeperEvent {
-                Text("Goalkeeper Event \(_goalkeeperEvent.gameId)")
+                HStack {
+                    if _goalkeeperEvent.eventTeam.place == .home {
+                        VStack {
+                            
+                        }
+                        .frame(maxHeight: .infinity)
+                        .frame(width: 6)
+                        .background(.red)
+                        .clipShape(RoundedRectangle(cornerRadius: .infinity))
+                    }
+                    VStack(alignment: .leading) {
+                        HStack {
+                            Text("Goalkeeper \(_goalkeeperEvent.isEntering ? "In" : "Out") -")
+                                .fontWeight(.semibold)
+                            Text("\(_goalkeeperEvent.player.jerseyToday) \(_goalkeeperEvent.player.firstName) \(_goalkeeperEvent.player.familyName)")
+                        }
+                        .padding(.bottom)
+                        Text("P\(_goalkeeperEvent.period) - \(_goalkeeperEvent.time)")
+                    }
+                    .padding(.horizontal, _goalkeeperEvent.eventTeam.place == .away ? 16 : 0)
+                    Spacer()
+                    if _goalkeeperEvent.eventTeam.place == .away {
+                        VStack {
+                            
+                        }
+                        .frame(maxHeight: .infinity)
+                        .frame(width: 6)
+                        .background(.blue)
+                        .clipShape(RoundedRectangle(cornerRadius: .infinity))
+                    }
+                }
+                .padding(8)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             } else if let _penaltyEvent = ev as? PenaltyEvent {
-                Text("Penalty Event \(_penaltyEvent.gameId)")
+                HStack {
+                    if _penaltyEvent.eventTeam.place == .home {
+                        VStack {
+                            
+                        }
+                        .frame(maxHeight: .infinity)
+                        .frame(width: 6)
+                        .background(.red)
+                        .clipShape(RoundedRectangle(cornerRadius: .infinity))
+                    }
+                    VStack(alignment: .leading) {
+                        HStack {
+                            Text("Penalty -")
+                                .fontWeight(.semibold)
+                            if let player = _penaltyEvent.player {
+                                Text("\(player.jerseyToday) \(player.firstName) \(player.familyName)")
+                            } else {
+                                Text(_penaltyEvent.eventTeam.teamName)
+                            }
+                        }
+                        Text("\(_penaltyEvent.offence) \(_penaltyEvent.variant.description != nil ? "- \(_penaltyEvent.variant.description!)" : "")")
+                        .padding(.bottom)
+                        Text("P\(_penaltyEvent.period) - \(_penaltyEvent.time)")
+                    }
+                    .padding(.horizontal, _penaltyEvent.eventTeam.place == .away ? 16 : 0)
+                    Spacer()
+                    if _penaltyEvent.eventTeam.place == .away {
+                        VStack {
+                            
+                        }
+                        .frame(maxHeight: .infinity)
+                        .frame(width: 6)
+                        .background(.blue)
+                        .clipShape(RoundedRectangle(cornerRadius: .infinity))
+                    }
+                }
+                .padding(8)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             } else if let _shotEvent = ev as? ShotEvent {
                 HStack {
                     if _shotEvent.eventTeam.place == .home {
@@ -101,7 +172,31 @@ struct PBPView: View {
                 .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             } else if let _timeoutEvent = ev as? TimeoutEvent {
-                Text("Timeout Event \(_timeoutEvent.gameId)")
+                HStack {
+                    VStack {
+                        HStack {
+                            Text("Tactical Timeout")
+                                .fontWeight(.semibold)
+                            Spacer()
+                        }
+                        .padding(.bottom, 4)
+                        HStack {
+                            Text("P\(_timeoutEvent.period) - \(_timeoutEvent.time)")
+                                .font(.footnote)
+                            Spacer()
+                        }
+                    }
+                    Spacer()
+                    let isHome = _timeoutEvent.eventTeam.teamId == _timeoutEvent.homeTeam.teamId
+                    Image("Team/\(isHome ? _timeoutEvent.homeTeam.teamCode : _timeoutEvent.awayTeam.teamCode)")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 48, height: 48)
+                }
+                .padding([.trailing, .vertical], 8)
+                .padding(.leading)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             }
         }
     }

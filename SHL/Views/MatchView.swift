@@ -17,6 +17,10 @@ struct MatchView: View {
     @EnvironmentObject var matchInfo: MatchInfo
     
     let match: Game
+    @State private var updater: GameUpdater?
+    
+    @State private var pbpUpdateTimer: Timer?
+    
     @State private var pbpEvents: [PBPEventProtocol] = []
     
     @State private var homeColor: Color = .black // Default color, updated on appear
@@ -24,22 +28,24 @@ struct MatchView: View {
     
     @State private var selectedTab: Tabs = .summary
     
+    @State private var offset = CGFloat.zero
+    
     var body: some View {
         ZStack {
             ZStack {
                 LinearGradient(gradient: Gradient(colors: [homeColor, awayColor]), startPoint: .leading, endPoint: .trailing)
-                    
+                LinearGradient(gradient: Gradient(colors: [.clear, Color(uiColor: .systemBackground)]), startPoint: .top, endPoint: .bottom)
             }
             .ignoresSafeArea()
             ScrollView {
                 HStack(spacing: 16) {
                     Spacer()
                     VStack {
-                        Text(String(match.homeTeam.result))
+                        Text(String(updater?.game?.homeGoals ?? match.homeTeam.result))
                             .font(.system(size: 96))
                             .fontWidth(.compressed)
                             .fontWeight(.bold)
-                            .foregroundStyle(match.homeTeam.result > match.awayTeam.result ? .white : .white.opacity(0.5))
+                            .foregroundStyle(updater?.game?.homeGoals ?? match.homeTeam.result > updater?.game?.awayGoals ?? match.awayTeam.result ? .white : .white.opacity(0.5))
                             .padding(.bottom, -2)
                         Spacer()
                         Image("Team/\(match.homeTeam.code)")
@@ -51,13 +57,55 @@ struct MatchView: View {
                     .frame(height: 172)
                     Spacer()
                     VStack {
-                        Text(match.shootout ? "OT" : match.overtime ? "OT" : match.played ? "Full" : Calendar.current.isDate(match.date, inSameDayAs: Date()) ? FormatTime(match.date) : FormatDate(match.date))
-                            .fontWeight(.semibold)
-                            .font(.title)
-                            .frame(height: 96)
-                            .foregroundColor(.white)
+                        if let _game = updater?.game {
+                            switch _game.state {
+                            case .starting:
+                                Text("0:00")
+                                    .fontWeight(.semibold)
+                                    .font(.title)
+                                    .frame(height: 96)
+                                    .foregroundColor(.white)
+                            case .ongoing:
+                                Text(_game.time.periodTime)
+                                    .fontWeight(.semibold)
+                                    .font(.title)
+                                    .frame(height: 96)
+                                    .foregroundColor(.white)
+                            case .onbreak:
+                                Text("Break")
+                                    .fontWeight(.semibold)
+                                    .font(.title)
+                                    .frame(height: 96)
+                                    .foregroundColor(.white)
+                            case .overtime:
+                                Text("OT\n\(_game.time.periodTime)")
+                                    .fontWeight(.semibold)
+                                    .font(.title)
+                                    .frame(height: 96)
+                                    .foregroundColor(.white)
+                            case .ended:
+                                Text("Ended")
+                                    .fontWeight(.semibold)
+                                    .font(.title)
+                                    .frame(height: 96)
+                                    .foregroundColor(.white)
+                            }
+                        } else {
+                            Text(match.shootout ? "OT" : match.overtime ? "OT" : match.played ? "Full" : Calendar.current.isDate(match.date, inSameDayAs: Date()) ? FormatTime(match.date) : FormatDate(match.date))
+                                .fontWeight(.semibold)
+                                .font(.title)
+                                .frame(height: 96)
+                                .foregroundColor(.white)
+                        }
                         Spacer()
                     }
+                    .overlay(alignment: .top, content: {
+                        if let _game = updater?.game,
+                           _game.state == .ongoing || _game.state == .onbreak {
+                            Label("P\(_game.time.period)", systemImage: "clock")
+                                .foregroundStyle(.white.opacity(0.5))
+                        }
+                    })
                     .frame(height: 172)
                     Spacer()
                     VStack {
@@ -77,6 +125,13 @@ struct MatchView: View {
                     .frame(height: 172)
                     Spacer()
                 }
+                .background(GeometryReader {
+                    Color.clear.preference(key: ViewOffsetKey.self,
+                                           value: -$0.frame(in: .named("scroll")).origin.y)
+                })
+                .onPreferenceChange(ViewOffsetKey.self) {
+                    offset = $0
+                }
                 .padding(.bottom)
                 
                 HStack {
@@ -92,26 +147,76 @@ struct MatchView: View {
                         Spacer()
                     }
                 }
-                .padding(.top)
+                .padding(.vertical)
                 
-                TabView(selection: $selectedTab) {
-                    Text("Summary")
-                        .tag(Tabs.summary)
-                        .id(Tabs.summary)
-                    
-                    PBPView(events: $pbpEvents)
-                        .padding(.horizontal)
-                        .tag(Tabs.pbp)
-                        .id(Tabs.pbp)
+                if (selectedTab == .summary) {
+                    VStack {
+                        VStack {
+                            let penalties: [PenaltyEvent] = getEvents(pbpEvents, type: PenaltyEvent.self)
+                            let homePenalties = penalties.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
+                            let awayPenalties = penalties.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
+                            VersusBar("Penalties", homeSide: homePenalties.count, awaySide: awayPenalties.count, homeColor: homeColor, awayColor: awayColor)
+                            
+                            let shots: [ShotEvent] = getEvents(pbpEvents, type: ShotEvent.self)
+                            let homeShots = shots.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
+                            let awayShots = shots.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
+                            VersusBar("Shots", homeSide: homeShots.count, awaySide: awayShots.count, homeColor: homeColor, awayColor: awayColor)
+                            
+                            let homeShotsGoal = homeShots.filter({ $0.goalSection == 0 })
+                            let awayShotsGoal = awayShots.filter({ $0.goalSection == 0 })
+                            VersusBar("Shots on goals", homeSide: homeShotsGoal.count, awaySide: awayShotsGoal.count, homeColor: homeColor, awayColor: awayColor)
+                        }
+                        .padding()
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .padding(.horizontal)
+                } else if (selectedTab == .pbp) {
+                    VStack {
+                        PBPView(events: $pbpEvents)
+                    }
+                    .padding(.horizontal)
                 }
-                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             }
-            .background(LinearGradient(gradient: Gradient(colors: [.clear, Color(uiColor: .systemBackground)]), startPoint: .top, endPoint: .bottom))
+            .refreshable {
+                pbpUpdateTimer?.invalidate()
+                if let _updater = updater,
+                   _updater.game == nil || _updater.game?.state != .ended {
+                    _updater.refreshPoller()
+                    startTimer()
+                }
+                do {
+                    if let events = try await matchInfo.getMatchPBP(match.id) {
+                        pbpEvents = events
+                    }
+                } catch {
+                    print("Failed to get play-by-play events")
+                }
+            }
+            .coordinateSpace(name: "scroll")
+            /*VStack {}
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .safeAreaInset(edge: .top) {
+                if (offset >= 200) {
+                    HStack {
+                        Spacer()
+                        Text("Hello, World!")
+                        Spacer()
+                    }
+                    .background(.bar)
+                    .zIndex(100)
+                }
+            }*/
         }
         .onAppear {
             loadTeamColors()
         }
         .task {
+            if !match.played && match.date < Date.now {
+                updater = GameUpdater(gameId: match.id)
+                startTimer()
+                print("Starting live updater")
+            }
             do {
                 if let events = try await matchInfo.getMatchPBP(match.id) {
                     pbpEvents = events
@@ -132,6 +237,38 @@ struct MatchView: View {
         }
     }
     
+    func startTimer() {
+        print("Starting PBP update timer")
+        pbpUpdateTimer?.invalidate()
+        pbpUpdateTimer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { timer in
+            print("Updating PBP events")
+            guard updater != nil else {
+                timer.invalidate()
+                print("Disabling timer, no updater present")
+                return
+            }
+            
+            if let _game = updater?.game,
+               _game.state == .ended {
+                print("Disabling timer, game has ended")
+                timer.invalidate()
+                return
+            }
+            
+            Task {
+                if let events = try await matchInfo.getMatchPBP(match.id) {
+                    pbpEvents = events
+                    print("Updated PBP events")
+                }
+            }
+        }
+    }
+    
+    func getEvents<T: PBPEventProtocol>(_ events: [PBPEventProtocol], type: T.Type) -> [T] {
+        return events.compactMap { $0 as? T }
+    }
+    
+    
     func FormatDate(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM dd"
@@ -142,6 +279,14 @@ struct MatchView: View {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "h:mm a"
         return dateFormatter.string(from: date)
+    }
+}
+
+struct ViewOffsetKey: PreferenceKey {
+    typealias Value = CGFloat
+    static var defaultValue = CGFloat.zero
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value += nextValue()
     }
 }
 

@@ -258,11 +258,18 @@ struct ContentView: View {
             gameListener = GameUpdater(gameId: newGame.id)
         })
         .onChange(of: scenePhase, { _oldPhase, _newPhase in
-            guard _newPhase != .active else {
+            guard _newPhase == .active else {
                 return
             }
             
             gameListener?.refreshPoller()
+            Task {
+                do {
+                    try await matchInfo.getLatest()
+                } catch {
+                    print("Unable to refresh")
+                }
+            }
         })
         .refreshable {
             do {
