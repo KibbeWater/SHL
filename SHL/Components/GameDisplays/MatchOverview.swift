@@ -146,7 +146,6 @@ struct MatchOverview: View {
         .frame(maxWidth: .infinity)
         .frame(height: 102)
         .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12.0))
         .overlay(alignment: .topLeading) {
             Text(game.venue)
                 .font(.caption2)

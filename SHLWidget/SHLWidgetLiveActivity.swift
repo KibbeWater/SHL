@@ -243,7 +243,7 @@ struct SHLWidgetLiveActivity: Widget {
 
 extension SHLWidgetAttributes {
     fileprivate static var preview: SHLWidgetAttributes {
-        SHLWidgetAttributes(homeTeam: ActivityTeam(name: "Luleå Hockey", teamCode: "LHF"), awayTeam: ActivityTeam(name: "MODO Hockey", teamCode: "MODO"))
+        SHLWidgetAttributes(id: "123", homeTeam: ActivityTeam(name: "Luleå Hockey", teamCode: "LHF"), awayTeam: ActivityTeam(name: "MODO Hockey", teamCode: "MODO"))
     }
 }
 

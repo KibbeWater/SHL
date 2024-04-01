@@ -1,4 +1,5 @@
 import SwiftUI
+import ActivityKit
 import HockeyKit
 
 private enum Tabs: String, CaseIterable {
@@ -101,15 +102,37 @@ struct MatchListView: View {
                         } label: {
                             MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
                                 .id("pm-\(match.id)")
+                                .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                                .contextMenu {
+                                    let activityActive = Activity<SHLWidgetAttributes>.activities.contains(where: { $0.attributes.id == match.id })
+                                    Button(activityActive ? "Stop Activity" : "Start Activity", systemImage: activityActive ? "minus" : "plus") {
+                                        if let live = getLiveMatch(gameId: match.id) {
+                                            if activityActive {
+                                                do {
+                                                    try ActivityUpdater.shared.start(match: live)
+                                                } catch {
+                                                    print("Failed to start activity")
+                                                }
+                                            } else {
+                                                let activity = Activity<SHLWidgetAttributes>.activities.first(where: { $0.attributes.id == match.id })
+                                                Task {
+                                                    await activity?.end(nil, dismissalPolicy: .immediate)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal)
                         }
                         .buttonStyle(PlainButtonStyle())
                     } else {
                         MatchOverview(game: match)
                             .id("pm-\(match.id)")
+                            .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                            .padding(.horizontal)
                     }
                 }
             }
-            .padding(.horizontal)
             Spacer()
         }
         .frame(maxWidth: .infinity)

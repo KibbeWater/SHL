@@ -25,7 +25,7 @@ struct StandingView: View {
     var body: some View {
         HStack {
             Text(String(standing.position))
-                .padding(.trailing, 18)
+                .frame(width: 24, alignment: .leading)
             
             Text(standing.team)
             
@@ -36,6 +36,7 @@ struct StandingView: View {
             
             Image("Team/\(standing.teamCode)")
                 .resizable()
+                .aspectRatio(contentMode: .fit)
                 .frame(width: 32, height: 32)
         }
     }
@@ -69,7 +70,7 @@ struct StandingsTable: View {
     func formatStandings(_ dictionary: Dictionary<Leagues, CacheItem<StandingResults?>>) -> [StandingObj]? {
         if let _league = dictionary[league]?.cacheItem {
             return _league.leagueStandings.map { standing in
-                return StandingObj(id: UUID().uuidString, position: standing.Rank, logo: standing.info.teamInfo.teamMedia, team: standing.info.teamInfo.teamNames.long, teamCode: standing.info.code ?? "UNK", matches: String(standing.GP), diff: String(standing.Diff), points: String(standing.Points))
+                return StandingObj(id: UUID().uuidString, position: standing.Rank, logo: standing.info.teamInfo.teamMedia, team: standing.info.teamInfo.teamNames.long, teamCode: standing.info.code ?? "TBD", matches: String(standing.GP), diff: String(standing.Diff), points: String(standing.Points))
             }
         }
         return nil

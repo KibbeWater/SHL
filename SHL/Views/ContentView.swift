@@ -8,6 +8,7 @@
 import UIKit
 import SwiftUI
 import HockeyKit
+import ActivityKit
 
 struct PageControlView<T: RawRepresentable>: UIViewRepresentable where T.RawValue == Int {
     @Environment(\.colorScheme) private var colorScheme
@@ -107,11 +108,36 @@ struct ContentView: View {
     
     var body: some View {
         ScrollView {
+            if let featured = SelectFeaturedMatch(),
+               gameListener?.game != nil {
+                HStack {
+                    Spacer()
+                    let activityActive = Activity<SHLWidgetAttributes>.activities.contains(where: { $0.attributes.id == featured.id })
+                    Button(activityActive ? "Stop Tracking" : "Track", systemImage: activityActive ? "minus" : "plus") {
+                        guard let _game = gameListener?.game else {
+                            return
+                        }
+                        
+                        do {
+                            try ActivityUpdater.shared.start(match: _game)
+                        } catch let _err {
+                            print("Unable to start activity \(_err)")
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .clipShape(RoundedRectangle(cornerRadius: .infinity))
+                    .font(.caption)
+                }
+                .padding(.horizontal)
+            }
             NavigationLink(destination: {
                 MatchListView()
             }, label: {
                 if let featured = SelectFeaturedMatch() {
-                    MatchOverview(game: featured, liveGame: gameListener?.game)
+                    VStack {
+                        MatchOverview(game: featured, liveGame: gameListener?.game)
+                            .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                    }
                 } else {
                     HStack {
                         
@@ -127,8 +153,12 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 VStack {
                     HStack {
-                        Text("Match Calendar")
-                            .font(.title)
+                        NavigationLink {
+                            MatchListView()
+                        } label: {
+                            Text("Match Calendar \(Image(systemName: "chevron.right"))")
+                                .font(.title)
+                        }
                         Spacer()
                     }
                     ScrollView(.horizontal) {
@@ -221,7 +251,7 @@ struct ContentView: View {
                 }
                 .padding(.vertical)
             }
-            Button("Debug") {
+            /*Button("Debug") {
                 debugOpen = true
             }
             .buttonStyle(.borderedProminent)
@@ -232,8 +262,7 @@ struct ContentView: View {
                 
                     .padding()
                 DebugView()
-            }
-            
+            }*/
         }
         .onAppear {
             Task {
