@@ -7,6 +7,7 @@
 
 import SwiftUI
 import HockeyKit
+import MapKit
 
 private enum Tabs: String, CaseIterable {
     case summary = "Summary"
@@ -17,6 +18,7 @@ struct MatchView: View {
     @EnvironmentObject var matchInfo: MatchInfo
     
     let match: Game
+    @State private var location: CLLocation?
     @State private var updater: GameUpdater?
     
     @State private var pbpUpdateTimer: Timer?
@@ -169,6 +171,42 @@ struct MatchView: View {
                         .padding()
                         .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
+                        
+                        VStack {
+                            if let _loc = location {
+                                /*Map(coordinateRegion: .constant(MKCoordinateRegion(
+                                    center: CLLocationCoordinate2D(latitude: _loc.coordinate.latitude, longitude: _loc.coordinate.longitude),
+                                    span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+                                )), interactionModes: [.zoom, .pitch], showsUserLocation: false)*/
+                                Map(bounds:
+                                        MapCameraBounds(
+                                            centerCoordinateBounds:
+                                                MKCoordinateRegion(
+                                                    center: CLLocationCoordinate2D(latitude: _loc.coordinate.latitude, longitude: _loc.coordinate.longitude),
+                                                    span: MKCoordinateSpan.init(latitudeDelta: 0.0005, longitudeDelta: 0.0005)),
+                                            minimumDistance: 500
+                                        ),
+                                    interactionModes: [.pan, .pitch, .zoom]
+                                ) {
+                                    Marker(coordinate: CLLocationCoordinate2D(latitude: _loc.coordinate.latitude, longitude: _loc.coordinate.longitude)) {
+                                        Text(match.venue)
+                                    }
+                                }
+                                .onTapGesture {
+                                    let url = URL(string: "maps://?q=\(match.venue)")
+                                    if UIApplication.shared.canOpenURL(url!) {
+                                          UIApplication.shared.open(url!, options: [:], completionHandler: nil)
+                                    }
+                                }
+                                .mapStyle(.hybrid)
+                            } else {
+                                ProgressView()
+                            }
+                        }
+                        .frame(height: 256)
+                        .frame(maxWidth: .infinity)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                     .padding(.horizontal)
                 } else if (selectedTab == .pbp) {
@@ -212,6 +250,7 @@ struct MatchView: View {
             loadTeamColors()
         }
         .task {
+            findVenue()
             if !match.played && match.date < Date.now {
                 updater = GameUpdater(gameId: match.id)
                 startTimer()
@@ -234,6 +273,23 @@ struct MatchView: View {
         withAnimation {
             self.homeColor = _homeColor
             self.awayColor = _awayColor
+        }
+    }
+    
+    func findVenue() {
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = "\(match.venue)"
+        
+        let search = MKLocalSearch(request: request)
+        search.start { (response, error) in
+            guard let response = response else {
+                print("Search error: \(error?.localizedDescription ?? "Unknown error")")
+                return
+            }
+            
+            if let venue = response.mapItems.first {
+                location = CLLocation(latitude: venue.placemark.coordinate.latitude, longitude: venue.placemark.coordinate.longitude)
+            }
         }
     }
     
