@@ -111,7 +111,7 @@ struct MatchView: View {
                     .frame(height: 172)
                     Spacer()
                     VStack {
-                        Text(String(match.awayTeam.result))
+                        Text(String(updater?.game?.awayGoals ?? match.awayTeam.result))
                             .font(.system(size: 96))
                             .fontWidth(.compressed)
                             .fontWeight(.bold)
@@ -292,7 +292,7 @@ struct MatchView: View {
     func startTimer() {
         print("Starting PBP update timer")
         pbpUpdateTimer?.invalidate()
-        pbpUpdateTimer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { timer in
+        pbpUpdateTimer = Timer.scheduledTimer(withTimeInterval: 20.0, repeats: true) { timer in
             print("Updating PBP events")
             guard updater != nil else {
                 timer.invalidate()
