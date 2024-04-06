@@ -121,6 +121,18 @@ struct MatchListView: View {
                                             }
                                         }
                                     }
+                                    
+                                    Button("Debug Activity", systemImage: "plus") {
+                                        Task {
+                                            if let _match = try await matchInfo.getMatch(match.id) {
+                                                do {
+                                                    try ActivityUpdater.shared.start(match: _match)
+                                                } catch {
+                                                    print("Failed to start activity")
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                                 .padding(.horizontal)
                         }

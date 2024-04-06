@@ -174,16 +174,12 @@ struct MatchView: View {
                         
                         VStack {
                             if let _loc = location {
-                                /*Map(coordinateRegion: .constant(MKCoordinateRegion(
-                                    center: CLLocationCoordinate2D(latitude: _loc.coordinate.latitude, longitude: _loc.coordinate.longitude),
-                                    span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
-                                )), interactionModes: [.zoom, .pitch], showsUserLocation: false)*/
                                 Map(bounds:
                                         MapCameraBounds(
                                             centerCoordinateBounds:
                                                 MKCoordinateRegion(
                                                     center: CLLocationCoordinate2D(latitude: _loc.coordinate.latitude, longitude: _loc.coordinate.longitude),
-                                                    span: MKCoordinateSpan.init(latitudeDelta: 0.0005, longitudeDelta: 0.0005)),
+                                                    span: MKCoordinateSpan.init(latitudeDelta: 0.01, longitudeDelta: 0.01)),
                                             minimumDistance: 500
                                         ),
                                     interactionModes: [.pan, .pitch, .zoom]
