@@ -130,13 +130,14 @@ struct MatchOverview: View {
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12.0))
         .overlay(alignment: .topLeading) {
-            Text(game.venue)
-                .font(.caption2)
-                .fontWeight(.semibold)
-                .foregroundStyle(.secondary)
-                .padding(.leading)
-                .padding(.top, 8)
-            
+            if let _venue = game.venue {
+                Text(_venue)
+                    .font(.caption2)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.secondary)
+                    .padding(.leading)
+                    .padding(.top, 8)
+            }
         }
         .onAppear {
             loadTeamColors()

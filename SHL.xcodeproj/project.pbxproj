@@ -84,6 +84,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		800644862BC9B46700A7560C /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Package.swift; path = ../HockeyKit/Package.swift; sourceTree = "<group>"; };
 		BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersusBar.swift; sourceTree = "<group>"; };
 		BC374DF92BAD922000378412 /* UIImageExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExt.swift; sourceTree = "<group>"; };
 		BC425E3E2B4702F900D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -156,6 +157,7 @@
 		6BD7AA263289D7097A35F2B2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				800644862BC9B46700A7560C /* Package.swift */,
 				BC425E442B4706CC00D82CFB /* WidgetKit.framework */,
 				BC425E462B4706CC00D82CFB /* SwiftUI.framework */,
 			);

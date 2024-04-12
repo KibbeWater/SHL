@@ -185,13 +185,13 @@ struct MatchView: View {
                                     interactionModes: [.pan, .pitch, .zoom]
                                 ) {
                                     Marker(coordinate: CLLocationCoordinate2D(latitude: _loc.coordinate.latitude, longitude: _loc.coordinate.longitude)) {
-                                        Text(match.venue)
+                                        Text(match.venue ?? "")
                                     }
                                 }
                                 .onTapGesture {
-                                    let url = URL(string: "maps://?q=\(match.venue)")
+                                    let url = URL(string: "maps://?q=\(match.venue ?? "")")
                                     if UIApplication.shared.canOpenURL(url!) {
-                                          UIApplication.shared.open(url!, options: [:], completionHandler: nil)
+                                        UIApplication.shared.open(url!, options: [:], completionHandler: nil)
                                     }
                                 }
                                 .mapStyle(.hybrid)
@@ -273,8 +273,10 @@ struct MatchView: View {
     }
     
     func findVenue() {
+        guard let _venue = match.venue else { return }
+        
         let request = MKLocalSearch.Request()
-        request.naturalLanguageQuery = "\(match.venue)"
+        request.naturalLanguageQuery = "\(_venue)"
         
         let search = MKLocalSearch(request: request)
         search.start { (response, error) in

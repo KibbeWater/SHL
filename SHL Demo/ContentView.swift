@@ -62,9 +62,11 @@ struct ContentView: View {
                                     }
                                     HStack {
                                         Spacer()
-                                        Text(match.venue)
-                                            .font(.footnote)
-                                        Spacer()
+                                        if let _venue = match.venue {
+                                            Text(_venue)
+                                                .font(.footnote)
+                                            Spacer()
+                                        }
                                     }
                                 }
                                 .padding(12)

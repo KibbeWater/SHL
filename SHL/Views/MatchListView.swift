@@ -11,6 +11,8 @@ private enum Tabs: String, CaseIterable {
 struct MatchListView: View {
     @EnvironmentObject var matchInfo: MatchInfo
     
+    @Environment(\.scenePhase) private var scenePhase
+    
     @State private var selectedTab: Tabs = .today
     @State private var previousMatches: [Game] = []
     @State private var todayMatches: [Game] = []
@@ -59,10 +61,27 @@ struct MatchListView: View {
                     .id(Tabs.upcoming)
                     .tag(Tabs.upcoming)
             }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
         }
         .onAppear {
             self.filterMatches()
+        }
+        .onChange(of: scenePhase) { _oldPhase, _newPhase in
+            guard _newPhase == .active else {
+                return
+            }
+            
+            matchListeners.forEach { listener in
+                listener.refreshPoller()
+            }
+            
+            Task {
+                do {
+                    try await matchInfo.getLatest()
+                } catch {
+                    print("Unable to refresh")
+                }
+            }
         }
     }
     

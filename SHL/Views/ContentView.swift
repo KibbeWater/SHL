@@ -187,15 +187,28 @@ struct ContentView: View {
                                     }
                                     HStack {
                                         Spacer()
-                                        Text(match.venue)
-                                            .font(.footnote)
-                                        Spacer()
+                                        if let _venue = match.venue {
+                                            Text(_venue)
+                                                .font(.footnote)
+                                            Spacer()
+                                        }
                                     }
                                 }
                                 .padding(12)
                                 .frame(width:200)
                                 .background(Color(UIColor.systemBackground))
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .onTapGesture(count: 5) {
+                                    debugOpen = true
+                                }
+                                .sheet(isPresented: $debugOpen) {
+                                    Capsule()
+                                        .fill(.primary)
+                                        .frame(width: 64, height: 6, alignment: .center)
+                                    
+                                        .padding()
+                                    DebugView()
+                                }
                             }
                         }
                         
