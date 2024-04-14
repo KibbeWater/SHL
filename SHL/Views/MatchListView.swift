@@ -19,6 +19,8 @@ struct MatchListView: View {
     @State private var upcomingMatches: [Game] = []
     
     @State private var matchListeners: [GameUpdater] = []
+    
+    @State private var scheduledNotifs: [String: Bool] = [:]
 
     // When matchInfo changes, re-filter the matches
     private func filterMatches() {
@@ -44,6 +46,21 @@ struct MatchListView: View {
         return matchListeners.first(where: { $0.gameId == gameId })?.game
     }
     
+    private func refreshActiveReminders() async {
+        let notifCenter = UNUserNotificationCenter.current()
+        var notifSnapshot = scheduledNotifs
+        (await notifCenter.pendingNotificationRequests()).forEach { _notif in
+            if matchInfo.latestMatches.contains(where: { $0.id == _notif.identifier }) {
+                notifSnapshot[_notif.identifier] = true
+            } else if notifSnapshot[_notif.identifier] == true {
+                notifSnapshot[_notif.identifier] = false
+            }
+        }
+        print(scheduledNotifs)
+        print(notifSnapshot)
+        scheduledNotifs = notifSnapshot
+    }
+    
     var body: some View {
         VStack {
             tabSelectionView
@@ -65,6 +82,14 @@ struct MatchListView: View {
         }
         .onAppear {
             self.filterMatches()
+            Task {
+                await refreshActiveReminders()
+            }
+        }
+        .onChange(of: matchInfo.latestMatches) {
+            Task {
+                await refreshActiveReminders()
+            }
         }
         .onChange(of: scenePhase) { _oldPhase, _newPhase in
             guard _newPhase == .active else {
@@ -108,6 +133,54 @@ struct MatchListView: View {
             try await matchInfo.getLatest()
         } catch {
             print("Unable to refresh matches")
+        }
+    }
+    
+    func requestNotificationAuthorization() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { success, error in
+            if success {
+                print("Authorization granted")
+            } else if let error = error {
+                print(error.localizedDescription)
+            }
+        }
+    }
+    
+    private func removeMatchNotification(match: Game) async {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [match.id])
+        await refreshActiveReminders()
+        print(scheduledNotifs)
+    }
+    
+    private func scheduleMatchNotification(match: Game) async {
+        requestNotificationAuthorization()
+        
+        let content = UNMutableNotificationContent()
+        content.title = "Match Starting"
+        content.body = "The match between \(match.homeTeam.name) and \(match.awayTeam.name) is about to begin in 5 minutes"
+        content.sound = UNNotificationSound.default
+        
+        let calendar = Calendar.current
+        let remindDate: Date = calendar.date(byAdding: .minute, value: -5, to: match.date)!
+        let dateComponents: DateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: remindDate)
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+        
+        let request = UNNotificationRequest(identifier: match.id, content: content, trigger: trigger)
+        
+        let notificationCenter = UNUserNotificationCenter.current()
+        do {
+            if (await notificationCenter.pendingNotificationRequests()).first(where: { $0.identifier == match.id }) != nil {
+                print("Notification is already scheduled")
+                await refreshActiveReminders()
+                return
+            }
+            
+            try await notificationCenter.add(request)
+            await refreshActiveReminders()
+            print("Notification has been scheduled")
+        } catch let _err {
+            print(_err)
         }
     }
     
@@ -157,10 +230,23 @@ struct MatchListView: View {
                         }
                         .buttonStyle(PlainButtonStyle())
                     } else {
+                        let isNotifScheduled = scheduledNotifs[match.id] == true
                         MatchOverview(game: match)
                             .id("pm-\(match.id)")
                             .clipShape(RoundedRectangle(cornerRadius: 12.0))
                             .padding(.horizontal)
+                            .contextMenu {
+                                Button(isNotifScheduled ? "Remove Reminder" : "Remind Me", systemImage: isNotifScheduled ? "bell.slash" :  "bell.and.waves.left.and.right") {
+                                    Task {
+                                        guard isNotifScheduled else {
+                                            await scheduleMatchNotification(match: match)
+                                            return
+                                        }
+                                        
+                                        await removeMatchNotification(match: match)
+                                    }
+                                }
+                            }
                     }
                 }
             }
