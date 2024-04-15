@@ -20,6 +20,8 @@ extension AnyTransition {
 }
 
 struct SHLWidgetLiveActivity: Widget {
+    @Environment(\.colorScheme) private var colorScheme
+    
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: SHLWidgetAttributes.self) { context in
             HStack {
@@ -106,9 +108,6 @@ struct SHLWidgetLiveActivity: Widget {
             }
             .padding(.horizontal)
             .padding(.vertical, 4)
-            .activityBackgroundTint(Color.clear)
-            .activitySystemActionForegroundColor(Color.black)
-
         } dynamicIsland: { context in
             DynamicIsland {
                 // Expanded UI goes here.  Compose the expanded UI through

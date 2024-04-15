@@ -219,63 +219,25 @@ struct ContentView: View {
                 }
                 .padding()
                 
-                VStack(spacing: 12) {
-                    TabView(selection: $selectedLeaderboard) {
-                        StandingsTable(title: "SHL", league: .SHL, dictionary: $leagueStandings.standings, onRefresh: {
-                            let startTime = DispatchTime.now()
+                StandingsTable(title: "Table", league: .SHL, dictionary: $leagueStandings.standings, onRefresh: {
+                    let startTime = DispatchTime.now()
+                    
+                    if (await leagueStandings.fetchLeague(league: .SHL, skipCache: true, clearExisting: true)) != nil {
+                        do {
+                            let endTime = DispatchTime.now()
+                            let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
+                            let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
                             
-                            if (await leagueStandings.fetchLeague(league: .SHL, skipCache: true, clearExisting: true)) != nil {
-                                do {
-                                    let endTime = DispatchTime.now()
-                                    let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
-                                    let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
-                                    
-                                    try await Task.sleep(nanoseconds: UInt64(remainingTime))
-                                } catch {
-                                    fatalError("Should be impossible")
-                                }
-                            }
-                        })
-                        .padding(.horizontal)
-                        .tag(LeaguePages.SHL)
-                        
-                        StandingsTable(title: "SDHL", league: .SDHL, dictionary: $leagueStandings.standings, onRefresh: {
-                            let startTime = DispatchTime.now()
-                            if (await leagueStandings.fetchLeague(league: .SDHL, skipCache: true, clearExisting: true)) != nil {
-                                do {
-                                    let endTime = DispatchTime.now()
-                                    let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
-                                    let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
-                                    
-                                    try await Task.sleep(nanoseconds: UInt64(remainingTime))
-                                } catch {
-                                    fatalError("Should be impossible")
-                                }
-                            }
-                        })
-                        .padding(.horizontal)
-                        .tag(LeaguePages.SDHL)
+                            try await Task.sleep(nanoseconds: UInt64(remainingTime))
+                        } catch {
+                            fatalError("Should be impossible")
+                        }
                     }
-                    .tabViewStyle(.page(indexDisplayMode: .never))
-                    .frame(height: 350)
-                    PageControlView(currentPage: $selectedLeaderboard, numberOfPages: .constant(2))
-                        .frame(maxWidth: 0, maxHeight: 0)
-                        .padding(.top, 12)
-                }
-                .padding(.vertical)
+                })
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .padding(.horizontal)
             }
-            /*Button("Debug") {
-                debugOpen = true
-            }
-            .buttonStyle(.borderedProminent)
-            .sheet(isPresented: $debugOpen) {
-                Capsule()
-                    .fill(.primary)
-                    .frame(width: 64, height: 6, alignment: .center)
-                
-                    .padding()
-                DebugView()
-            }*/
         }
         .onAppear {
             Task {

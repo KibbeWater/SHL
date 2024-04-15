@@ -175,7 +175,6 @@
 		BC425E482B4706CC00D82CFB /* SHLWidget */ = {
 			isa = PBXGroup;
 			children = (
-				BCEDF4132B471A01002C0DB4 /* Components */,
 				BC425E492B4706CC00D82CFB /* SHLWidgetBundle.swift */,
 				BC425E4B2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift */,
 				BC425E4F2B4706CC00D82CFB /* AppIntent.swift */,
@@ -289,13 +288,6 @@
 				BC6212E42BB05B81003CCB45 /* MatchView.swift */,
 			);
 			path = Views;
-			sourceTree = "<group>";
-		};
-		BCEDF4132B471A01002C0DB4 /* Components */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Components;
 			sourceTree = "<group>";
 		};
 		BCF54B572B40E44200960F47 /* Components */ = {

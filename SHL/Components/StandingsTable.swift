@@ -23,13 +23,10 @@ struct StandingView: View {
     public var standing: StandingObj
     
     var body: some View {
-        HStack {
+        Group {
             Text(String(standing.position))
-                .frame(width: 24, alignment: .leading)
             
             Text(standing.team)
-            
-            Spacer()
             
             Text("\(standing.points)p")
                 .padding(.trailing, 24)
@@ -80,23 +77,17 @@ struct StandingsTable: View {
         VStack {
             HStack {
                 Text(title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.white)
-                    .padding(.vertical, 6)
+                    .fontWeight(.semibold)
             }
-            .frame(minWidth: 0, maxWidth: .infinity)
-            .background(.accent)
-            
             if let _items = _intItems {
-                List {
+                LazyVGrid(columns: [
+                    GridItem(.fixed(24), alignment: .topLeading),
+                    GridItem(.flexible(), alignment: .topLeading),
+                    GridItem(.flexible(), alignment: .topTrailing),
+                    GridItem(.fixed(32), alignment: .topTrailing),
+                ]) {
                     ForEach(_items) { item in
                         StandingView(standing: item)
-                    }
-                }.listStyle(.plain)
-                .refreshable {
-                    if let _refreshCallback = onRefresh {
-                        await _refreshCallback()
                     }
                 }
             } else {
@@ -105,18 +96,9 @@ struct StandingsTable: View {
                     .padding()
                 Spacer()
             }
-            
-            HStack {
-                Text(title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.white)
-                    .padding(.vertical, 6)
-            }
-            .frame(minWidth: 0, maxWidth: .infinity)
-            .background(.accent)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding()
+        .frame(maxWidth: .infinity)
         .onChange(of: dict) { _, _ in
             let _s = formatStandings(dict)
             _intItems = _s
@@ -129,8 +111,7 @@ struct StandingsTable: View {
 
 #Preview {
     VStack {
-        Spacer()
-        StandingsTable(title: "SHL", league: .SHL, items: .constant([StandingObj(id: "1", position: 1, logo: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg", team: "Luleå Hockey", teamCode: "LHF", matches: "123", diff: "69", points: "59")])) {
+        StandingsTable(title: "Table", league: .SHL, items: .constant([StandingObj(id: "1", position: 1, logo: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg", team: "Luleå Hockey", teamCode: "LHF", matches: "123", diff: "69", points: "59")])) {
             do {
                 try await Task.sleep(nanoseconds: 1_000_000_000)
             } catch {
@@ -139,10 +120,5 @@ struct StandingsTable: View {
         }
         .padding(.horizontal)
         .frame(height: 250)
-        Spacer()
-        StandingsTable(title: "SHL", league: .SHL, items: .constant(nil))
-            .padding(.horizontal)
-            .frame(height: 250)
-        Spacer()
     }
 }
