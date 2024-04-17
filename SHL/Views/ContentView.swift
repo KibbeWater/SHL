@@ -2,68 +2,12 @@
 //  ContentView.swift
 //  LHF
 //
-//  Created by user242911 on 12/30/23.
+//  Created by KibbeWater on 12/30/23.
 //
 
-import UIKit
 import SwiftUI
 import HockeyKit
 import ActivityKit
-
-struct PageControlView<T: RawRepresentable>: UIViewRepresentable where T.RawValue == Int {
-    @Environment(\.colorScheme) private var colorScheme
-    
-    @Binding var currentPage: T
-    @Binding var numberOfPages: Int
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
-    func makeUIView(context: Context)
-    -> UIPageControl {
-        let uiView = UIPageControl()
-        uiView.pageIndicatorTintColor = colorScheme == .dark ? nil : .black.withAlphaComponent(0.2)
-        uiView.currentPageIndicatorTintColor = colorScheme == .dark ? nil : .black
-        uiView.backgroundStyle = .automatic
-        uiView.currentPage = currentPage.rawValue
-        uiView.numberOfPages = numberOfPages
-        uiView.addTarget(context.coordinator, action: #selector(Coordinator.valueChanged), for: .valueChanged)
-        return uiView
-    }
-
-    func updateUIView(_ uiView: UIPageControl, context: Context) {
-        uiView.currentPage = currentPage.rawValue
-        uiView.numberOfPages = numberOfPages
-        updateColors(uiView)
-    }
-    
-    private func updateColors(_ uiView: UIPageControl) {
-            uiView.pageIndicatorTintColor = colorScheme == .dark ? nil : .black.withAlphaComponent(0.2)
-            uiView.currentPageIndicatorTintColor = colorScheme == .dark ? nil : .black
-            uiView.backgroundStyle = .automatic
-        }
-}
-
-extension PageControlView {
-    final class Coordinator: NSObject {
-        var parent: PageControlView
-        
-        init(_ parent: PageControlView) {
-            self.parent = parent
-        }
-        
-        @objc func valueChanged(sender: UIPageControl) {
-            guard let currentPage = T(rawValue: sender.currentPage) else {
-                return
-            }
-
-            withAnimation {
-                parent.currentPage = currentPage
-            }
-        }
-    }
-}
 
 public struct LiveGame {
     public var id: String
@@ -103,8 +47,6 @@ struct ContentView: View {
     
     @State private var selectedLeaderboard: LeaguePages = .SHL
     @State private var numberOfPages = LeaguePages.allCases.count
-    
-    @State private var debugOpen: Bool = false
     
     var body: some View {
         ScrollView {
@@ -161,60 +103,12 @@ struct ContentView: View {
                         }
                         Spacer()
                     }
+                    
                     ScrollView(.horizontal) {
-                        HStack {
-                            ForEach(matchInfo.latestMatches.filter({!$0.played})) { match in
-                                VStack(spacing: 6) {
-                                    HStack {
-                                        Image("Team/\(match.homeTeam.code)")
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fit)
-                                            .frame(width: 50, height: 50)
-                                        Spacer()
-                                        VStack {
-                                            Text(FormatDate(match.date))
-                                                .font(.callout)
-                                                .fontWeight(.semibold)
-                                            Text("vs.")
-                                                .font(.callout)
-                                            Spacer()
-                                        }
-                                        Spacer()
-                                        Image("Team/\(match.awayTeam.code)")
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fit)
-                                            .frame(width: 50, height: 50)
-                                    }
-                                    HStack {
-                                        Spacer()
-                                        if let _venue = match.venue {
-                                            Text(_venue)
-                                                .font(.footnote)
-                                            Spacer()
-                                        }
-                                    }
-                                }
-                                .padding(12)
-                                .frame(width:200)
-                                .background(Color(UIColor.systemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                                .onTapGesture(count: 5) {
-                                    debugOpen = true
-                                }
-                                .sheet(isPresented: $debugOpen) {
-                                    Capsule()
-                                        .fill(.primary)
-                                        .frame(width: 64, height: 6, alignment: .center)
-                                    
-                                        .padding()
-                                    DebugView()
-                                }
-                            }
-                        }
-                        
+                        MatchCalendar(matches: matchInfo.latestMatches)
                     }
                     .padding(8)
-                    .background(.primary.opacity(0.1))
+                    .background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
                 .padding()
@@ -291,12 +185,6 @@ struct ContentView: View {
                 Logging.shared.log("This should be impossible, please report this issue \(_err)")
             }
         }
-    }
-    
-    func FormatDate(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM dd"
-        return dateFormatter.string(from: date)
     }
     
     func ReformatStandings(_ standings: StandingResults) -> [StandingObj] {

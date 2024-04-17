@@ -39,6 +39,7 @@ struct MatchView: View {
                 LinearGradient(gradient: Gradient(colors: [.clear, Color(uiColor: .systemBackground)]), startPoint: .top, endPoint: .bottom)
             }
             .ignoresSafeArea()
+            
             ScrollView {
                 HStack(spacing: 16) {
                     Spacer()
@@ -153,13 +154,29 @@ struct MatchView: View {
                 
                 if (selectedTab == .summary) {
                     VStack {
+                        if !match.played && match.date > Date.now {
+                            VStack {
+                                Text("GAME IS LIVE")
+                                    .foregroundStyle(.red)
+                                    .fontWeight(.bold)
+                                Text("Stats and PBP plays may be updated")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(.ultraThinMaterial)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        
                         VStack {
+                            let goals: [GoalEvent] = getEvents(pbpEvents, type: GoalEvent.self)
+                            let shots: [ShotEvent] = getEvents(pbpEvents, type: ShotEvent.self)
                             let penalties: [PenaltyEvent] = getEvents(pbpEvents, type: PenaltyEvent.self)
+                            
                             let homePenalties = penalties.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
                             let awayPenalties = penalties.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
                             VersusBar("Penalties", homeSide: homePenalties.count, awaySide: awayPenalties.count, homeColor: homeColor, awayColor: awayColor)
                             
-                            let shots: [ShotEvent] = getEvents(pbpEvents, type: ShotEvent.self)
+                            
                             let homeShots = shots.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
                             let awayShots = shots.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
                             VersusBar("Shots", homeSide: homeShots.count, awaySide: awayShots.count, homeColor: homeColor, awayColor: awayColor)
@@ -167,6 +184,10 @@ struct MatchView: View {
                             let homeShotsGoal = homeShots.filter({ $0.goalSection == 0 })
                             let awayShotsGoal = awayShots.filter({ $0.goalSection == 0 })
                             VersusBar("Shots on goals", homeSide: homeShotsGoal.count, awaySide: awayShotsGoal.count, homeColor: homeColor, awayColor: awayColor)
+                            
+                            let homeGoals = goals.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
+                            let awayGoals = goals.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
+                            VersusBar("Save %", homePercent: 1.0-(Float(homeGoals.count) / Float(homeShotsGoal.count + awayShotsGoal.count + goals.count)), awayPercent: 1.0-(Float(awayGoals.count) / Float(homeShotsGoal.count + awayShotsGoal.count + goals.count)), homeColor: homeColor, awayColor: awayColor)
                         }
                         .padding()
                         .background(.ultraThinMaterial)

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		801BC55A2BCFEF2C00417693 /* StandingsTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFA44AA2B44C06700B4358C /* StandingsTable.swift */; };
+		802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802B98E72BD06C6800278A00 /* MatchCalendar.swift */; };
 		BC044CEA2BB43F9A0058B12B /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = BC044CE92BB43F9A0058B12B /* HockeyKit */; };
 		BC369E1C2BBAF5CC00940F42 /* VersusBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */; };
 		BC374DFA2BAD922000378412 /* UIImageExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC374DF92BAD922000378412 /* UIImageExt.swift */; };
@@ -85,6 +86,7 @@
 
 /* Begin PBXFileReference section */
 		800644862BC9B46700A7560C /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Package.swift; path = ../HockeyKit/Package.swift; sourceTree = "<group>"; };
+		802B98E72BD06C6800278A00 /* MatchCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCalendar.swift; sourceTree = "<group>"; };
 		BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersusBar.swift; sourceTree = "<group>"; };
 		BC374DF92BAD922000378412 /* UIImageExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExt.swift; sourceTree = "<group>"; };
 		BC425E3E2B4702F900D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -296,6 +298,7 @@
 				BC7645B52B46054A0000B7AB /* DebugView.swift */,
 				BC457B1A2BB9BB9100227D75 /* PBPView.swift */,
 				BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */,
+				802B98E72BD06C6800278A00 /* MatchCalendar.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -470,6 +473,7 @@
 			files = (
 				BCAFE2D02B4095170044225A /* ContentView.swift in Sources */,
 				BC369E1C2BBAF5CC00940F42 /* VersusBar.swift in Sources */,
+				802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */,
 				BC8C15112BAC787B0010AB59 /* MatchOverview.swift in Sources */,
 				BCD7BC182BAF6B9800E208B3 /* MatchListView.swift in Sources */,
 				BC457B1B2BB9BB9100227D75 /* PBPView.swift in Sources */,

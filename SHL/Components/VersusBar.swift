@@ -9,31 +9,46 @@ import SwiftUI
 
 struct VersusBar: View {
     var title: String
-    var homeSide: Int
-    var awaySide: Int
+    var homeSide: Float
+    var awaySide: Float
     
     var homeColor: Color
     var awayColor: Color
     
+    private var isPercent: Bool
+    
     init(_ title: String, homeSide: Int, awaySide: Int, homeColor: Color, awayColor: Color) {
         self.title = title
-        self.homeSide = homeSide
-        self.awaySide = awaySide
+        self.homeSide = Float(homeSide)
+        self.awaySide = Float(awaySide)
         
         self.homeColor = homeColor
         self.awayColor = awayColor
+        
+        self.isPercent = false
+    }
+    
+    init(_ title: String, homePercent: Float, awayPercent: Float, homeColor: Color, awayColor: Color) {
+        self.title = title
+        self.homeSide = homePercent
+        self.awaySide = awayPercent
+        
+        self.homeColor = homeColor
+        self.awayColor = awayColor
+        
+        self.isPercent = true
     }
     
     var body: some View {
         VStack {
             HStack {
-                Text("\(homeSide)")
+                Text("\(isPercent ? String("\(floor(homeSide * 1000) / 10)%") : String(format: "%.0f", homeSide))")
                     .font(.title2)
                     .fontWidth(.compressed)
                     .fontWeight(.bold)
                     .padding(2)
                 Spacer()
-                Text("\(awaySide)")
+                Text("\(isPercent ? String("\(floor(awaySide * 1000) / 10)%") : String(format: "%.0f", awaySide))")
                     .font(.title2)
                     .fontWidth(.compressed)
                     .fontWeight(.bold)
@@ -76,6 +91,10 @@ struct VersusBar: View {
     VStack {
         VersusBar("Penalties", homeSide: 3, awaySide: 7, homeColor: .red, awayColor: .blue)
         VersusBar("Shots on goal", homeSide: 37, awaySide: 24, homeColor: .red, awayColor: .blue)
+            .padding(.bottom, 64)
+        
+        VersusBar("Penalties %", homePercent: 0.3, awayPercent: 0.7, homeColor: .red, awayColor: .blue)
+        VersusBar("Shots %", homePercent: 0.60655, awayPercent: 0.39344, homeColor: .red, awayColor: .blue)
     }
     .padding(.horizontal)
 }
