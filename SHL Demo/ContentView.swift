@@ -18,8 +18,6 @@ struct ContentView: View {
     @State private var selectedLeaderboard: LeaguePages = .SHL
     @State private var numberOfPages = LeaguePages.allCases.count
     
-    @State private var debugOpen: Bool = false
-    
     var body: some View {
         PromotionBanner()
         ScrollView {
@@ -84,49 +82,24 @@ struct ContentView: View {
                 .padding()
                 
                 VStack(spacing: 12) {
-                    TabView(selection: $selectedLeaderboard) {
-                        StandingsTable(title: "SHL", league: .SHL, dictionary: $leagueStandings.standings, onRefresh: {
-                            let startTime = DispatchTime.now()
-                            
-                            if (await leagueStandings.fetchLeague(league: .SHL, skipCache: true, clearExisting: true)) != nil {
-                                do {
-                                    let endTime = DispatchTime.now()
-                                    let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
-                                    let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
-                                    
-                                    try await Task.sleep(nanoseconds: UInt64(remainingTime))
-                                } catch {
-                                    fatalError("Should be impossible")
-                                }
-                            }
-                        })
-                        .padding(.horizontal)
-                        .tag(LeaguePages.SHL)
-                        .id(LeaguePages.SDHL)
+                    StandingsTable(title: "Table", league: .SHL, dictionary: $leagueStandings.standings, onRefresh: {
+                        let startTime = DispatchTime.now()
                         
-                        StandingsTable(title: "SDHL", league: .SDHL, dictionary: $leagueStandings.standings, onRefresh: {
-                            let startTime = DispatchTime.now()
-                            if (await leagueStandings.fetchLeague(league: .SDHL, skipCache: true, clearExisting: true)) != nil {
-                                do {
-                                    let endTime = DispatchTime.now()
-                                    let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
-                                    let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
-                                    
-                                    try await Task.sleep(nanoseconds: UInt64(remainingTime))
-                                } catch {
-                                    fatalError("Should be impossible")
-                                }
+                        if (await leagueStandings.fetchLeague(league: .SHL, skipCache: true, clearExisting: true)) != nil {
+                            do {
+                                let endTime = DispatchTime.now()
+                                let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
+                                let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
+                                
+                                try await Task.sleep(nanoseconds: UInt64(remainingTime))
+                            } catch {
+                                fatalError("Should be impossible")
                             }
-                        })
-                        .padding(.horizontal)
-                        .tag(LeaguePages.SDHL)
-                        .id(LeaguePages.SDHL)
-                    }
-                    .tabViewStyle(.page(indexDisplayMode: .never))
-                    .frame(height: 350)
-                    PageControlView(currentPage: $selectedLeaderboard, numberOfPages: .constant(2))
-                        .frame(maxWidth: 0, maxHeight: 0)
-                        .padding(.top, 12)
+                        }
+                    })
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .padding(.horizontal)
                 }
                 .padding(.vertical)
             }

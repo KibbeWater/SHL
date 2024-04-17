@@ -228,19 +228,6 @@ struct MatchView: View {
                 }
             }
             .coordinateSpace(name: "scroll")
-            /*VStack {}
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .safeAreaInset(edge: .top) {
-                if (offset >= 200) {
-                    HStack {
-                        Spacer()
-                        Text("Hello, World!")
-                        Spacer()
-                    }
-                    .background(.bar)
-                    .zIndex(100)
-                }
-            }*/
         }
         .onAppear {
             loadTeamColors()

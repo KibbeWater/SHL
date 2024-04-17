@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		801BC55A2BCFEF2C00417693 /* StandingsTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFA44AA2B44C06700B4358C /* StandingsTable.swift */; };
 		BC044CEA2BB43F9A0058B12B /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = BC044CE92BB43F9A0058B12B /* HockeyKit */; };
 		BC369E1C2BBAF5CC00940F42 /* VersusBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */; };
 		BC374DFA2BAD922000378412 /* UIImageExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC374DF92BAD922000378412 /* UIImageExt.swift */; };
@@ -29,7 +30,6 @@
 		BC8848182BB1637F00844DBB /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = BC8848172BB1637F00844DBB /* HockeyKit */; };
 		BC88481B2BB1642E00844DBB /* MatchOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88481A2BB1642E00844DBB /* MatchOverview.swift */; };
 		BC88481E2BB1660700844DBB /* UIImageColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88481D2BB1660700844DBB /* UIImageColors.swift */; };
-		BC8848202BB166FC00844DBB /* StandingsTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88481F2BB166FC00844DBB /* StandingsTable.swift */; };
 		BC8C15112BAC787B0010AB59 /* MatchOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8C15102BAC787B0010AB59 /* MatchOverview.swift */; };
 		BC9490732BB19F63009047E4 /* PromotionBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC9490722BB19F63009047E4 /* PromotionBanner.swift */; };
 		BCAFE2CE2B4095170044225A /* SHLApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CD2B4095170044225A /* SHLApp.swift */; };
@@ -109,7 +109,6 @@
 		BC88480F2BB15F4F00844DBB /* SHL_Demo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SHL_Demo.entitlements; sourceTree = "<group>"; };
 		BC88481A2BB1642E00844DBB /* MatchOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverview.swift; sourceTree = "<group>"; };
 		BC88481D2BB1660700844DBB /* UIImageColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageColors.swift; sourceTree = "<group>"; };
-		BC88481F2BB166FC00844DBB /* StandingsTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingsTable.swift; sourceTree = "<group>"; };
 		BC8848252BB1714800844DBB /* SHL.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SHL.entitlements; sourceTree = "<group>"; };
 		BC8C15102BAC787B0010AB59 /* MatchOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverview.swift; sourceTree = "<group>"; };
 		BC9490722BB19F63009047E4 /* PromotionBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionBanner.swift; sourceTree = "<group>"; };
@@ -211,7 +210,6 @@
 			isa = PBXGroup;
 			children = (
 				BC88481A2BB1642E00844DBB /* MatchOverview.swift */,
-				BC88481F2BB166FC00844DBB /* StandingsTable.swift */,
 				BC9490722BB19F63009047E4 /* PromotionBanner.swift */,
 			);
 			path = Components;
@@ -400,7 +398,7 @@
 			);
 			mainGroup = BCAFE2C12B4095170044225A;
 			packageReferences = (
-				BC81B64F2B40ACE5007B2E90 /* XCLocalSwiftPackageReference "../HockeyKit" */,
+				801BC55B2BD06A8F00417693 /* XCRemoteSwiftPackageReference "HockeyKit" */,
 			);
 			productRefGroup = BCAFE2CB2B4095170044225A /* Products */;
 			projectDirPath = "";
@@ -458,7 +456,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BC8848082BB15F4E00844DBB /* ContentView.swift in Sources */,
-				BC8848202BB166FC00844DBB /* StandingsTable.swift in Sources */,
+				801BC55A2BCFEF2C00417693 /* StandingsTable.swift in Sources */,
 				BC88481E2BB1660700844DBB /* UIImageColors.swift in Sources */,
 				BC9490732BB19F63009047E4 /* PromotionBanner.swift in Sources */,
 				BC8848062BB15F4E00844DBB /* LHF_DemoApp.swift in Sources */,
@@ -880,12 +878,16 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		BC81B64F2B40ACE5007B2E90 /* XCLocalSwiftPackageReference "../HockeyKit" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../HockeyKit;
+/* Begin XCRemoteSwiftPackageReference section */
+		801BC55B2BD06A8F00417693 /* XCRemoteSwiftPackageReference "HockeyKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:KibbeWater/HockeyKit.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
 		};
-/* End XCLocalSwiftPackageReference section */
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		BC044CE92BB43F9A0058B12B /* HockeyKit */ = {
