@@ -37,11 +37,9 @@ struct MatchCalendar: View {
                     }
                     HStack {
                         Spacer()
-                        if let _venue = match.venue {
-                            Text(_venue)
-                                .font(.footnote)
-                            Spacer()
-                        }
+                        Text(match.venue ?? "TBD")
+                            .font(.footnote)
+                        Spacer()
                     }
                 }
                 .padding(12)
@@ -49,7 +47,7 @@ struct MatchCalendar: View {
                 .background(Color(UIColor.systemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-        }
+        }   
     }
     
     func FormatDate(_ date: Date) -> String {

@@ -196,32 +196,12 @@ struct MatchListView: View {
                                 .id("pm-\(match.id)")
                                 .clipShape(RoundedRectangle(cornerRadius: 12.0))
                                 .contextMenu {
-                                    let activityActive = Activity<SHLWidgetAttributes>.activities.contains(where: { $0.attributes.id == match.id })
-                                    Button(activityActive ? "Stop Activity" : "Start Activity", systemImage: activityActive ? "minus" : "plus") {
+                                    Button("Start Activity", systemImage: "plus") {
                                         if let live = getLiveMatch(gameId: match.id) {
-                                            if activityActive {
-                                                do {
-                                                    try ActivityUpdater.shared.start(match: live)
-                                                } catch {
-                                                    print("Failed to start activity")
-                                                }
-                                            } else {
-                                                let activity = Activity<SHLWidgetAttributes>.activities.first(where: { $0.attributes.id == match.id })
-                                                Task {
-                                                    await activity?.end(nil, dismissalPolicy: .immediate)
-                                                }
-                                            }
-                                        }
-                                    }
-                                    
-                                    Button("Debug Activity", systemImage: "plus") {
-                                        Task {
-                                            if let _match = try await matchInfo.getMatch(match.id) {
-                                                do {
-                                                    try ActivityUpdater.shared.start(match: _match)
-                                                } catch {
-                                                    print("Failed to start activity")
-                                                }
+                                            do {
+                                                try ActivityUpdater.shared.start(match: live)
+                                            } catch {
+                                                print("Failed to start activity")
                                             }
                                         }
                                     }

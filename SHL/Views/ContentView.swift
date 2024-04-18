@@ -50,12 +50,10 @@ struct ContentView: View {
     
     var body: some View {
         ScrollView {
-            if let featured = SelectFeaturedMatch(),
-               gameListener?.game != nil {
+            if gameListener?.game != nil {
                 HStack {
                     Spacer()
-                    let activityActive = Activity<SHLWidgetAttributes>.activities.contains(where: { $0.attributes.id == featured.id })
-                    Button(activityActive ? "Stop Tracking" : "Track", systemImage: activityActive ? "minus" : "plus") {
+                    Button("Start Activity", systemImage: "plus") {
                         guard let _game = gameListener?.game else {
                             return
                         }
@@ -72,6 +70,7 @@ struct ContentView: View {
                 }
                 .padding(.horizontal)
             }
+            
             NavigationLink(destination: {
                 MatchListView()
             }, label: {
@@ -92,6 +91,7 @@ struct ContentView: View {
             })
             .buttonStyle(PlainButtonStyle())
             .padding(.horizontal)
+            
             VStack(spacing: 0) {
                 VStack {
                     HStack {
@@ -174,11 +174,12 @@ struct ContentView: View {
                 let startTime = DispatchTime.now()
                 
                 try await matchInfo.getLatest()
+                if let newGame = matchInfo.latestMatches.last(where: { IsLive($0) }) {
+                    gameListener = GameUpdater(gameId: newGame.id)
+                }
                 let endTime = DispatchTime.now()
                 let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
                 let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
-                
-                gameListener?.refreshPoller()
                 
                 try await Task.sleep(nanoseconds: UInt64(remainingTime))
             } catch let _err {
