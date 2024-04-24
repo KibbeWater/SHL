@@ -50,7 +50,7 @@ struct ContentView: View {
     
     var body: some View {
         ScrollView {
-            if gameListener?.game != nil {
+            if #available(iOS 17.2, *) {
                 HStack {
                     Spacer()
                     Button("Start Activity", systemImage: "plus") {
@@ -67,6 +67,7 @@ struct ContentView: View {
                     .buttonStyle(.bordered)
                     .clipShape(RoundedRectangle(cornerRadius: .infinity))
                     .font(.caption)
+                    .disabled(gameListener == nil)
                 }
                 .padding(.horizontal)
             }
@@ -113,41 +114,15 @@ struct ContentView: View {
                 }
                 .padding()
                 
-                StandingsTable(title: "Table", league: .SHL, dictionary: $leagueStandings.standings, onRefresh: {
-                    let startTime = DispatchTime.now()
-                    
-                    if (await leagueStandings.fetchLeague(league: .SHL, skipCache: true, clearExisting: true)) != nil {
-                        do {
-                            let endTime = DispatchTime.now()
-                            let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
-                            let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
-                            
-                            try await Task.sleep(nanoseconds: UInt64(remainingTime))
-                        } catch {
-                            fatalError("Should be impossible")
-                        }
-                    }
-                })
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .padding(.horizontal)
+                StandingsTable(title: "Table", league: .SHL, dictionary: $leagueStandings.standings)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .padding(.horizontal)
             }
         }
-        .onAppear {
-            Task {
-                do {
-                    try await matchInfo.getLatest()
-                } catch {
-                    fatalError("This should be impossible, please report this issue")
-                }
-            }
-            Task {
-                leagueStandings.fetchLeagues(skipCache: true)
-            }
-        }
-        .onChange(of: matchInfo.latestMatches, { oldMatches, newMatches in
+        .onChange(of: matchInfo.latestMatches, perform: { oldMatches in
             let oldGame = oldMatches.last(where: { IsLive($0) })
-            guard let newGame = newMatches.last(where: { IsLive($0) }) else { return }
+            guard let newGame = matchInfo.latestMatches.last(where: { IsLive($0) }) else { return }
             
             guard oldGame?.id != newGame.id else {
                 return
@@ -155,8 +130,8 @@ struct ContentView: View {
             
             gameListener = GameUpdater(gameId: newGame.id)
         })
-        .onChange(of: scenePhase, { _oldPhase, _newPhase in
-            guard _newPhase == .active else {
+        .onChange(of: scenePhase, perform: { _ in
+            guard scenePhase == .active else {
                 return
             }
             
@@ -170,21 +145,18 @@ struct ContentView: View {
             }
         })
         .refreshable {
-            do {
-                let startTime = DispatchTime.now()
+            await Task {
+                do {
+                    try await matchInfo.getLatest()
+                    let _ = try await leagueStandings.fetchLeague(league: .SHL, skipCache: true)
+                } catch let _err {
+                    print(_err)
+                }
                 
-                try await matchInfo.getLatest()
                 if let newGame = matchInfo.latestMatches.last(where: { IsLive($0) }) {
                     gameListener = GameUpdater(gameId: newGame.id)
                 }
-                let endTime = DispatchTime.now()
-                let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
-                let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
-                
-                try await Task.sleep(nanoseconds: UInt64(remainingTime))
-            } catch let _err {
-                Logging.shared.log("This should be impossible, please report this issue \(_err)")
-            }
+            }.value
         }
     }
     

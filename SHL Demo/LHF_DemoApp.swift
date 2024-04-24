@@ -15,7 +15,7 @@ struct LHF_DemoApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Root()
                 .environmentObject(matchInfo)
                 .environmentObject(leagueStandigs)
         }

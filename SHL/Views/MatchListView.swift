@@ -56,8 +56,7 @@ struct MatchListView: View {
                 notifSnapshot[_notif.identifier] = false
             }
         }
-        print(scheduledNotifs)
-        print(notifSnapshot)
+        
         scheduledNotifs = notifSnapshot
     }
     
@@ -86,13 +85,13 @@ struct MatchListView: View {
                 await refreshActiveReminders()
             }
         }
-        .onChange(of: matchInfo.latestMatches) {
+        .onChange(of: matchInfo.latestMatches) { _ in
             Task {
                 await refreshActiveReminders()
             }
         }
-        .onChange(of: scenePhase) { _oldPhase, _newPhase in
-            guard _newPhase == .active else {
+        .onChange(of: scenePhase) { _ in
+            guard scenePhase == .active else {
                 return
             }
             
@@ -171,14 +170,12 @@ struct MatchListView: View {
         let notificationCenter = UNUserNotificationCenter.current()
         do {
             if (await notificationCenter.pendingNotificationRequests()).first(where: { $0.identifier == match.id }) != nil {
-                print("Notification is already scheduled")
                 await refreshActiveReminders()
                 return
             }
             
             try await notificationCenter.add(request)
             await refreshActiveReminders()
-            print("Notification has been scheduled")
         } catch let _err {
             print(_err)
         }
@@ -192,41 +189,59 @@ struct MatchListView: View {
                         NavigationLink {
                             MatchView(match: match)
                         } label: {
-                            MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
-                                .id("pm-\(match.id)")
-                                .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                                .contextMenu {
-                                    Button("Start Activity", systemImage: "plus") {
-                                        if let live = getLiveMatch(gameId: match.id) {
-                                            do {
-                                                try ActivityUpdater.shared.start(match: live)
-                                            } catch {
-                                                print("Failed to start activity")
+                            if #available(iOS 17.2, *) {
+                                MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
+                                    .id("pm-\(match.id)")
+                                    .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                                    .contextMenu {
+                                        Button("Start Activity", systemImage: "plus") {
+                                            if let live = getLiveMatch(gameId: match.id) {
+                                                do {
+                                                    try ActivityUpdater.shared.start(match: live)
+                                                } catch {
+                                                    print("Failed to start activity")
+                                                }
                                             }
                                         }
+                                        
+                                        #if DEBUG
+                                        Button("Debug Activity") {
+                                            try? ActivityUpdater.shared.start(match: GameOverview.generateFake())
+                                        }
+                                        #endif
                                     }
-                                }
-                                .padding(.horizontal)
+                                    .padding(.horizontal)
+                            } else {
+                                MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
+                                    .id("pm-\(match.id)")
+                                    .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                                    .padding(.horizontal)
+                            }
                         }
                         .buttonStyle(PlainButtonStyle())
                     } else {
                         let isNotifScheduled = scheduledNotifs[match.id] == true
-                        MatchOverview(game: match)
-                            .id("pm-\(match.id)")
-                            .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                            .padding(.horizontal)
-                            .contextMenu {
-                                Button(isNotifScheduled ? "Remove Reminder" : "Remind Me", systemImage: isNotifScheduled ? "bell.slash" :  "bell.and.waves.left.and.right") {
-                                    Task {
-                                        guard isNotifScheduled else {
-                                            await scheduleMatchNotification(match: match)
-                                            return
+                        NavigationLink {
+                            MatchView(match: match)
+                        } label: {
+                            MatchOverview(game: match)
+                                .id("pm-\(match.id)")
+                                .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                                .padding(.horizontal)
+                                .contextMenu {
+                                    Button(isNotifScheduled ? "Remove Reminder" : "Remind Me", systemImage: isNotifScheduled ? "bell.slash" :  "bell.and.waves.left.and.right") {
+                                        Task {
+                                            guard isNotifScheduled else {
+                                                await scheduleMatchNotification(match: match)
+                                                return
+                                            }
+                                            
+                                            await removeMatchNotification(match: match)
                                         }
-                                        
-                                        await removeMatchNotification(match: match)
                                     }
                                 }
-                            }
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
             }

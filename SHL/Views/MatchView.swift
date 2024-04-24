@@ -44,20 +44,22 @@ struct MatchView: View {
                 HStack(spacing: 16) {
                     Spacer()
                     VStack {
-                        Text(String(updater?.game?.homeGoals ?? match.homeTeam.result))
-                            .font(.system(size: 96))
-                            .fontWidth(.compressed)
-                            .fontWeight(.bold)
-                            .foregroundStyle(updater?.game?.homeGoals ?? match.homeTeam.result > updater?.game?.awayGoals ?? match.awayTeam.result ? .white : .white.opacity(0.5))
-                            .padding(.bottom, -2)
-                        Spacer()
+                        if (match.date < Date.now) {
+                            Text(String(updater?.game?.homeGoals ?? match.homeTeam.result))
+                                .font(.system(size: 96))
+                                .fontWidth(.compressed)
+                                .fontWeight(.bold)
+                                .foregroundStyle(updater?.game?.homeGoals ?? match.homeTeam.result > updater?.game?.awayGoals ?? match.awayTeam.result ? .white : .white.opacity(0.5))
+                                .padding(.bottom, -2)
+                            Spacer()
+                        }
                         Image("Team/\(match.homeTeam.code)")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 84, height: 84)
                             .padding(0)
                     }
-                    .frame(height: 172)
+                    .frame(height: match.date < Date.now ? 172 : 84)
                     Spacer()
                     VStack {
                         if let _game = updater?.game {
@@ -94,11 +96,19 @@ struct MatchView: View {
                                     .foregroundColor(.white)
                             }
                         } else {
-                            Text(match.shootout ? "OT" : match.overtime ? "OT" : match.played ? "Full" : Calendar.current.isDate(match.date, inSameDayAs: Date()) ? FormatTime(match.date) : FormatDate(match.date))
-                                .fontWeight(.semibold)
-                                .font(.title)
-                                .frame(height: 96)
-                                .foregroundColor(.white)
+                            if match.date < Date.now {
+                                Text(match.shootout ? "OT" : match.overtime ? "OT" : match.played ? "Full" : Calendar.current.isDate(match.date, inSameDayAs: Date()) ? FormatTime(match.date) : FormatDate(match.date))
+                                    .fontWeight(.semibold)
+                                    .font(.title)
+                                    .frame(height: 96)
+                                    .foregroundColor(.white)
+                            } else {
+                                Text(Calendar.current.isDate(match.date, inSameDayAs: Date()) ? FormatTime(match.date) : FormatDate(match.date))
+                                    .fontWeight(.semibold)
+                                    .font(.title)
+                                    .frame(height: 96)
+                                    .foregroundColor(.white)
+                            }
                         }
                         Spacer()
                     }
@@ -109,23 +119,25 @@ struct MatchView: View {
                                 .foregroundStyle(.white.opacity(0.5))
                         }
                     })
-                    .frame(height: 172)
+                    .frame(height: match.date < Date.now ? 172 : 84)
                     Spacer()
                     VStack {
-                        Text(String(updater?.game?.awayGoals ?? match.awayTeam.result))
-                            .font(.system(size: 96))
-                            .fontWidth(.compressed)
-                            .fontWeight(.bold)
-                            .foregroundStyle(match.awayTeam.result > match.homeTeam.result ? .white : .white.opacity(0.5))
-                            .padding(.bottom, -2)
-                        Spacer()
+                        if match.date < Date.now {
+                            Text(String(updater?.game?.awayGoals ?? match.awayTeam.result))
+                                .font(.system(size: 96))
+                                .fontWidth(.compressed)
+                                .fontWeight(.bold)
+                                .foregroundStyle(match.awayTeam.result > match.homeTeam.result ? .white : .white.opacity(0.5))
+                                .padding(.bottom, -2)
+                            Spacer()
+                        }
                         Image("Team/\(match.awayTeam.code)")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 84, height: 84)
                             .padding(0)
                     }
-                    .frame(height: 172)
+                    .frame(height: match.date < Date.now ? 172 : 84)
                     Spacer()
                 }
                 .background(GeometryReader {
@@ -154,7 +166,7 @@ struct MatchView: View {
                 
                 if (selectedTab == .summary) {
                     VStack {
-                        if !match.played && match.date > Date.now {
+                        if !match.played && match.date < Date.now {
                             VStack {
                                 Text("GAME IS LIVE")
                                     .foregroundStyle(.red)
@@ -167,55 +179,61 @@ struct MatchView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
                         
-                        VStack {
-                            let goals: [GoalEvent] = getEvents(pbpEvents, type: GoalEvent.self)
-                            let shots: [ShotEvent] = getEvents(pbpEvents, type: ShotEvent.self)
-                            let penalties: [PenaltyEvent] = getEvents(pbpEvents, type: PenaltyEvent.self)
-                            
-                            let homePenalties = penalties.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
-                            let awayPenalties = penalties.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
-                            VersusBar("Penalties", homeSide: homePenalties.count, awaySide: awayPenalties.count, homeColor: homeColor, awayColor: awayColor)
-                            
-                            
-                            let homeShots = shots.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
-                            let awayShots = shots.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
-                            VersusBar("Shots", homeSide: homeShots.count, awaySide: awayShots.count, homeColor: homeColor, awayColor: awayColor)
-                            
-                            let homeShotsGoal = homeShots.filter({ $0.goalSection == 0 })
-                            let awayShotsGoal = awayShots.filter({ $0.goalSection == 0 })
-                            VersusBar("Shots on goals", homeSide: homeShotsGoal.count, awaySide: awayShotsGoal.count, homeColor: homeColor, awayColor: awayColor)
-                            
-                            let homeGoals = goals.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
-                            let awayGoals = goals.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
-                            VersusBar("Save %", homePercent: 1.0-(Float(homeGoals.count) / Float(homeShotsGoal.count + awayShotsGoal.count + goals.count)), awayPercent: 1.0-(Float(awayGoals.count) / Float(homeShotsGoal.count + awayShotsGoal.count + goals.count)), homeColor: homeColor, awayColor: awayColor)
+                        if match.date < Date.now {
+                            VStack {
+                                let goals: [GoalEvent] = getEvents(pbpEvents, type: GoalEvent.self)
+                                let shots: [ShotEvent] = getEvents(pbpEvents, type: ShotEvent.self)
+                                let penalties: [PenaltyEvent] = getEvents(pbpEvents, type: PenaltyEvent.self)
+                                
+                                let homePenalties = penalties.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
+                                let awayPenalties = penalties.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
+                                VersusBar("Penalties", homeSide: homePenalties.count, awaySide: awayPenalties.count, homeColor: homeColor, awayColor: awayColor)
+                                
+                                
+                                let homeShots = shots.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
+                                let awayShots = shots.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
+                                VersusBar("Shots", homeSide: homeShots.count, awaySide: awayShots.count, homeColor: homeColor, awayColor: awayColor)
+                                
+                                let homeShotsGoal = homeShots.filter({ $0.goalSection == 0 })
+                                let awayShotsGoal = awayShots.filter({ $0.goalSection == 0 })
+                                VersusBar("Shots on goals", homeSide: homeShotsGoal.count, awaySide: awayShotsGoal.count, homeColor: homeColor, awayColor: awayColor)
+                                
+                                let homeGoals = goals.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
+                                let awayGoals = goals.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
+                                VersusBar("Save %", homePercent: 1.0-(Float(homeGoals.count) / Float(homeShotsGoal.count + awayShotsGoal.count + goals.count)), awayPercent: 1.0-(Float(awayGoals.count) / Float(homeShotsGoal.count + awayShotsGoal.count + goals.count)), homeColor: homeColor, awayColor: awayColor)
+                            }
+                            .padding()
+                            .background(.ultraThinMaterial)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
-                        .padding()
-                        .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
                         
                         VStack {
                             if let _loc = location {
-                                Map(bounds:
-                                        MapCameraBounds(
-                                            centerCoordinateBounds:
-                                                MKCoordinateRegion(
-                                                    center: CLLocationCoordinate2D(latitude: _loc.coordinate.latitude, longitude: _loc.coordinate.longitude),
-                                                    span: MKCoordinateSpan.init(latitudeDelta: 0.01, longitudeDelta: 0.01)),
-                                            minimumDistance: 500
-                                        ),
-                                    interactionModes: [.pan, .pitch, .zoom]
-                                ) {
-                                    Marker(coordinate: CLLocationCoordinate2D(latitude: _loc.coordinate.latitude, longitude: _loc.coordinate.longitude)) {
-                                        Text(match.venue ?? "")
+                                if #available(iOS 17.0, *) {
+                                    Map(bounds:
+                                            MapCameraBounds(
+                                                centerCoordinateBounds:
+                                                    MKCoordinateRegion(
+                                                        center: CLLocationCoordinate2D(latitude: _loc.coordinate.latitude, longitude: _loc.coordinate.longitude),
+                                                        span: MKCoordinateSpan.init(latitudeDelta: 1, longitudeDelta: 1)),
+                                                minimumDistance: 500
+                                            ),
+                                        interactionModes: [.pan, .pitch, .zoom]
+                                    ) {
+                                        Marker(coordinate: CLLocationCoordinate2D(latitude: _loc.coordinate.latitude, longitude: _loc.coordinate.longitude)) {
+                                            Text(match.venue ?? "")
+                                        }
                                     }
-                                }
-                                .onTapGesture {
-                                    let url = URL(string: "maps://?q=\(match.venue ?? "")")
-                                    if UIApplication.shared.canOpenURL(url!) {
-                                        UIApplication.shared.open(url!, options: [:], completionHandler: nil)
+                                    .onTapGesture {
+                                        let url = URL(string: "maps://?q=\(match.venue ?? "")")
+                                        if UIApplication.shared.canOpenURL(url!) {
+                                            UIApplication.shared.open(url!, options: [:], completionHandler: nil)
+                                        }
                                     }
+                                    .mapStyle(.hybrid)
+                                } else {
+                                    // TODO: Fallback on earlier versions
                                 }
-                                .mapStyle(.hybrid)
                             } else {
                                 ProgressView()
                             }
@@ -227,10 +245,19 @@ struct MatchView: View {
                     }
                     .padding(.horizontal)
                 } else if (selectedTab == .pbp) {
-                    VStack {
-                        PBPView(events: $pbpEvents)
+                    if match.date > Date.now {
+                        VStack {
+                            Text("Game has not yet started")
+                                .foregroundStyle(.white)
+                                .fontWeight(.semibold)
+                                .padding(.top)
+                        }
+                    } else if !pbpEvents.isEmpty {
+                        VStack {
+                            PBPView(events: $pbpEvents)
+                        }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
                 }
             }
             .refreshable {
@@ -352,7 +379,12 @@ struct ViewOffsetKey: PreferenceKey {
     }
 }
 
-#Preview {
+#Preview("Previous") {
     MatchView(match: Game.fakeData())
+        .environmentObject(MatchInfo())
+}
+
+#Preview("Upcoming") {
+    MatchView(match: Game(id: Game.fakeData().id, date: Date.distantFuture, played: Game.fakeData().played, overtime: Game.fakeData().overtime, shootout: Game.fakeData().shootout, ssgtUuid: Game.fakeData().ssgtUuid, seriesCode: Game.fakeData().seriesCode, venue: Game.fakeData().venue, homeTeam: Game.fakeData().homeTeam, awayTeam: Game.fakeData().awayTeam))
         .environmentObject(MatchInfo())
 }

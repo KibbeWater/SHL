@@ -48,15 +48,15 @@ struct StandingsTable: View {
     
     public var onRefresh: (() async -> Void)? = nil
     
-    init(title: String, league: Leagues, items: Binding<[StandingObj]?>, onRefresh: (() async -> Void)? = nil) {
+    init(title: String, league: Leagues, items: Binding<[StandingObj]?>) {
         self.title = title
         self.league = league
         self._items = items
-        self.onRefresh = onRefresh
+        self.onRefresh = nil
         self._dict = .constant(Dictionary<Leagues, CacheItem<StandingResults?>>())
     }
     
-    init(title: String, league: Leagues, dictionary: Binding<Dictionary<Leagues, CacheItem<StandingResults?>>>, onRefresh: (() async -> Void)? = nil) {
+    init(title: String, league: Leagues, dictionary: Binding<Dictionary<Leagues, CacheItem<StandingResults?>>>) {
         self.title = title
         self.league = league
         self._dict = dictionary
@@ -99,11 +99,11 @@ struct StandingsTable: View {
         }
         .padding()
         .frame(maxWidth: .infinity)
-        .onChange(of: dict) { _, _ in
+        .onChange(of: dict) { _ in
             let _s = formatStandings(dict)
             _intItems = _s
         }
-        .onChange(of: items) { _, _ in
+        .onChange(of: items) { _ in
             _intItems = items
         }
     }
@@ -111,14 +111,8 @@ struct StandingsTable: View {
 
 #Preview {
     VStack {
-        StandingsTable(title: "Table", league: .SHL, items: .constant([StandingObj(id: "1", position: 1, logo: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg", team: "Luleå Hockey", teamCode: "LHF", matches: "123", diff: "69", points: "59")])) {
-            do {
-                try await Task.sleep(nanoseconds: 1_000_000_000)
-            } catch {
-                fatalError("What the fuck?")
-            }
-        }
-        .padding(.horizontal)
-        .frame(height: 250)
+        StandingsTable(title: "Table", league: .SHL, items: .constant([StandingObj(id: "1", position: 1, logo: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg", team: "Luleå Hockey", teamCode: "LHF", matches: "123", diff: "69", points: "59")]))
+            .padding(.horizontal)
+            .frame(height: 250)
     }
 }

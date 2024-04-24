@@ -22,8 +22,13 @@ struct ContentView: View {
         PromotionBanner()
         ScrollView {
             if let featured = SelectFeaturedMatch() {
-                MatchOverview(game: featured)
-                    .padding(.horizontal)
+                NavigationLink {
+                    MatchView(match: featured)
+                } label: {
+                    MatchOverview(game: featured)
+                        .padding(.horizontal)
+                }
+                .buttonStyle(PlainButtonStyle())
             }
             
             VStack(spacing: 0) {
@@ -35,45 +40,7 @@ struct ContentView: View {
                         Spacer()
                     }
                     ScrollView(.horizontal) {
-                        HStack {
-                            ForEach(matchInfo.latestMatches.filter({!$0.played})) { match in
-                                VStack(spacing: 6) {
-                                    HStack {
-                                        Image("Team/\(match.homeTeam.code)")
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fit)
-                                            .frame(width: 50, height: 50)
-                                        Spacer()
-                                        VStack {
-                                            Text(FormatDate(match.date))
-                                                .font(.callout)
-                                                .fontWeight(.semibold)
-                                            Text("vs.")
-                                                .font(.callout)
-                                            Spacer()
-                                        }
-                                        Spacer()
-                                        Image("Team/\(match.awayTeam.code)")
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fit)
-                                            .frame(width: 50, height: 50)
-                                    }
-                                    HStack {
-                                        Spacer()
-                                        if let _venue = match.venue {
-                                            Text(_venue)
-                                                .font(.footnote)
-                                            Spacer()
-                                        }
-                                    }
-                                }
-                                .padding(12)
-                                .frame(width:200)
-                                .background(Color(UIColor.systemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                            }
-                        }
-                        
+                        MatchCalendar(matches: matchInfo.latestMatches)
                     }
                     .padding(8)
                     .background(.primary.opacity(0.1))
@@ -82,24 +49,10 @@ struct ContentView: View {
                 .padding()
                 
                 VStack(spacing: 12) {
-                    StandingsTable(title: "Table", league: .SHL, dictionary: $leagueStandings.standings, onRefresh: {
-                        let startTime = DispatchTime.now()
-                        
-                        if (await leagueStandings.fetchLeague(league: .SHL, skipCache: true, clearExisting: true)) != nil {
-                            do {
-                                let endTime = DispatchTime.now()
-                                let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
-                                let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
-                                
-                                try await Task.sleep(nanoseconds: UInt64(remainingTime))
-                            } catch {
-                                fatalError("Should be impossible")
-                            }
-                        }
-                    })
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .padding(.horizontal)
+                    StandingsTable(title: "Table", league: .SHL, dictionary: $leagueStandings.standings)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .padding(.horizontal)
                 }
                 .padding(.vertical)
             }
@@ -113,7 +66,7 @@ struct ContentView: View {
                 }
             }
             Task {
-                leagueStandings.fetchLeagues(skipCache: true)
+                try? await leagueStandings.fetchLeagues(skipCache: true)
             }
         }
         .refreshable {
@@ -125,6 +78,8 @@ struct ContentView: View {
                 } catch let _err {
                     print(_err)
                 }
+                
+                let _ = try await leagueStandings.fetchLeague(league: .SHL, skipCache: true)
                 
                 let endTime = DispatchTime.now()
                 let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds

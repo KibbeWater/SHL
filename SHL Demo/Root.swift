@@ -1,8 +1,8 @@
 //
 //  Root.swift
-//  LHF
+//  SHL Demo
 //
-//  Created by user242911 on 3/23/24.
+//  Created by Linus Rönnbäck Larsson on 2024-04-24.
 //
 
 import SwiftUI
@@ -58,6 +58,4 @@ struct Root: View {
 
 #Preview {
     Root()
-        .environmentObject(MatchInfo())
-        .environmentObject(LeagueStandings())
 }
