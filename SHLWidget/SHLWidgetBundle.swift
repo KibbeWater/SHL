@@ -12,5 +12,6 @@ import SwiftUI
 struct SHLWidgetBundle: WidgetBundle {
     var body: some Widget {
         SHLWidgetLiveActivity()
+        SHLWidgetUpcoming()
     }
 }

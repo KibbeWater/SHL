@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		801BC55A2BCFEF2C00417693 /* StandingsTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFA44AA2B44C06700B4358C /* StandingsTable.swift */; };
 		802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802B98E72BD06C6800278A00 /* MatchCalendar.swift */; };
+		804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804316232BDCFFA5007D1D9A /* AppIntent.swift */; };
+		804316262BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804316252BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift */; };
+		804316272BDD05E8007D1D9A /* UIImageExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC374DF92BAD922000378412 /* UIImageExt.swift */; };
 		8055E5152BD171660096DCBF /* MatchCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802B98E72BD06C6800278A00 /* MatchCalendar.swift */; };
 		8055E5172BD1739D0096DCBF /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8055E5162BD1739D0096DCBF /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8055E5182BD173A30096DCBF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC425E442B4706CC00D82CFB /* WidgetKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -24,9 +27,8 @@
 		BC425E472B4706CC00D82CFB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC425E462B4706CC00D82CFB /* SwiftUI.framework */; };
 		BC425E4A2B4706CC00D82CFB /* SHLWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E492B4706CC00D82CFB /* SHLWidgetBundle.swift */; };
 		BC425E4C2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4B2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift */; };
-		BC425E502B4706CC00D82CFB /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC425E4F2B4706CC00D82CFB /* AppIntent.swift */; };
 		BC425E522B4706CD00D82CFB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC425E512B4706CD00D82CFB /* Assets.xcassets */; };
-		BC425E562B4706CD00D82CFB /* SHLWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC425E432B4706CC00D82CFB /* SHLWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BC425E562B4706CD00D82CFB /* SHLWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC425E432B4706CC00D82CFB /* SHLWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BC457B1B2BB9BB9100227D75 /* PBPView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC457B1A2BB9BB9100227D75 /* PBPView.swift */; };
 		BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6212E42BB05B81003CCB45 /* MatchView.swift */; };
 		BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7645B52B46054A0000B7AB /* DebugView.swift */; };
@@ -74,7 +76,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				BC425E562B4706CD00D82CFB /* SHLWidgetExtension.appex in Embed Foundation Extensions */,
+				BC425E562B4706CD00D82CFB /* SHLWidget.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -95,18 +97,19 @@
 /* Begin PBXFileReference section */
 		800644862BC9B46700A7560C /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Package.swift; path = ../HockeyKit/Package.swift; sourceTree = "<group>"; };
 		802B98E72BD06C6800278A00 /* MatchCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCalendar.swift; sourceTree = "<group>"; };
+		804316232BDCFFA5007D1D9A /* AppIntent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
+		804316252BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetUpcoming.swift; sourceTree = "<group>"; };
 		8055E5162BD1739D0096DCBF /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
 		8055E51B2BD187670096DCBF /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		80E0F5812BD9346100A4C232 /* Root.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Root.swift; sourceTree = "<group>"; };
 		BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersusBar.swift; sourceTree = "<group>"; };
 		BC374DF92BAD922000378412 /* UIImageExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExt.swift; sourceTree = "<group>"; };
 		BC425E3E2B4702F900D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		BC425E432B4706CC00D82CFB /* SHLWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SHLWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC425E432B4706CC00D82CFB /* SHLWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SHLWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC425E442B4706CC00D82CFB /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		BC425E462B4706CC00D82CFB /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		BC425E492B4706CC00D82CFB /* SHLWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetBundle.swift; sourceTree = "<group>"; };
 		BC425E4B2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetLiveActivity.swift; sourceTree = "<group>"; };
-		BC425E4F2B4706CC00D82CFB /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
 		BC425E512B4706CD00D82CFB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BC425E532B4706CD00D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BC457B1A2BB9BB9100227D75 /* PBPView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PBPView.swift; sourceTree = "<group>"; };
@@ -190,9 +193,10 @@
 		BC425E482B4706CC00D82CFB /* SHLWidget */ = {
 			isa = PBXGroup;
 			children = (
+				804316232BDCFFA5007D1D9A /* AppIntent.swift */,
 				BC425E492B4706CC00D82CFB /* SHLWidgetBundle.swift */,
 				BC425E4B2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift */,
-				BC425E4F2B4706CC00D82CFB /* AppIntent.swift */,
+				804316252BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift */,
 				BC425E512B4706CD00D82CFB /* Assets.xcassets */,
 				BC425E532B4706CD00D82CFB /* Info.plist */,
 			);
@@ -265,7 +269,7 @@
 			isa = PBXGroup;
 			children = (
 				BCAFE2CA2B4095170044225A /* SHL.app */,
-				BC425E432B4706CC00D82CFB /* SHLWidgetExtension.appex */,
+				BC425E432B4706CC00D82CFB /* SHLWidget.appex */,
 				BC8848032BB15F4E00844DBB /* SHL Demo.app */,
 			);
 			name = Products;
@@ -322,9 +326,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		BC425E422B4706CC00D82CFB /* SHLWidgetExtension */ = {
+		BC425E422B4706CC00D82CFB /* SHLWidget */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BC425E572B4706CD00D82CFB /* Build configuration list for PBXNativeTarget "SHLWidgetExtension" */;
+			buildConfigurationList = BC425E572B4706CD00D82CFB /* Build configuration list for PBXNativeTarget "SHLWidget" */;
 			buildPhases = (
 				BC425E3F2B4706CC00D82CFB /* Sources */,
 				BC425E402B4706CC00D82CFB /* Frameworks */,
@@ -334,12 +338,12 @@
 			);
 			dependencies = (
 			);
-			name = SHLWidgetExtension;
+			name = SHLWidget;
 			packageProductDependencies = (
 				BC044CE92BB43F9A0058B12B /* HockeyKit */,
 			);
 			productName = LHFWidgetExtension;
-			productReference = BC425E432B4706CC00D82CFB /* SHLWidgetExtension.appex */;
+			productReference = BC425E432B4706CC00D82CFB /* SHLWidget.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 		BC8848022BB15F4E00844DBB /* SHL Demo */ = {
@@ -424,7 +428,7 @@
 			projectRoot = "";
 			targets = (
 				BCAFE2C92B4095170044225A /* SHL */,
-				BC425E422B4706CC00D82CFB /* SHLWidgetExtension */,
+				BC425E422B4706CC00D82CFB /* SHLWidget */,
 				BC8848022BB15F4E00844DBB /* SHL Demo */,
 			);
 		};
@@ -465,9 +469,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				804316272BDD05E8007D1D9A /* UIImageExt.swift in Sources */,
 				BC425E4A2B4706CC00D82CFB /* SHLWidgetBundle.swift in Sources */,
-				BC425E502B4706CC00D82CFB /* AppIntent.swift in Sources */,
 				BC425E4C2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift in Sources */,
+				804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */,
+				804316262BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -513,7 +519,7 @@
 /* Begin PBXTargetDependency section */
 		BC425E552B4706CD00D82CFB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = BC425E422B4706CC00D82CFB /* SHLWidgetExtension */;
+			target = BC425E422B4706CC00D82CFB /* SHLWidget */;
 			targetProxy = BC425E542B4706CD00D82CFB /* PBXContainerItemProxy */;
 		};
 		BC8848112BB15F4F00844DBB /* PBXTargetDependency */ = {
@@ -872,7 +878,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		BC425E572B4706CD00D82CFB /* Build configuration list for PBXNativeTarget "SHLWidgetExtension" */ = {
+		BC425E572B4706CD00D82CFB /* Build configuration list for PBXNativeTarget "SHLWidget" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BC425E582B4706CD00D82CFB /* Debug */,
