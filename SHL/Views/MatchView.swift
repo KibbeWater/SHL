@@ -20,6 +20,7 @@ struct MatchView: View {
     
     let match: Game
     @State private var location: CLLocation?
+    @State private var mapImage: UIImage?
     @State private var updater: GameUpdater?
     
     @State private var pbpUpdateTimer: Timer?
@@ -145,8 +146,8 @@ struct MatchView: View {
                                     .foregroundColor(.white)
                             }
                         } else {
-                            if match.date < Date.now {
-                                Text(match.shootout ? "OT" : match.overtime ? "OT" : match.played ? "Full" : Calendar.current.isDate(match.date, inSameDayAs: Date()) ? FormatTime(match.date) : FormatDate(match.date))
+                            if match.date < Date.now && match.played {
+                                Text(match.shootout ? "OT" : match.overtime ? "OT" : "Full")
                                     .fontWeight(.semibold)
                                     .font(.title)
                                     .frame(height: 96)
@@ -157,6 +158,14 @@ struct MatchView: View {
                                     .font(.title)
                                     .frame(height: 96)
                                     .foregroundColor(.white)
+                                    .overlay(alignment: .bottom) {
+                                        if !Calendar.current.isDate(match.date, inSameDayAs: Date()) {
+                                            Text(String(FormatTime(match.date)))
+                                                .fontWeight(.semibold)
+                                                .font(.title2)
+                                                .foregroundColor(.white)
+                                        }
+                                    }
                             }
                         }
                         Spacer()
@@ -215,7 +224,7 @@ struct MatchView: View {
                 
                 if (selectedTab == .summary) {
                     VStack {
-                        if !match.played && match.date > Date.now {
+                        if !match.played && match.date < Date.now {
                             VStack {
                                 Text("GAME IS LIVE")
                                     .foregroundStyle(.red)
@@ -257,35 +266,27 @@ struct MatchView: View {
                         }
                         
                         VStack {
-                            if let _loc = location {
+                            GeometryReader { geo in
                                 if #available(iOS 17.0, *) {
-                                    Map(bounds:
-                                            MapCameraBounds(
-                                                centerCoordinateBounds:
-                                                    MKCoordinateRegion(
-                                                        center: CLLocationCoordinate2D(latitude: _loc.coordinate.latitude, longitude: _loc.coordinate.longitude),
-                                                        span: MKCoordinateSpan.init(latitudeDelta: 1, longitudeDelta: 1)),
-                                                minimumDistance: 500
-                                            ),
-                                        interactionModes: [.pan, .pitch, .zoom]
-                                    ) {
-                                        Marker(coordinate: CLLocationCoordinate2D(latitude: _loc.coordinate.latitude, longitude: _loc.coordinate.longitude)) {
-                                            Text(match.venue ?? "")
-                                        }
+                                    if let _map = mapImage {
+                                        Image(uiImage: _map)
+                                            .frame(height: 256)
+                                            .frame(maxWidth: .infinity)
+                                            .onTapGesture {
+                                                let url = URL(string: "maps://?q=\(match.venue ?? "")")
+                                                if UIApplication.shared.canOpenURL(url!) {
+                                                    UIApplication.shared.open(url!, options: [:], completionHandler: nil)
+                                                }
+                                            }
+                                    } else {
+                                        ProgressView()
+                                            .onAppear {
+                                                findVenue(.init(width: geo.size.width, height: geo.size.height))
+                                            }
                                     }
-                                    .onTapGesture {
-                                        let url = URL(string: "maps://?q=\(match.venue ?? "")")
-                                        if UIApplication.shared.canOpenURL(url!) {
-                                            UIApplication.shared.open(url!, options: [:], completionHandler: nil)
-                                        }
-                                    }
-                                    .mapStyle(.hybrid)
-                                    .clipped()
                                 } else {
                                     // TODO: Fallback on earlier versions
                                 }
-                            } else {
-                                ProgressView()
                             }
                         }
                         .frame(height: 256)
@@ -339,7 +340,6 @@ struct MatchView: View {
             checkActiveActivitites()
         }
         .task {
-            findVenue()
             if !match.played && match.date < Date.now {
                 updater = GameUpdater(gameId: match.id)
                 startTimer()
@@ -372,7 +372,7 @@ struct MatchView: View {
         }
     }
     
-    func findVenue() {
+    func findVenue(_ cgSize: CGSize) {
         guard let _venue = match.venue else { return }
         
         let request = MKLocalSearch.Request()
@@ -386,6 +386,31 @@ struct MatchView: View {
             }
             
             if let venue = response.mapItems.first {
+                let options: MKMapSnapshotter.Options = .init()
+                options.region = MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(
+                        latitude: venue.placemark.coordinate.latitude,
+                        longitude: venue.placemark.coordinate.longitude
+                    ),
+                    span: MKCoordinateSpan(latitudeDelta: 0.004, longitudeDelta: 0.004)
+                )
+                
+                options.size = cgSize
+                options.mapType = .hybrid
+                options.showsBuildings = true
+                
+                let snapshotter = MKMapSnapshotter(
+                    options: options
+                )
+                
+                snapshotter.start { snapshot, error in
+                   if let snapshot = snapshot {
+                      mapImage = snapshot.image
+                   } else if let _error = error {
+                      print("Something went wrong \(_error)")
+                   }
+                }
+                
                 location = CLLocation(latitude: venue.placemark.coordinate.latitude, longitude: venue.placemark.coordinate.longitude)
             }
         }
@@ -431,7 +456,7 @@ struct MatchView: View {
     
     func FormatTime(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "h:mm a"
+        dateFormatter.dateFormat = "hh:mm"
         return dateFormatter.string(from: date)
     }
 }

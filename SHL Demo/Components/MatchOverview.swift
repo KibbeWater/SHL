@@ -22,7 +22,7 @@ struct MatchOverview: View {
     
     func FormatTime(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "h:mm a"
+        dateFormatter.dateFormat = "hh:mm"
         return dateFormatter.string(from: date)
     }
     
