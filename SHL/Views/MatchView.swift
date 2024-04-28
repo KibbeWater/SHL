@@ -283,6 +283,7 @@ struct MatchView: View {
                                             .onAppear {
                                                 findVenue(.init(width: geo.size.width, height: geo.size.height))
                                             }
+                                            .frame(width: geo.size.width, height: geo.size.height)
                                     }
                                 } else {
                                     // TODO: Fallback on earlier versions
@@ -456,7 +457,7 @@ struct MatchView: View {
     
     func FormatTime(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "hh:mm"
+        dateFormatter.dateFormat = "HH:mm"
         return dateFormatter.string(from: date)
     }
 }

@@ -14,10 +14,16 @@ struct Root: View {
     @EnvironmentObject var matchInfo: MatchInfo
     @EnvironmentObject var leagueStandings: LeagueStandings
     
+    @State private var openedGame: MatchView?
+    @State private var isGameOpen = false
+    
     var body: some View {
         ZStack {
             NavigationStack {
                 ContentView()
+                    .navigationDestination(isPresented: $isGameOpen) {
+                        openedGame
+                    }
             }
             
             if !loggedIn {
@@ -52,6 +58,39 @@ struct Root: View {
                     }
                 }
             }
+        }
+        .onOpenURL { incomingURL in
+            print("App was opened via URL: \(incomingURL)")
+            handleIncomingURL(incomingURL)
+        }
+    }
+    
+    private func handleIncomingURL(_ url: URL) {
+        guard url.scheme == "shltracker" else {
+            return
+        }
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+            print("Invalid URL")
+            return
+        }
+        
+        guard let action = components.host, action == "open-game" else {
+            print("Unknown URL, we can't handle this one!")
+            return
+        }
+        
+        guard let matchId = components.queryItems?.first(where: { $0.name == "id" })?.value else {
+            print("Hello")
+            return
+        }
+        
+        Task {
+            guard let game = try? await matchInfo.getMatchExtra(matchId) else {
+                print("Unable to find game")
+                return
+            }
+            openedGame = MatchView(match: Game(game))
+            isGameOpen = true
         }
     }
 }

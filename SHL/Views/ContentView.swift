@@ -17,15 +17,14 @@ public struct LiveGame {
     
     init (game: Game) {
         self.id = game.id
-        self.homeTeam = LiveTeam(name: game.homeTeam.name, code: game.homeTeam.code, icon: game.homeTeam.logo, score: game.homeTeam.result)
-        self.awayTeam = LiveTeam(name: game.awayTeam.name, code: game.awayTeam.code, icon: game.awayTeam.logo, score: game.awayTeam.result)
+        self.homeTeam = LiveTeam(name: game.homeTeam.name, code: game.homeTeam.code, score: game.homeTeam.result)
+        self.awayTeam = LiveTeam(name: game.awayTeam.name, code: game.awayTeam.code, score: game.awayTeam.result)
         self.time = LiveTime(period: 0, time: "00:00")
     }
     
     public struct LiveTeam {
         public var name: String
         public var code: String
-        public var icon: String
         public var score: Int
     }
     
