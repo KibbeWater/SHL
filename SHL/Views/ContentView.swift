@@ -50,48 +50,48 @@ struct ContentView: View {
     
     var body: some View {
         ScrollView {
-            if #available(iOS 17.2, *) {
+//            if #available(iOS 17.2, *) {
+//                HStack {
+//                    Spacer()
+//                    Button("Start Activity", systemImage: "plus") {
+//                        guard let _game = gameListener?.game else {
+//                            return
+//                        }
+//                        
+//                        do {
+//                            try ActivityUpdater.shared.start(match: _game)
+//                        } catch let _err {
+//                            print("Unable to start activity \(_err)")
+//                        }
+//                    }
+//                    .buttonStyle(.bordered)
+//                    .clipShape(RoundedRectangle(cornerRadius: .infinity))
+//                    .font(.caption)
+//                    .disabled(gameListener == nil)
+//                }
+//                .padding(.horizontal)
+//            }
+            
+            if let featured = SelectFeaturedMatch() {
+                NavigationLink(destination: {
+                    MatchView(match: featured)
+                }, label: {
+                    MatchOverview(game: featured, liveGame: gameListener?.game)
+                        .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                })
+                .buttonStyle(PlainButtonStyle())
+                .padding(.horizontal)
+            } else {
                 HStack {
-                    Spacer()
-                    Button("Start Activity", systemImage: "plus") {
-                        guard let _game = gameListener?.game else {
-                            return
-                        }
-                        
-                        do {
-                            try ActivityUpdater.shared.start(match: _game)
-                        } catch let _err {
-                            print("Unable to start activity \(_err)")
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .clipShape(RoundedRectangle(cornerRadius: .infinity))
-                    .font(.caption)
-                    .disabled(gameListener == nil)
+                    
                 }
+                .frame(maxWidth: .infinity)
+                .frame(height: 96)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 12.0))
                 .padding(.horizontal)
             }
             
-            NavigationLink(destination: {
-                MatchListView()
-            }, label: {
-                if let featured = SelectFeaturedMatch() {
-                    VStack {
-                        MatchOverview(game: featured, liveGame: gameListener?.game)
-                            .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                    }
-                } else {
-                    HStack {
-                        
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 96)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                }
-            })
-            .buttonStyle(PlainButtonStyle())
-            .padding(.horizontal)
             
             VStack(spacing: 0) {
                 VStack {

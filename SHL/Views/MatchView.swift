@@ -7,6 +7,7 @@
 
 import SwiftUI
 import HockeyKit
+import ActivityKit
 import MapKit
 
 private enum Tabs: String, CaseIterable {
@@ -31,6 +32,54 @@ struct MatchView: View {
     @State private var selectedTab: Tabs = .summary
     
     @State private var offset = CGFloat.zero
+    
+    @State private var activityRunning = false
+    
+    var trailingButton: some View {
+        Button(action: {
+            guard let _game = updater?.game else {
+                return
+            }
+            
+            do {
+                if activityRunning {
+                    var activities = Activity<SHLWidgetAttributes>.activities
+                    activities = activities.filter({ $0.attributes.id == match.id })
+                    
+                    let contentState =
+                        SHLWidgetAttributes.ContentState(
+                            homeScore: _game.homeGoals,
+                            awayScore: _game.awayGoals,
+                            period: ActivityPeriod(
+                                period: _game.time.period,
+                                periodEnd: (_game.time.periodEnd ?? Date()).ISO8601Format(),
+                                state: ActivityState(rawValue: _game.state.rawValue) ?? .starting
+                            )
+                        )
+                    
+                    activities.forEach { activity in
+                        Task {
+                            await activity.end(
+                                ActivityContent(
+                                    state: contentState,
+                                    staleDate: .now
+                                ),
+                                dismissalPolicy: .immediate
+                            )
+                        }
+                    }
+                    activityRunning = false
+                } else {
+                    try ActivityUpdater.shared.start(match: _game)
+                    activityRunning = true
+                }
+            } catch let _err {
+                print("Unable to start activity \(_err)")
+            }
+        }) {
+            Text(activityRunning ? "Stop Activity" : "Start Activity")
+        }
+    }
     
     var body: some View {
         ZStack {
@@ -166,7 +215,7 @@ struct MatchView: View {
                 
                 if (selectedTab == .summary) {
                     VStack {
-                        if !match.played && match.date < Date.now {
+                        if !match.played && match.date > Date.now {
                             VStack {
                                 Text("GAME IS LIVE")
                                     .foregroundStyle(.red)
@@ -231,6 +280,7 @@ struct MatchView: View {
                                         }
                                     }
                                     .mapStyle(.hybrid)
+                                    .clipped()
                                 } else {
                                     // TODO: Fallback on earlier versions
                                 }
@@ -277,8 +327,16 @@ struct MatchView: View {
             }
             .coordinateSpace(name: "scroll")
         }
+        .toolbar {
+            #if !APPCLIP
+            if updater?.game != nil {
+                trailingButton
+            }
+            #endif
+        }
         .onAppear {
             loadTeamColors()
+            checkActiveActivitites()
         }
         .task {
             findVenue()
@@ -295,6 +353,13 @@ struct MatchView: View {
                 print("Failed to get play-by-play events")
             }
         }
+    }
+    
+    private func checkActiveActivitites() {
+        var activities = Activity<SHLWidgetAttributes>.activities
+        activities = activities.filter({ $0.attributes.id == match.id })
+        
+        activityRunning = activities.count != 0
     }
     
     private func loadTeamColors() {

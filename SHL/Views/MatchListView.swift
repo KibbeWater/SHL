@@ -194,6 +194,7 @@ struct MatchListView: View {
                                     .id("pm-\(match.id)")
                                     .clipShape(RoundedRectangle(cornerRadius: 12.0))
                                     .contextMenu {
+                                        #if !APPCLIP
                                         Button("Start Activity", systemImage: "plus") {
                                             if let live = getLiveMatch(gameId: match.id) {
                                                 do {
@@ -203,6 +204,7 @@ struct MatchListView: View {
                                                 }
                                             }
                                         }
+                                        #endif
                                         
                                         #if DEBUG
                                         Button("Debug Activity") {
@@ -227,7 +229,6 @@ struct MatchListView: View {
                             MatchOverview(game: match)
                                 .id("pm-\(match.id)")
                                 .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                                .padding(.horizontal)
                                 .contextMenu {
                                     Button(isNotifScheduled ? "Remove Reminder" : "Remind Me", systemImage: isNotifScheduled ? "bell.slash" :  "bell.and.waves.left.and.right") {
                                         Task {
@@ -240,6 +241,7 @@ struct MatchListView: View {
                                         }
                                     }
                                 }
+                                .padding(.horizontal)
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
