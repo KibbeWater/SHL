@@ -59,36 +59,17 @@ struct ContentView: View {
         }
         .onAppear {
             Task {
-                do {
-                    try await matchInfo.getLatest()
-                } catch {
-                    fatalError("This should be impossible, please report this issue")
-                }
+                try await matchInfo.getLatest()
             }
             Task {
                 try? await leagueStandings.fetchLeagues(skipCache: true)
             }
         }
         .refreshable {
-            do {
-                let startTime = DispatchTime.now()
-                
-                do {
-                    try await matchInfo.getLatest()
-                } catch let _err {
-                    print(_err)
-                }
-                
-                let _ = try await leagueStandings.fetchLeague(league: .SHL, skipCache: true)
-                
-                let endTime = DispatchTime.now()
-                let nanoTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
-                let remainingTime = max(0, 1_000_000_000 - Int(nanoTime))
-                
-                try await Task.sleep(nanoseconds: UInt64(remainingTime))
-            } catch {
-                fatalError("This should be impossible, please report this issue")
-            }
+            await Task {
+                try? await matchInfo.getLatest()
+                let _ = try? await leagueStandings.fetchLeague(league: .SHL, skipCache: true)
+            }.value
         }
     }
     
