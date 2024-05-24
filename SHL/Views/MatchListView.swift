@@ -14,6 +14,7 @@ struct MatchListView: View {
     @Environment(\.scenePhase) private var scenePhase
     
     @State private var selectedTab: Tabs = .today
+    @State private var latestMatches: SeasonSchedule? = nil
     @State private var previousMatches: [Game] = []
     @State private var todayMatches: [Game] = []
     @State private var upcomingMatches: [Game] = []
@@ -21,14 +22,16 @@ struct MatchListView: View {
     @State private var matchListeners: [GameUpdater] = []
     
     @State private var scheduledNotifs: [String: Bool] = [:]
+    
+    @State private var openDates: [String: Bool] = [:]
 
     // When matchInfo changes, re-filter the matches
     private func filterMatches() {
         let now = Date()
         let calendar = Calendar.current
-        previousMatches = matchInfo.latestMatches.filter { $0.date < calendar.startOfDay(for: now) }
-        todayMatches = matchInfo.latestMatches.filter { calendar.isDateInToday($0.date) }
-        upcomingMatches = matchInfo.latestMatches.filter { calendar.startOfDay(for: $0.date) >= calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now))! }
+        previousMatches = latestMatches?.gameInfo.filter({ $0.startDateTime < calendar.startOfDay(for: now) }).map { $0.toGame() } ?? []
+        todayMatches = latestMatches?.gameInfo.filter({ calendar.isDateInToday($0.startDateTime) }).map { $0.toGame() } ?? []
+        upcomingMatches = latestMatches?.gameInfo.filter({ calendar.startOfDay(for: $0.startDateTime) >= calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now))! }).map { $0.toGame() } ?? []
         
         matchListeners.removeAll(where: { _listener in
             return !todayMatches.contains(where: { $0.id == _listener.gameId })
@@ -80,15 +83,21 @@ struct MatchListView: View {
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
         }
         .onAppear {
-            self.filterMatches()
             Task {
+                print("Fetching season")
+                if let season = try? await matchInfo.getCurrentSeason() {
+                    print("Current season found")
+                    print(season)
+                    latestMatches = try? await matchInfo.getSchedule(season)
+                }
                 await refreshActiveReminders()
             }
         }
-        .onChange(of: matchInfo.latestMatches) { _ in
+        .onChange(of: latestMatches) { _ in
             Task {
                 await refreshActiveReminders()
             }
+            filterMatches()
         }
         .onChange(of: scenePhase) { _ in
             guard scenePhase == .active else {
@@ -181,69 +190,130 @@ struct MatchListView: View {
         }
     }
     
-    private func matchesScrollView(for matches: [Game]) -> some View {
-        VStack {
-            ScrollView {
-                ForEach(matches, id: \.id) { match in
-                    if match.date < Date.now {
-                        NavigationLink {
-                            MatchView(match: match)
-                        } label: {
-                            if #available(iOS 17.2, *) {
-                                MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
-                                    .id("pm-\(match.id)")
-                                    .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                                    .contextMenu {
-                                        #if !APPCLIP
-                                        Button("Start Activity", systemImage: "plus") {
-                                            if let live = getLiveMatch(gameId: match.id) {
-                                                do {
-                                                    try ActivityUpdater.shared.start(match: live)
-                                                } catch {
-                                                    print("Failed to start activity")
-                                                }
-                                            }
-                                        }
-                                        #endif
-                                        
-                                        #if DEBUG
-                                        Button("Debug Activity") {
-                                            try? ActivityUpdater.shared.start(match: GameOverview.generateFake())
-                                        }
-                                        #endif
-                                    }
-                                    .padding(.horizontal)
-                            } else {
-                                MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
-                                    .id("pm-\(match.id)")
-                                    .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                                    .padding(.horizontal)
-                            }
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                    } else {
-                        let isNotifScheduled = scheduledNotifs[match.id] == true
-                        NavigationLink {
-                            MatchView(match: match)
-                        } label: {
-                            MatchOverview(game: match)
-                                .id("pm-\(match.id)")
-                                .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                                .contextMenu {
-                                    Button(isNotifScheduled ? "Remove Reminder" : "Remind Me", systemImage: isNotifScheduled ? "bell.slash" :  "bell.and.waves.left.and.right") {
-                                        Task {
-                                            guard isNotifScheduled else {
-                                                await scheduleMatchNotification(match: match)
-                                                return
-                                            }
-                                            
-                                            await removeMatchNotification(match: match)
+    private func matchItem(_ match: Game) -> some View {
+        HStack {
+            if match.date < Date.now {
+                NavigationLink {
+                    MatchView(match: match)
+                } label: {
+                    if #available(iOS 17.2, *) {
+                        MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
+                            .id("pm-\(match.id)")
+                            .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                            .contextMenu {
+                                #if !APPCLIP
+                                Button("Start Activity", systemImage: "plus") {
+                                    if let live = getLiveMatch(gameId: match.id) {
+                                        do {
+                                            try ActivityUpdater.shared.start(match: live)
+                                        } catch {
+                                            print("Failed to start activity")
                                         }
                                     }
                                 }
-                                .padding(.horizontal)
+                                #endif
+                                
+                                #if DEBUG
+                                Button("Debug Activity") {
+                                    try? ActivityUpdater.shared.start(match: GameOverview.generateFake())
+                                }
+                                #endif
+                            }
+                            .padding(.horizontal)
+                    } else {
+                        MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
+                            .id("pm-\(match.id)")
+                            .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                            .padding(.horizontal)
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
+            } else {
+                let isNotifScheduled = scheduledNotifs[match.id] == true
+                NavigationLink {
+                    MatchView(match: match)
+                } label: {
+                    MatchOverview(game: match)
+                        .id("pm-\(match.id)")
+                        .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                        .contextMenu {
+                            Button(isNotifScheduled ? "Remove Reminder" : "Remind Me", systemImage: isNotifScheduled ? "bell.slash" :  "bell.and.waves.left.and.right") {
+                                Task {
+                                    guard isNotifScheduled else {
+                                        await scheduleMatchNotification(match: match)
+                                        return
+                                    }
+                                    
+                                    await removeMatchNotification(match: match)
+                                }
+                            }
                         }
-                        .buttonStyle(PlainButtonStyle())
+                        .padding(.horizontal)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+        }
+    }
+    
+    private func getDate(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        return dateFormatter.string(from: date)
+    }
+    
+    private func getGroupDate(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = Calendar.current.isDate(Date.now, equalTo: date, toGranularity: .year) 
+            ? "EEEE, d MMM"
+            : "EEEE, d MMM yyyy"
+        return dateFormatter.string(from: date)
+    }
+    
+    private func matchesScrollView(for matches: [Game]) -> some View {
+        VStack {
+            ScrollView {
+                if matches.first?.date ?? Date.now > Date.now {
+                    let matchGroups = matches.groupBy(keySelector: { getDate($0.date) })
+                    ForEach(matchGroups.keys.sorted(), id: \.self) { key in
+                        let matchList = matchGroups[key]!
+                        let isFirst = matchGroups.keys.sorted().first == key
+                        VStack {
+                            HStack {
+                                Text(getGroupDate(matchList.first?.date ?? Date.now))
+                                    .font(.footnote)
+                                    .foregroundColor(.secondary)
+                                    .fontWeight(.bold)
+                                Spacer()
+                                if !isFirst {
+                                    Button(openDates[key] == true ? "Show less" : "Show more", systemImage: openDates[key] == true ? "chevron.up" : "chevron.down") {
+                                        let isOpen = openDates[key] ?? false
+                                        withAnimation {
+                                            if isOpen {
+                                                openDates[key] = false
+                                            } else {
+                                                openDates[key] = true
+                                            }
+                                        }
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                    .font(.footnote)
+                                    .foregroundColor(.secondary)
+                                }
+                            }
+                            .padding(.horizontal)
+                            if openDates[key] == true || isFirst {
+                                LazyVStack {
+                                    ForEach(matchList, id: \.id) { match in
+                                        matchItem(match)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.bottom)
+                    }
+                } else {
+                    ForEach(matches, id: \.id) { match in
+                        matchItem(match)
                     }
                 }
             }

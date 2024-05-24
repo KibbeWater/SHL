@@ -31,9 +31,11 @@ struct MatchOverview: View {
         let _homeColor = Color(UIImage(named: "Team/\(game.homeTeam.code)")?.getColors(quality: .low)?.background ?? UIColor.black)
         let _awayColor = Color(UIImage(named: "Team/\(game.awayTeam.code)")?.getColors(quality: .low)?.background ?? UIColor.black)
         
-        withAnimation {
-            self.homeColor = _homeColor
-            self.awayColor = _awayColor
+        DispatchQueue.main.async {
+            withAnimation {
+                self.homeColor = _homeColor
+                self.awayColor = _awayColor
+            }
         }
     }
     
@@ -157,7 +159,11 @@ struct MatchOverview: View {
             }
         }
         .onAppear {
-            loadTeamColors()
+            if awayColor == .black || homeColor == .black {
+                Task(priority: .low) {
+                    loadTeamColors()
+                }
+            }
         }
     }
 }
