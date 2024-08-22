@@ -12,42 +12,41 @@ struct MatchCalendar: View {
     var matches: [Game]
     
     var body: some View {
-        HStack {
-            ForEach(matches.filter({!$0.played})) { match in
-                VStack(spacing: 6) {
-                    HStack {
-                        Image("Team/\(match.homeTeam.code)")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 50, height: 50)
-                        Spacer()
-                        VStack {
-                            Text(FormatDate(match.date))
-                                .font(.callout)
-                                .fontWeight(.semibold)
-                            Text("vs.")
-                                .font(.callout)
-                            Spacer()
-                        }
-                        Spacer()
-                        Image("Team/\(match.awayTeam.code)")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 50, height: 50)
-                    }
-                    HStack {
-                        Spacer()
-                        Text(match.venue ?? "TBD")
-                            .font(.footnote)
-                        Spacer()
-                    }
+        ForEach(matches.filter({!$0.played})) { match in
+            NavigationLink {
+                MatchView(match: match)
+            } label: {
+                HStack {
+                    Image("Team/\(match.homeTeam.code)")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 42, height: 42)
+                    Text(match.homeTeam.code)
+                        .fontWeight(.semibold)
+                    Spacer()
+                    Text(match.awayTeam.code)
+                        .fontWeight(.semibold)
+                    Image("Team/\(match.awayTeam.code)")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 42, height: 42)
                 }
-                .padding(12)
-                .frame(width:200)
-                .background(Color(UIColor.systemBackground))
+                .overlay(alignment: .center, content: {
+                    VStack {
+                        Text(FormatDate(match.date))
+                            .font(.callout)
+                            .fontWeight(.semibold)
+                        Text("vs.")
+                            .font(.callout)
+                        Spacer()
+                    }
+                })
+                .padding(8)
+                .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-        }   
+            .foregroundStyle(.primary)
+        }
     }
     
     func FormatDate(_ date: Date) -> String {
@@ -58,5 +57,10 @@ struct MatchCalendar: View {
 }
 
 #Preview {
-    MatchCalendar(matches: [])
+    MatchCalendar(matches: [
+        .fakeData(),
+        .fakeData(),
+        .fakeData(),
+        .fakeData(),
+    ])
 }

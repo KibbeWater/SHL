@@ -101,18 +101,18 @@ struct ContentView: View {
                             Text("Match Calendar \(Image(systemName: "chevron.right"))")
                                 .font(.title)
                         }
+                        .padding(.horizontal)
                         Spacer()
                     }
                     
-                    ScrollView(.horizontal) {
-                        MatchCalendar(matches: matchInfo.latestMatches)
+                    VStack(spacing: 12) {
+                        MatchCalendar(matches: Array(matchInfo.latestMatches.prefix(5)))
                     }
-                    .padding(8)
-                    .background(.ultraThinMaterial)
+                    .padding(.horizontal)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
-                .padding()
-                
+                .padding(.vertical)
+
                 StandingsTable(title: "Table", league: .SHL, dictionary: $leagueStandings.standings)
                     .background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -174,6 +174,11 @@ struct ContentView: View {
         
         if let lastInPast = matchInfo.latestMatches.last(where: { IsLive($0) }) {
             return lastInPast
+        }
+        
+        if lastPlayed == nil,
+           let firstInFuture = matchInfo.latestMatches.first {
+            return firstInFuture
         }
         
         return lastPlayed

@@ -256,9 +256,9 @@ struct MatchView: View {
                                 let awayShotsGoal = awayShots.filter({ $0.goalSection == 0 })
                                 VersusBar("Shots on goals", homeSide: homeShotsGoal.count, awaySide: awayShotsGoal.count, homeColor: homeColor, awayColor: awayColor)
                                 
-                                let homeGoals = goals.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
+                                /* let homeGoals = goals.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
                                 let awayGoals = goals.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
-                                VersusBar("Save %", homePercent: 1.0-(Float(homeGoals.count) / Float(homeShotsGoal.count + awayShotsGoal.count + goals.count)), awayPercent: 1.0-(Float(awayGoals.count) / Float(homeShotsGoal.count + awayShotsGoal.count + goals.count)), homeColor: homeColor, awayColor: awayColor)
+                                VersusBar("Save %", homePercent: 1.0-(Float(homeGoals.count) / Float(homeShotsGoal.count + awayShotsGoal.count + goals.count)), awayPercent: 1.0-(Float(awayGoals.count) / Float(homeShotsGoal.count + awayShotsGoal.count + goals.count)), homeColor: homeColor, awayColor: awayColor) */
                             }
                             .padding()
                             .background(.ultraThinMaterial)
