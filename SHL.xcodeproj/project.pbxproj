@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -17,6 +17,9 @@
 		8055E5172BD1739D0096DCBF /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8055E5162BD1739D0096DCBF /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8055E5182BD173A30096DCBF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC425E442B4706CC00D82CFB /* WidgetKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8055E51C2BD187670096DCBF /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8055E51B2BD187670096DCBF /* Launch Screen.storyboard */; };
+		80DCA05E2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */; };
+		80DCA05F2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */; };
+		80DCA0602C9DBEFF0058B6F2 /* ColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */; };
 		80E0F5822BD9346100A4C232 /* Root.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E0F5812BD9346100A4C232 /* Root.swift */; };
 		80E0F5872BD9359B00A4C232 /* MatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6212E42BB05B81003CCB45 /* MatchView.swift */; };
 		80E0F5882BD935F100A4C232 /* PBPView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC457B1A2BB9BB9100227D75 /* PBPView.swift */; };
@@ -103,6 +106,7 @@
 		804316252BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetUpcoming.swift; sourceTree = "<group>"; };
 		8055E5162BD1739D0096DCBF /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
 		8055E51B2BD187670096DCBF /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCache.swift; sourceTree = "<group>"; };
 		80E0F5812BD9346100A4C232 /* Root.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Root.swift; sourceTree = "<group>"; };
 		BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersusBar.swift; sourceTree = "<group>"; };
 		BC374DF92BAD922000378412 /* UIImageExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExt.swift; sourceTree = "<group>"; };
@@ -140,6 +144,22 @@
 		BCD7BC172BAF6B9800E208B3 /* MatchListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchListView.swift; sourceTree = "<group>"; };
 		BCFA44AA2B44C06700B4358C /* StandingsTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandingsTable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		80CF89F82C779212000CE2CE /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Pulse.metal,
+				"View+Pulse.swift",
+				"View+Ripple.swift",
+			);
+			target = BCAFE2C92B4095170044225A /* SHL */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		80CF89F52C7791F3000CE2CE /* Pulse Shader */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (80CF89F82C779212000CE2CE /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "Pulse Shader"; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		BC425E402B4706CC00D82CFB /* Frameworks */ = {
@@ -189,6 +209,7 @@
 			children = (
 				BC374DF92BAD922000378412 /* UIImageExt.swift */,
 				800F320D2C00D1300069E436 /* Sequence.swift */,
+				80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -316,6 +337,7 @@
 		BCF54B572B40E44200960F47 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				80CF89F52C7791F3000CE2CE /* Pulse Shader */,
 				BC8C150F2BAC780F0010AB59 /* GameDisplays */,
 				BCFA44AA2B44C06700B4358C /* StandingsTable.swift */,
 				BC7645B52B46054A0000B7AB /* DebugView.swift */,
@@ -476,6 +498,7 @@
 				BC425E4A2B4706CC00D82CFB /* SHLWidgetBundle.swift in Sources */,
 				BC425E4C2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift in Sources */,
 				804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */,
+				80DCA05F2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */,
 				804316262BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -494,6 +517,7 @@
 				BC9490732BB19F63009047E4 /* PromotionBanner.swift in Sources */,
 				BC8848062BB15F4E00844DBB /* LHF_DemoApp.swift in Sources */,
 				8055E5152BD171660096DCBF /* MatchCalendar.swift in Sources */,
+				80DCA0602C9DBEFF0058B6F2 /* ColorCache.swift in Sources */,
 				BC88481B2BB1642E00844DBB /* MatchOverview.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -509,6 +533,7 @@
 				BCD7BC182BAF6B9800E208B3 /* MatchListView.swift in Sources */,
 				BC457B1B2BB9BB9100227D75 /* PBPView.swift in Sources */,
 				800F320E2C00D1300069E436 /* Sequence.swift in Sources */,
+				80DCA05E2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */,
 				BCD7BC152BAF69D500E208B3 /* Root.swift in Sources */,
 				BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */,
 				BCAFE2CE2B4095170044225A /* SHLApp.swift in Sources */,
@@ -808,6 +833,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = SHL/SHL.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SHL/Preview Content\"";
@@ -831,6 +857,7 @@
 				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -848,6 +875,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = SHL/SHL.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SHL/Preview Content\"";
@@ -871,6 +899,7 @@
 				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
