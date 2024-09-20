@@ -239,7 +239,7 @@ struct MatchView: View {
                         
                         if match.date < Date.now {
                             VStack {
-                                let goals: [GoalEvent] = getEvents(pbpEvents, type: GoalEvent.self)
+                                let _: [GoalEvent] = getEvents(pbpEvents, type: GoalEvent.self)
                                 let shots: [ShotEvent] = getEvents(pbpEvents, type: ShotEvent.self)
                                 let penalties: [PenaltyEvent] = getEvents(pbpEvents, type: PenaltyEvent.self)
                                 
@@ -364,12 +364,41 @@ struct MatchView: View {
     }
     
     private func loadTeamColors() {
-        let _homeColor = Color(UIImage(named: "Team/\(match.homeTeam.code)")?.getColors(quality: .low)?.background ?? UIColor.black)
-        let _awayColor = Color(UIImage(named: "Team/\(match.awayTeam.code)")?.getColors(quality: .low)?.background ?? UIColor.black)
+        let _homeKey = "Team/\(match.homeTeam.code.uppercased())"
+        let _awayKey = "Team/\(match.awayTeam.code.uppercased())"
         
-        withAnimation {
-            self.homeColor = _homeColor
-            self.awayColor = _awayColor
+        if let _homeColor = UIImage(named: _homeKey) {
+            if let cache = ColorCache.shared.getColor(forKey: _homeKey) {
+                withAnimation {
+                    self.homeColor = Color(uiColor: cache)
+                }
+            } else {
+                _homeColor.getColors(quality: .low) { clr in
+                    if let _bg = clr?.background {
+                        ColorCache.shared.cacheColor(_bg, forKey: _homeKey)
+                        withAnimation {
+                            self.homeColor = Color(uiColor: _bg)
+                        }
+                    }
+                }
+            }
+        }
+        
+        if let _awayColor = UIImage(named: _awayKey) {
+            if let cache = ColorCache.shared.getColor(forKey: _awayKey) {
+                withAnimation {
+                    self.awayColor = Color(uiColor: cache)
+                }
+            } else {
+                _awayColor.getColors(quality: .low) { clr in
+                    if let _bg = clr?.background {
+                        ColorCache.shared.cacheColor(_bg, forKey: _awayKey)
+                        withAnimation {
+                            self.awayColor = Color(uiColor: _bg)
+                        }
+                    }
+                }
+            }
         }
     }
     

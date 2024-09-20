@@ -28,13 +28,40 @@ struct MatchOverview: View {
     }
     
     private func loadTeamColors() {
-        let _homeColor = Color(UIImage(named: "Team/\(game.homeTeam.code)")?.getColors(quality: .low)?.background ?? UIColor.black)
-        let _awayColor = Color(UIImage(named: "Team/\(game.awayTeam.code)")?.getColors(quality: .low)?.background ?? UIColor.black)
+        let _homeKey = "Team/\(game.homeTeam.code.uppercased())"
+        let _awayKey = "Team/\(game.awayTeam.code.uppercased())"
         
-        DispatchQueue.main.async {
-            withAnimation {
-                self.homeColor = _homeColor
-                self.awayColor = _awayColor
+        if let _homeColor = UIImage(named: _homeKey) {
+            if let cache = ColorCache.shared.getColor(forKey: _homeKey) {
+                withAnimation {
+                    self.homeColor = Color(uiColor: cache)
+                }
+            } else {
+                _homeColor.getColors(quality: .low) { clr in
+                    if let _bg = clr?.background {
+                        ColorCache.shared.cacheColor(_bg, forKey: _homeKey)
+                        withAnimation {
+                            self.homeColor = Color(uiColor: _bg)
+                        }
+                    }
+                }
+            }
+        }
+        
+        if let _awayColor = UIImage(named: _awayKey) {
+            if let cache = ColorCache.shared.getColor(forKey: _awayKey) {
+                withAnimation {
+                    self.awayColor = Color(uiColor: cache)
+                }
+            } else {
+                _awayColor.getColors(quality: .low) { clr in
+                    if let _bg = clr?.background {
+                        ColorCache.shared.cacheColor(_bg, forKey: _awayKey)
+                        withAnimation {
+                            self.awayColor = Color(uiColor: _bg)
+                        }
+                    }
+                }
             }
         }
     }
@@ -52,7 +79,7 @@ struct MatchOverview: View {
                 HStack {
                     VStack {
                         Spacer()
-                        Image("Team/\(game.homeTeam.code)")
+                        Image("Team/\(game.homeTeam.code.uppercased())")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 48, height: 48)
@@ -120,7 +147,7 @@ struct MatchOverview: View {
                     Spacer()
                     VStack {
                         Spacer()
-                        Image("Team/\(game.awayTeam.code)")
+                        Image("Team/\(game.awayTeam.code.uppercased())")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 48, height: 48)
