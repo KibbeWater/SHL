@@ -19,6 +19,9 @@
 		8055E5172BD1739D0096DCBF /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8055E5162BD1739D0096DCBF /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8055E5182BD173A30096DCBF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC425E442B4706CC00D82CFB /* WidgetKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8055E51C2BD187670096DCBF /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8055E51B2BD187670096DCBF /* Launch Screen.storyboard */; };
+		8075FBB42CA62706004C6438 /* GameExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB32CA62706004C6438 /* GameExtensions.swift */; };
+		8075FBB52CA62706004C6438 /* GameExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB32CA62706004C6438 /* GameExtensions.swift */; };
+		8075FBB62CA62706004C6438 /* GameExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB32CA62706004C6438 /* GameExtensions.swift */; };
 		80DCA05E2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */; };
 		80DCA05F2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */; };
 		80DCA0602C9DBEFF0058B6F2 /* ColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */; };
@@ -109,6 +112,7 @@
 		804316252BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetUpcoming.swift; sourceTree = "<group>"; };
 		8055E5162BD1739D0096DCBF /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
 		8055E51B2BD187670096DCBF /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		8075FBB32CA62706004C6438 /* GameExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameExtensions.swift; sourceTree = "<group>"; };
 		80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCache.swift; sourceTree = "<group>"; };
 		80E0F5812BD9346100A4C232 /* Root.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Root.swift; sourceTree = "<group>"; };
 		BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersusBar.swift; sourceTree = "<group>"; };
@@ -221,6 +225,7 @@
 				BC374DF92BAD922000378412 /* UIImageExt.swift */,
 				800F320D2C00D1300069E436 /* Sequence.swift */,
 				80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */,
+				8075FBB32CA62706004C6438 /* GameExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -509,6 +514,7 @@
 				804316272BDD05E8007D1D9A /* UIImageExt.swift in Sources */,
 				BC425E4A2B4706CC00D82CFB /* SHLWidgetBundle.swift in Sources */,
 				BC425E4C2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift in Sources */,
+				8075FBB52CA62706004C6438 /* GameExtensions.swift in Sources */,
 				804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */,
 				80DCA05F2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */,
 				804316262BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift in Sources */,
@@ -522,6 +528,7 @@
 				BC8848082BB15F4E00844DBB /* ContentView.swift in Sources */,
 				80E0F5892BD935F300A4C232 /* VersusBar.swift in Sources */,
 				80E0F5822BD9346100A4C232 /* Root.swift in Sources */,
+				8075FBB62CA62706004C6438 /* GameExtensions.swift in Sources */,
 				801BC55A2BCFEF2C00417693 /* StandingsTable.swift in Sources */,
 				80E0F5882BD935F100A4C232 /* PBPView.swift in Sources */,
 				8008FC7F2C9DD0A400B23669 /* ReminderContext.swift in Sources */,
@@ -550,6 +557,7 @@
 				80DCA05E2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */,
 				BCD7BC152BAF69D500E208B3 /* Root.swift in Sources */,
 				BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */,
+				8075FBB42CA62706004C6438 /* GameExtensions.swift in Sources */,
 				BCAFE2CE2B4095170044225A /* SHLApp.swift in Sources */,
 				BCFA44AB2B44C06700B4358C /* StandingsTable.swift in Sources */,
 				BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */,

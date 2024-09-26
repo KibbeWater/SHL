@@ -154,14 +154,14 @@ struct MatchView: View {
                                     .foregroundColor(.white)
                             } else {
                                 let isToday = Calendar.current.isDate(match.date, inSameDayAs: Date())
-                                Text(isToday ? FormatTime(match.date) : FormatDate(match.date))
+                                Text(isToday ? match.formatTime() : match.formatDate())
                                     .fontWeight(.semibold)
                                     .font(.title)
                                     .frame(height: 96)
                                     .foregroundColor(.white)
                                     .overlay(alignment: .bottom) {
                                         if !isToday {
-                                            Text(String(FormatTime(match.date)))
+                                            Text(String(match.formatTime()))
                                                 .fontWeight(.semibold)
                                                 .font(.title2)
                                                 .foregroundColor(.white)
@@ -477,21 +477,6 @@ struct MatchView: View {
     
     func getEvents<T: PBPEventProtocol>(_ events: [PBPEventProtocol], type: T.Type) -> [T] {
         return events.compactMap { $0 as? T }
-    }
-    
-    
-    func FormatDate(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM dd"
-        return dateFormatter.string(from: date)
-    }
-    
-    func FormatTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        formatter.locale = Locale.current
-        formatter.timeZone = .current
-        return formatter.string(from: date)
     }
 }
 

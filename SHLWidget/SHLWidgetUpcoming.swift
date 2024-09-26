@@ -81,18 +81,6 @@ struct SHLWidgetUpcomingEntryView : View {
     
     @Environment(\.widgetFamily) var family
     
-    func FormatDate(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM dd"
-        return dateFormatter.string(from: date)
-    }
-    
-    func FormatTime(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "HH:mm"
-        return dateFormatter.string(from: date)
-    }
-
     var body: some View {
         if family == .systemMedium {
             HStack {
@@ -122,14 +110,14 @@ struct SHLWidgetUpcomingEntryView : View {
                     VStack {
                         Spacer()
                         if !Calendar.current.isDate(entry.game?.date ?? Date.now, inSameDayAs: entry.date) {
-                            Text(FormatDate(game.date))
+                            Text(game.formatDate())
                                 .fontWidth(.condensed)
-                            Text(FormatTime(game.date))
+                            Text(game.formatTime())
                                 .fontWeight(.medium)
                                 .fontWidth(.condensed)
                                 .font(.title2)
                         } else {
-                            Text(FormatTime(game.date))
+                            Text(game.formatTime())
                                 .fontWeight(.semibold)
                                 .fontWidth(.compressed)
                                 .font(.system(size: 42))
@@ -202,12 +190,12 @@ struct SHLWidgetUpcomingEntryView : View {
                             if !Calendar.current.isDate(entry.game?.date ?? Date.now, inSameDayAs: entry.date) {
                                 Text("Date")
                                     .font(.system(size: 14))
-                                Text(FormatDate(game.date))
+                                Text(game.formatDate())
                                     .font(.system(size: 10))
                             } else {
                                 Text("Time")
                                     .font(.system(size: 16))
-                                Text(FormatTime(game.date))
+                                Text(game.formatTime())
                                     .font(.system(size: 10))
                             }
                         }

@@ -70,12 +70,6 @@ struct ContentView: View {
         }
     }
     
-    func FormatDate(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM dd"
-        return dateFormatter.string(from: date)
-    }
-    
     func ReformatStandings(_ standings: StandingResults) -> [StandingObj] {
         return standings.leagueStandings.map { standing in
             return StandingObj(id: UUID().uuidString, position: standing.Rank, logo: standing.info.teamInfo.teamMedia, team: standing.info.teamInfo.teamNames.long, teamCode: standing.info.code ?? "UNK", matches: String(standing.GP), diff: String(standing.Diff), points: String(standing.Points))

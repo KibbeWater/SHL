@@ -15,21 +15,6 @@ struct MatchOverview: View {
     @State private var homeColor: Color = .black // Default color, updated on appear
     @State private var awayColor: Color = .black // Default color, updated on appear
     
-    func FormatDate(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM dd"
-        dateFormatter.locale = Locale.current
-        return dateFormatter.string(from: date)
-    }
-    
-    func FormatTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        formatter.locale = Locale.current
-        formatter.timeZone = .current
-        return formatter.string(from: date)
-    }
-    
     private func loadTeamColors() {
         let _homeKey = "Team/\(game.homeTeam.code.uppercased())"
         let _awayKey = "Team/\(game.awayTeam.code.uppercased())"
@@ -128,7 +113,7 @@ struct MatchOverview: View {
                         Text("Ended")
                     }
                 } else {
-                    Text(game.shootout ? "Shootout" : game.overtime ? "Overtime" : game.played ? "Full-Time" : Calendar.current.isDate(game.date, inSameDayAs: Date()) ? FormatTime(game.date) : FormatDate(game.date))
+                    Text(game.shootout ? "Shootout" : game.overtime ? "Overtime" : game.played ? "Full-Time" : Calendar.current.isDate(game.date, inSameDayAs: Date()) ? game.formatTime() : game.formatDate())
                         .fontWeight(.medium)
                 }
                 Spacer()
@@ -200,4 +185,6 @@ struct MatchOverview: View {
 
 #Preview {
     MatchOverview(game: Game.fakeData())
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(.horizontal)
 }
