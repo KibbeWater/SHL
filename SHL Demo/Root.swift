@@ -36,7 +36,7 @@ struct Root: View {
                 )
                 .task {
                     do {
-                        let _ = try await leagueStandings.fetchLeague(league: .SHL, skipCache: true)
+                        let _ = try await leagueStandings.fetchLeague(skipCache: true)
                     } catch let _err {
                         print(_err)
                     }

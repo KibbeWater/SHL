@@ -17,7 +17,7 @@ struct MatchCalendar: View {
                 MatchView(match: match)
             } label: {
                 HStack {
-                    Image("Team/\(match.homeTeam.code)")
+                    Image("Team/\(match.homeTeam.code.uppercased())")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 42, height: 42)
@@ -26,7 +26,7 @@ struct MatchCalendar: View {
                     Spacer()
                     Text(match.awayTeam.code)
                         .fontWeight(.semibold)
-                    Image("Team/\(match.awayTeam.code)")
+                    Image("Team/\(match.awayTeam.code.uppercased())")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 42, height: 42)
@@ -46,6 +46,11 @@ struct MatchCalendar: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             .foregroundStyle(.primary)
+            .contextMenu {
+                #if !APPCLIP
+                ReminderContext(game: match)
+                #endif
+            }
         }
     }
     

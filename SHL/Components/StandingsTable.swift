@@ -42,33 +42,30 @@ struct StandingView: View {
 struct StandingsTable: View {
     public var title: String
     @Binding public var items: [StandingObj]?
-    @Binding public var dict: Dictionary<Leagues, CacheItem<StandingResults?>>
+    @Binding public var standings: CacheItem<StandingResults>?
     @State private var _intItems: [StandingObj]?
-    private var league: Leagues
     
     public var onRefresh: (() async -> Void)? = nil
     
-    init(title: String, league: Leagues, items: Binding<[StandingObj]?>) {
+    init(title: String, items: Binding<[StandingObj]?>) {
         self.title = title
-        self.league = league
         self._items = items
         self.onRefresh = nil
-        self._dict = .constant(Dictionary<Leagues, CacheItem<StandingResults?>>())
+        self._standings = .constant(nil)
     }
     
-    init(title: String, league: Leagues, dictionary: Binding<Dictionary<Leagues, CacheItem<StandingResults?>>>) {
+    init(title: String, standings: Binding<CacheItem<StandingResults>?>) {
         self.title = title
-        self.league = league
-        self._dict = dictionary
+        self._standings = standings
         self.onRefresh = nil
         self._items = .constant(nil)
     }
     
-    func formatStandings(_ dictionary: Dictionary<Leagues, CacheItem<StandingResults?>>) -> [StandingObj]? {
-        if let _league = dictionary[league]?.cacheItem {
-            return _league.leagueStandings.map { standing in
+    func formatStandings(_ standings: CacheItem<StandingResults>?) -> [StandingObj]? {
+        if let _standings = standings?.cacheItem {
+            return _standings.leagueStandings.map({ standing in
                 return StandingObj(id: UUID().uuidString, position: standing.Rank, logo: standing.info.teamInfo.teamMedia, team: standing.info.teamInfo.teamNames.long, teamCode: standing.info.code ?? "TBD", matches: String(standing.GP), diff: String(standing.Diff), points: String(standing.Points))
-            }
+            })
         }
         return nil
     }
@@ -99,8 +96,8 @@ struct StandingsTable: View {
         }
         .padding()
         .frame(maxWidth: .infinity)
-        .onChange(of: dict) { _ in
-            let _s = formatStandings(dict)
+        .onChange(of: standings) { _ in
+            let _s = formatStandings(standings)
             _intItems = _s
         }
         .onChange(of: items) { _ in
@@ -111,7 +108,7 @@ struct StandingsTable: View {
 
 #Preview {
     VStack {
-        StandingsTable(title: "Table", league: .SHL, items: .constant([StandingObj(id: "1", position: 1, logo: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg", team: "Luleå Hockey", teamCode: "LHF", matches: "123", diff: "69", points: "59")]))
+        StandingsTable(title: "Table", items: .constant([StandingObj(id: "1", position: 1, logo: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg", team: "Luleå Hockey", teamCode: "LHF", matches: "123", diff: "69", points: "59")]))
             .padding(.horizontal)
             .frame(height: 250)
     }

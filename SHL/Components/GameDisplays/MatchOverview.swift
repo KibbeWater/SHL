@@ -18,13 +18,16 @@ struct MatchOverview: View {
     func FormatDate(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM dd"
+        dateFormatter.locale = Locale.current
         return dateFormatter.string(from: date)
     }
     
     func FormatTime(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "HH:mm"
-        return dateFormatter.string(from: date)
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        formatter.locale = Locale.current
+        formatter.timeZone = .current
+        return formatter.string(from: date)
     }
     
     private func loadTeamColors() {

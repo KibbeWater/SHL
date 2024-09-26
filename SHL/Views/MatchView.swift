@@ -103,7 +103,7 @@ struct MatchView: View {
                                 .padding(.bottom, -2)
                             Spacer()
                         }
-                        Image("Team/\(match.homeTeam.code)")
+                        Image("Team/\(match.homeTeam.code.uppercased())")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 84, height: 84)
@@ -153,13 +153,14 @@ struct MatchView: View {
                                     .frame(height: 96)
                                     .foregroundColor(.white)
                             } else {
-                                Text(Calendar.current.isDate(match.date, inSameDayAs: Date()) ? FormatTime(match.date) : FormatDate(match.date))
+                                let isToday = Calendar.current.isDate(match.date, inSameDayAs: Date())
+                                Text(isToday ? FormatTime(match.date) : FormatDate(match.date))
                                     .fontWeight(.semibold)
                                     .font(.title)
                                     .frame(height: 96)
                                     .foregroundColor(.white)
                                     .overlay(alignment: .bottom) {
-                                        if !Calendar.current.isDate(match.date, inSameDayAs: Date()) {
+                                        if !isToday {
                                             Text(String(FormatTime(match.date)))
                                                 .fontWeight(.semibold)
                                                 .font(.title2)
@@ -178,6 +179,7 @@ struct MatchView: View {
                         }
                     })
                     .frame(height: match.date < Date.now ? 172 : 84)
+                    .frame(maxWidth: .infinity)
                     Spacer()
                     VStack {
                         if match.date < Date.now {
@@ -189,7 +191,7 @@ struct MatchView: View {
                                 .padding(.bottom, -2)
                             Spacer()
                         }
-                        Image("Team/\(match.awayTeam.code)")
+                        Image("Team/\(match.awayTeam.code.uppercased())")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 84, height: 84)
@@ -485,9 +487,11 @@ struct MatchView: View {
     }
     
     func FormatTime(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "HH:mm"
-        return dateFormatter.string(from: date)
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        formatter.locale = Locale.current
+        formatter.timeZone = .current
+        return formatter.string(from: date)
     }
 }
 

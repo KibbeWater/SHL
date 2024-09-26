@@ -117,14 +117,14 @@ struct ContentView: View {
                     }
                     
                     VStack(spacing: 12) {
-                        MatchCalendar(matches: Array(matchInfo.latestMatches.prefix(5)))
+                        MatchCalendar(matches: Array(matchInfo.latestMatches.filter({ !$0.played }).prefix(5)))
                     }
                     .padding(.horizontal)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
                 .padding(.vertical)
 
-                StandingsTable(title: "Table", league: .SHL, dictionary: $leagueStandings.standings)
+                StandingsTable(title: "Table", standings: $leagueStandings.standings)
                     .background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .padding(.horizontal)
@@ -158,7 +158,7 @@ struct ContentView: View {
             await Task {
                 do {
                     try await matchInfo.getLatest()
-                    let _ = try await leagueStandings.fetchLeague(league: .SHL, skipCache: true)
+                    let _ = try await leagueStandings.fetchLeague(skipCache: true)
                 } catch let _err {
                     print(_err)
                 }

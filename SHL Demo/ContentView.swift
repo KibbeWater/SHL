@@ -35,26 +35,23 @@ struct ContentView: View {
                 VStack {
                     HStack {
                         Text("Match Calendar")
-                            .multilineTextAlignment(.leading)
                             .font(.title)
+                        .padding(.horizontal)
                         Spacer()
                     }
-                    ScrollView(.horizontal) {
-                        MatchCalendar(matches: matchInfo.latestMatches)
+                    
+                    VStack(spacing: 12) {
+                        MatchCalendar(matches: Array(matchInfo.latestMatches.prefix(5)))
                     }
-                    .padding(8)
-                    .background(.primary.opacity(0.1))
+                    .padding(.horizontal)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
-                .padding()
-                
-                VStack(spacing: 12) {
-                    StandingsTable(title: "Table", league: .SHL, dictionary: $leagueStandings.standings)
-                        .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .padding(.horizontal)
-                }
                 .padding(.vertical)
+
+                StandingsTable(title: "Table", standings: $leagueStandings.standings)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .padding(.horizontal)
             }
         }
         .onAppear {
@@ -62,13 +59,13 @@ struct ContentView: View {
                 try await matchInfo.getLatest()
             }
             Task {
-                try? await leagueStandings.fetchLeagues(skipCache: true)
+                try? await leagueStandings.fetchLeague(skipCache: true)
             }
         }
         .refreshable {
             await Task {
                 try? await matchInfo.getLatest()
-                let _ = try? await leagueStandings.fetchLeague(league: .SHL, skipCache: true)
+                let _ = try? await leagueStandings.fetchLeague(skipCache: true)
             }.value
         }
     }
