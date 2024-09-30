@@ -44,53 +44,66 @@ struct ContentView: View {
     
     @State private var sortOrder = [KeyPathComparator(\StandingObj.position)]
     
-    @State private var selectedLeaderboard: LeaguePages = .SHL
-    @State private var numberOfPages = LeaguePages.allCases.count
-    
     @State private var date: Date = Date()
     @State private var center: CGPoint = .zero
     
     func renderFeaturedGame(_ featured: Game) -> some View {
-        return NavigationLink(destination: {
-                MatchView(match: featured)
-            }, label: {
-                MatchOverview(game: featured, liveGame: gameListener?.game)
-            })
-            .buttonStyle(PlainButtonStyle())
-            .background(GeometryReader { geo in
-                Color(uiColor: .systemBackground)
-                    .onAppear {
-                        center = .init(x: geo.size.width/2, y: geo.size.height/2)
-                    }
-            })
+        let content: some View = {
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                return AnyView(LargeOverview(game: featured, liveGame: gameListener?.game))
+            } else {
+                return AnyView(
+                    MatchOverview(game: featured, liveGame: gameListener?.game)
+                        .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                )
+            }
+        }()
         
+        return NavigationLink(destination: {
+            MatchView(match: featured)
+        }, label: {
+            content
+        })
+        .buttonStyle(PlainButtonStyle())
+        .background(GeometryReader { geo in
+            Color(uiColor: .systemBackground)
+                .onAppear {
+                    center = .init(x: geo.size.width / 2, y: geo.size.height / 2)
+                }
+        })
     }
+
     
     func getTimeLoop() -> Double {
         let precision: Double = 10000
-        return Double(Int((date.timeIntervalSinceNow * -1)*precision)%(3*Int(precision)))/precision
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return Double(Int((date.timeIntervalSinceNow * -1)*precision)%(4*Int(precision)))/precision
+        } else {
+            return Double(Int((date.timeIntervalSinceNow * -1)*precision)%(3*Int(precision)))/precision
+        }
     }
     
     var body: some View {
         ScrollView {
             if let featured = SelectFeaturedMatch() {
-                if #available(iOS 17.0, *) {
-                    if featured.isLive() {
-                        TimelineView(.animation) { _ in
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    renderFeaturedGame(featured)
+                } else {
+                    if #available(iOS 17.0, *) {
+                        if featured.isLive() {
+                            TimelineView(.animation) { _ in
+                                renderFeaturedGame(featured)
+                                    .pulseShader(time: getTimeLoop(), center: center, speed: 150.0, amplitude: 0.1, decay: 5.0)
+                                    .padding(.horizontal)
+                            }
+                        } else {
                             renderFeaturedGame(featured)
-                                .pulseShader(time: getTimeLoop(), center: center, speed: 150.0, amplitude: 0.1, decay: 5.0)
-                                .clipShape(RoundedRectangle(cornerRadius: 12.0))
                                 .padding(.horizontal)
                         }
                     } else {
                         renderFeaturedGame(featured)
-                            .clipShape(RoundedRectangle(cornerRadius: 12.0))
                             .padding(.horizontal)
                     }
-                } else {
-                    renderFeaturedGame(featured)
-                        .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                        .padding(.horizontal)
                 }
             } else {
                 HStack {
@@ -103,16 +116,13 @@ struct ContentView: View {
                 .padding(.horizontal)
             }
             
-            VStack(spacing: 0) {
-                VStack {
+            VStack(spacing: 24) {
+                VStack(spacing: 8) {
                     HStack {
-                        NavigationLink {
-                            MatchListView()
-                        } label: {
-                            Text("Match Calendar \(Image(systemName: "chevron.right"))")
-                                .font(.title)
-                        }
-                        .padding(.horizontal)
+                        Text("Match Calendar")
+                            .font(.title)
+                            .fontWeight(.semibold)
+                            .padding(.horizontal)
                         Spacer()
                     }
                     
@@ -122,13 +132,24 @@ struct ContentView: View {
                     .padding(.horizontal)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
-                .padding(.vertical)
 
-                StandingsTable(title: "Table", standings: $leagueStandings.standings)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .padding(.horizontal)
+                VStack(spacing: 8) {
+                    HStack {
+                        Text("Leaderboard")
+                            .font(.title)
+                            .fontWeight(.semibold)
+                            .padding(.horizontal)
+                        Spacer()
+                    }
+                    
+                    StandingsTable(title: "Table", standings: $leagueStandings.standings)
+                        .frame(maxWidth: .infinity)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .padding(.horizontal)
+                }
             }
+            .padding(.top)
         }
         .onChange(of: matchInfo.latestMatches, perform: { oldMatches in
             let oldGame = oldMatches.last(where: { IsLive($0) })
@@ -168,6 +189,7 @@ struct ContentView: View {
                 }
             }.value
         }
+        .ignoresSafeArea(.container, edges: UIDevice.current.userInterfaceIdiom == .pad ? .all : .horizontal)
     }
     
     func ReformatStandings(_ standings: StandingResults) -> [StandingObj] {

@@ -95,7 +95,6 @@ struct StandingsTable: View {
             }
         }
         .padding()
-        .frame(maxWidth: .infinity)
         .onChange(of: standings) { _ in
             let _s = formatStandings(standings)
             _intItems = _s

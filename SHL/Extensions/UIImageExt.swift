@@ -13,6 +13,7 @@
 #else
     import UIKit
 #endif
+import SwiftUI
 
 public struct UIImageColors {
     public var background: UIColor!
@@ -177,6 +178,16 @@ fileprivate extension Double {
     }
 }
 
+func svgToImage(named: String, width: CGFloat) -> Image? {
+    let size = CGSize(width: width, height: CGFloat.infinity)
+    
+    guard let svgImage = UIImage(named: named)?.resized(to: size) else {
+        return nil
+    }
+    
+    return Image(uiImage: svgImage)
+}
+
 extension UIImage {
     #if os(OSX)
         private func resizeForUIImageColors(newSize: CGSize) -> UIImage? {
@@ -205,6 +216,29 @@ extension UIImage {
         }
     #endif
 
+    func resized(to targetSize: CGSize) -> UIImage {
+        let size = self.size
+        
+        let widthRatio  = targetSize.width  / size.width
+        let heightRatio = targetSize.height / size.height
+        
+        var newSize: CGSize
+        if widthRatio > heightRatio {
+            newSize = CGSize(width: size.width * heightRatio, height: size.height * heightRatio)
+        } else {
+            newSize = CGSize(width: size.width * widthRatio,  height: size.height * widthRatio)
+        }
+        
+        let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
+        
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 0)
+        self.draw(in: rect)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return newImage ?? self
+    }
+    
     public func getColors(quality: UIImageColorsQuality = .high, _ completion: @escaping (UIImageColors?) -> Void) {
         DispatchQueue.global().async {
             let result = self.getColors(quality: quality)

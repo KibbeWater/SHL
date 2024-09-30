@@ -15,40 +15,15 @@ struct MatchOverview: View {
     @State private var awayColor: Color = .black // Default color, updated on appear
     
     private func loadTeamColors() {
-        let _homeKey = "Team/\(game.homeTeam.code.uppercased())"
-        let _awayKey = "Team/\(game.awayTeam.code.uppercased())"
-        
-        if let _homeColor = UIImage(named: _homeKey) {
-            if let cache = ColorCache.shared.getColor(forKey: _homeKey) {
-                withAnimation {
-                    self.homeColor = Color(uiColor: cache)
-                }
-            } else {
-                _homeColor.getColors(quality: .low) { clr in
-                    if let _bg = clr?.background {
-                        ColorCache.shared.cacheColor(_bg, forKey: _homeKey)
-                        withAnimation {
-                            self.homeColor = Color(uiColor: _bg)
-                        }
-                    }
-                }
+        game.awayTeam.getTeamColor { clr in
+            withAnimation {
+                self.awayColor = clr
             }
         }
         
-        if let _awayColor = UIImage(named: _awayKey) {
-            if let cache = ColorCache.shared.getColor(forKey: _awayKey) {
-                withAnimation {
-                    self.awayColor = Color(uiColor: cache)
-                }
-            } else {
-                _awayColor.getColors(quality: .low) { clr in
-                    if let _bg = clr?.background {
-                        ColorCache.shared.cacheColor(_bg, forKey: _awayKey)
-                        withAnimation {
-                            self.awayColor = Color(uiColor: _bg)
-                        }
-                    }
-                }
+        game.homeTeam.getTeamColor { clr in
+            withAnimation {
+                self.homeColor = clr
             }
         }
     }

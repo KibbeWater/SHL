@@ -8,6 +8,20 @@
 import SwiftUI
 import HockeyKit
 
+enum RootTabs: Equatable, Hashable, Identifiable {
+    case home
+    case calendar
+    case team(SiteTeam)
+    
+    var id: String {
+        switch self {
+        case .home: return "home"
+        case .calendar: return "calendar"
+        case .team(let team): return "team_\(team.id)"
+        }
+    }
+}
+
 struct Root: View {
     @State private var loggedIn = false
     
@@ -17,9 +31,50 @@ struct Root: View {
     @State private var openedGame: MatchView?
     @State private var isGameOpen = false
     
+    @State private var selectedTab: RootTabs = .home
+    
+    @State private var teams: [SiteTeam] = []
+    
     var body: some View {
         ZStack {
-            NavigationStack {
+            if #available(iOS 18.0, *) {
+                TabView(selection: $selectedTab) {
+                    Tab("Home", systemImage: "house", value: .home) {
+                        NavigationStack {
+                            ContentView()
+                                .navigationDestination(isPresented: $isGameOpen) {
+                                    openedGame
+                                }
+                        }
+                    }
+                    
+                    Tab("Schedule", systemImage: "calendar", value: RootTabs.calendar) {
+                        NavigationStack {
+                            MatchListView()
+                        }
+                    }
+                    
+                    if UIDevice.current.userInterfaceIdiom == .pad {
+                        TabSection("Teams") {
+                            ForEach(teams, id: \.id) { team in
+                                Tab(value: RootTabs.team(team)) {
+                                    TeamView(team: team)
+                                } label: {
+                                    HStack {
+                                        svgToImage(named: "Team/\(team.names.code.uppercased())", width: 28)!
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                        Text(team.names.longSite ?? team.name)
+                                    }
+                                    .frame(height: 32)
+                                }
+                            }
+                        }
+                        .defaultVisibility(.hidden, for: .tabBar)
+                    }
+                }
+                .tabViewStyle(.sidebarAdaptable)
+            } else {
                 ContentView()
                     .navigationDestination(isPresented: $isGameOpen) {
                         openedGame
@@ -29,6 +84,7 @@ struct Root: View {
             if !loggedIn {
                 VStack {
                     Spacer()
+                    
                     Text("SHL")
                         .font(.system(size: 72, weight: .heavy))
                     Spacer()
@@ -38,7 +94,7 @@ struct Root: View {
                 .zIndex(10)
                 .transition(
                     .move(edge: .bottom)
-                        .animation(.easeInOut(duration: 300))
+                    .animation(.easeInOut(duration: 300))
                 )
                 .task {
                     do {
@@ -57,6 +113,14 @@ struct Root: View {
                         loggedIn = true
                     }
                 }
+                
+            }
+        }
+        .task {
+            do {
+                teams = try await TeamAPI.shared.getTeams()
+            } catch let _err {
+                print(_err)
             }
         }
         .onAppear {

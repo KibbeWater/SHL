@@ -19,6 +19,9 @@ struct MatchView: View {
     @EnvironmentObject var matchInfo: MatchInfo
     
     let match: Game
+    
+    @State private var extendedMatchInfo: GameExtraInfo? = nil
+    
     @State private var location: CLLocation?
     @State private var mapImage: UIImage?
     @State private var updater: GameUpdater?
@@ -29,6 +32,9 @@ struct MatchView: View {
     
     @State private var homeColor: Color = .black // Default color, updated on appear
     @State private var awayColor: Color = .black // Default color, updated on appear
+    
+    @State private var homeTeam: SiteTeam?
+    @State private var awayTeam: SiteTeam?
     
     @State private var selectedTab: Tabs = .summary
     
@@ -93,24 +99,34 @@ struct MatchView: View {
             ScrollView {
                 HStack(spacing: 16) {
                     Spacer()
-                    VStack {
-                        if (match.date < Date.now) {
-                            Text(String(updater?.game?.homeGoals ?? match.homeTeam.result))
-                                .font(.system(size: 96))
-                                .fontWidth(.compressed)
-                                .fontWeight(.bold)
-                                .foregroundStyle(updater?.game?.homeGoals ?? match.homeTeam.result > updater?.game?.awayGoals ?? match.awayTeam.result ? .white : .white.opacity(0.5))
-                                .padding(.bottom, -2)
-                            Spacer()
+                    NavigationLink {
+                        if let _team = homeTeam {
+                            TeamView(team: _team)
+                        } else {
+                            ProgressView()
                         }
-                        Image("Team/\(match.homeTeam.code.uppercased())")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 84, height: 84)
-                            .padding(0)
+                    } label: {
+                        VStack {
+                            if (match.date < Date.now) {
+                                Text(String(updater?.game?.homeGoals ?? match.homeTeam.result))
+                                    .font(.system(size: 96))
+                                    .fontWidth(.compressed)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(updater?.game?.homeGoals ?? match.homeTeam.result > updater?.game?.awayGoals ?? match.awayTeam.result ? .white : .white.opacity(0.5))
+                                    .padding(.bottom, -2)
+                                Spacer()
+                            }
+                            Image("Team/\(match.homeTeam.code.uppercased())")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 84, height: 84)
+                                .padding(0)
+                        }
+                        .frame(height: match.date < Date.now ? 172 : 84)
                     }
-                    .frame(height: match.date < Date.now ? 172 : 84)
+                    
                     Spacer()
+                    
                     VStack {
                         if let _game = updater?.game {
                             switch _game.state {
@@ -181,23 +197,33 @@ struct MatchView: View {
                     .frame(height: match.date < Date.now ? 172 : 84)
                     .frame(maxWidth: .infinity)
                     Spacer()
-                    VStack {
-                        if match.date < Date.now {
-                            Text(String(updater?.game?.awayGoals ?? match.awayTeam.result))
-                                .font(.system(size: 96))
-                                .fontWidth(.compressed)
-                                .fontWeight(.bold)
-                                .foregroundStyle(match.awayTeam.result > match.homeTeam.result ? .white : .white.opacity(0.5))
-                                .padding(.bottom, -2)
-                            Spacer()
+                    
+                    NavigationLink {
+                        if let _team = awayTeam {
+                            TeamView(team: _team)
+                        } else {
+                            ProgressView()
                         }
-                        Image("Team/\(match.awayTeam.code.uppercased())")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 84, height: 84)
-                            .padding(0)
+                    } label: {
+                        VStack {
+                            if match.date < Date.now {
+                                Text(String(updater?.game?.awayGoals ?? match.awayTeam.result))
+                                    .font(.system(size: 96))
+                                    .fontWidth(.compressed)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(match.awayTeam.result > match.homeTeam.result ? .white : .white.opacity(0.5))
+                                    .padding(.bottom, -2)
+                                Spacer()
+                            }
+                            Image("Team/\(match.awayTeam.code.uppercased())")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 84, height: 84)
+                                .padding(0)
+                        }
+                        .frame(height: match.date < Date.now ? 172 : 84)
                     }
-                    .frame(height: match.date < Date.now ? 172 : 84)
+                    
                     Spacer()
                 }
                 .background(GeometryReader {
@@ -283,7 +309,15 @@ struct MatchView: View {
                                     } else {
                                         ProgressView()
                                             .onAppear {
-                                                findVenue(.init(width: geo.size.width, height: geo.size.height))
+                                                match.findVenue(.init(width: geo.size.width, height: geo.size.height)) { res in
+                                                    switch res {
+                                                    case .success(let success):
+                                                        location = success.1
+                                                        mapImage = success.0.image
+                                                    case .failure(let failure):
+                                                        print(failure)
+                                                    }
+                                                }
                                             }
                                             .frame(width: geo.size.width, height: geo.size.height)
                                     }
@@ -341,6 +375,7 @@ struct MatchView: View {
         .onAppear {
             loadTeamColors()
             checkActiveActivitites()
+            fetchTeam()
         }
         .task {
             if !match.played && match.date < Date.now {
@@ -366,85 +401,32 @@ struct MatchView: View {
     }
     
     private func loadTeamColors() {
-        let _homeKey = "Team/\(match.homeTeam.code.uppercased())"
-        let _awayKey = "Team/\(match.awayTeam.code.uppercased())"
-        
-        if let _homeColor = UIImage(named: _homeKey) {
-            if let cache = ColorCache.shared.getColor(forKey: _homeKey) {
-                withAnimation {
-                    self.homeColor = Color(uiColor: cache)
-                }
-            } else {
-                _homeColor.getColors(quality: .low) { clr in
-                    if let _bg = clr?.background {
-                        ColorCache.shared.cacheColor(_bg, forKey: _homeKey)
-                        withAnimation {
-                            self.homeColor = Color(uiColor: _bg)
-                        }
-                    }
-                }
+        match.awayTeam.getTeamColor { clr in
+            withAnimation {
+                self.awayColor = clr
             }
         }
         
-        if let _awayColor = UIImage(named: _awayKey) {
-            if let cache = ColorCache.shared.getColor(forKey: _awayKey) {
-                withAnimation {
-                    self.awayColor = Color(uiColor: cache)
-                }
-            } else {
-                _awayColor.getColors(quality: .low) { clr in
-                    if let _bg = clr?.background {
-                        ColorCache.shared.cacheColor(_bg, forKey: _awayKey)
-                        withAnimation {
-                            self.awayColor = Color(uiColor: _bg)
-                        }
-                    }
-                }
+        match.homeTeam.getTeamColor { clr in
+            withAnimation {
+                self.homeColor = clr
             }
         }
     }
     
-    func findVenue(_ cgSize: CGSize) {
-        guard let _venue = match.venue else { return }
-        
-        let request = MKLocalSearch.Request()
-        request.naturalLanguageQuery = "\(_venue)"
-        
-        let search = MKLocalSearch(request: request)
-        search.start { (response, error) in
-            guard let response = response else {
-                print("Search error: \(error?.localizedDescription ?? "Unknown error")")
-                return
+    func fetchTeam() {
+        Task {
+            var overview: GameExtraInfo? = nil
+            if let _extendedMatchInfo = extendedMatchInfo {
+                overview = _extendedMatchInfo
+            } else {
+                overview = try? await matchInfo.getMatchExtra(match.id)
             }
             
-            if let venue = response.mapItems.first {
-                let options: MKMapSnapshotter.Options = .init()
-                options.region = MKCoordinateRegion(
-                    center: CLLocationCoordinate2D(
-                        latitude: venue.placemark.coordinate.latitude,
-                        longitude: venue.placemark.coordinate.longitude
-                    ),
-                    span: MKCoordinateSpan(latitudeDelta: 0.004, longitudeDelta: 0.004)
-                )
-                
-                options.size = cgSize
-                options.mapType = .hybrid
-                options.showsBuildings = true
-                
-                let snapshotter = MKMapSnapshotter(
-                    options: options
-                )
-                
-                snapshotter.start { snapshot, error in
-                   if let snapshot = snapshot {
-                      mapImage = snapshot.image
-                   } else if let _error = error {
-                      print("Something went wrong \(_error)")
-                   }
-                }
-                
-                location = CLLocation(latitude: venue.placemark.coordinate.latitude, longitude: venue.placemark.coordinate.longitude)
-            }
+            guard let _overview = overview else { return }
+            
+            homeTeam = try? await TeamAPI.shared.getTeam(_overview.homeTeam.uuid)
+            awayTeam = try? await TeamAPI.shared.getTeam(_overview.awayTeam.uuid)
         }
     }
     
