@@ -21,6 +21,7 @@ struct MatchView: View {
     let match: Game
     
     @State private var extendedMatchInfo: GameExtraInfo? = nil
+    @State private var matchInfoStatistics: GameStatsAPIResponse? = nil
     
     @State private var location: CLLocation?
     @State private var mapImage: UIImage?
@@ -86,6 +87,35 @@ struct MatchView: View {
         }) {
             Text(activityRunning ? "Stop Activity" : "Start Activity")
         }
+    }
+    
+    var statComponent: some View {
+        VStack {
+            let goals: [GoalEvent] = getEvents(pbpEvents, type: GoalEvent.self)
+            // let shots: [ShotEvent] = getEvents(pbpEvents, type: ShotEvent.self)
+            let penalties: [PenaltyEvent] = getEvents(pbpEvents, type: PenaltyEvent.self)
+            
+            let homePenalties = penalties.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
+            let awayPenalties = penalties.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
+            VersusBar("Penalties", homeSide: homePenalties.count, awaySide: awayPenalties.count, homeColor: homeColor, awayColor: awayColor)
+            
+            let homeShotsGoal = matchInfoStatistics?.home.getStat(for: .shotsOnGoal) ?? 0
+            let awayShotsGoal = matchInfoStatistics?.away.getStat(for: .shotsOnGoal) ?? 0
+            VersusBar("Shots on goals", homeSide: homeShotsGoal, awaySide: awayShotsGoal, homeColor: homeColor, awayColor: awayColor)
+            
+            let homeGoals = goals.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
+            let awayGoals = goals.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
+            let homeSavesPercent = homeShotsGoal == 0 ? 0 : (Float(homeShotsGoal - awayGoals.count) / Float(homeShotsGoal)) * 100.0
+            let awaySavesPercent = awayShotsGoal == 0 ? 0 : (Float(awayShotsGoal - homeGoals.count) / Float(awayShotsGoal)) * 100.0
+            VersusBar("Save %", homeSide: Int(homeSavesPercent), awaySide: Int(awaySavesPercent), homeColor: homeColor, awayColor: awayColor)
+            
+            let homeFaceoffs = matchInfoStatistics?.home.getStat(for: .wonFaceoffs) ?? 0
+            let awayFaceoffs = matchInfoStatistics?.away.getStat(for: .wonFaceoffs) ?? 0
+            VersusBar("Won Faceoffs", homeSide: homeFaceoffs, awaySide: awayFaceoffs, homeColor: homeColor, awayColor: awayColor)
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
     
     var body: some View {
@@ -266,31 +296,7 @@ struct MatchView: View {
                         }
                         
                         if match.date < Date.now {
-                            VStack {
-                                let _: [GoalEvent] = getEvents(pbpEvents, type: GoalEvent.self)
-                                let shots: [ShotEvent] = getEvents(pbpEvents, type: ShotEvent.self)
-                                let penalties: [PenaltyEvent] = getEvents(pbpEvents, type: PenaltyEvent.self)
-                                
-                                let homePenalties = penalties.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
-                                let awayPenalties = penalties.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
-                                VersusBar("Penalties", homeSide: homePenalties.count, awaySide: awayPenalties.count, homeColor: homeColor, awayColor: awayColor)
-                                
-                                
-                                let homeShots = shots.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
-                                let awayShots = shots.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
-                                VersusBar("Shots", homeSide: homeShots.count, awaySide: awayShots.count, homeColor: homeColor, awayColor: awayColor)
-                                
-                                let homeShotsGoal = homeShots.filter({ $0.goalSection == 0 })
-                                let awayShotsGoal = awayShots.filter({ $0.goalSection == 0 })
-                                VersusBar("Shots on goals", homeSide: homeShotsGoal.count, awaySide: awayShotsGoal.count, homeColor: homeColor, awayColor: awayColor)
-                                
-                                /* let homeGoals = goals.filter({ $0.eventTeam.teamCode == match.homeTeam.code })
-                                let awayGoals = goals.filter({ $0.eventTeam.teamCode == match.awayTeam.code })
-                                VersusBar("Save %", homePercent: 1.0-(Float(homeGoals.count) / Float(homeShotsGoal.count + awayShotsGoal.count + goals.count)), awayPercent: 1.0-(Float(awayGoals.count) / Float(homeShotsGoal.count + awayShotsGoal.count + goals.count)), homeColor: homeColor, awayColor: awayColor) */
-                            }
-                            .padding()
-                            .background(.ultraThinMaterial)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            statComponent
                         }
                         
                         VStack {
@@ -376,6 +382,7 @@ struct MatchView: View {
             loadTeamColors()
             checkActiveActivitites()
             fetchTeam()
+            fetchMatchStats()
         }
         .task {
             if !match.played && match.date < Date.now {
@@ -427,6 +434,16 @@ struct MatchView: View {
             
             homeTeam = try? await TeamAPI.shared.getTeam(_overview.homeTeam.uuid)
             awayTeam = try? await TeamAPI.shared.getTeam(_overview.awayTeam.uuid)
+        }
+    }
+    
+    func fetchMatchStats() {
+        Task {
+            do {
+                matchInfoStatistics = try await matchInfo.getGameStats(match)
+            } catch let _err {
+                print("Error fetching match stats: \(_err)")
+            }
         }
     }
     
