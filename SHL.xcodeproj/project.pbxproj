@@ -12,6 +12,7 @@
 		800F320E2C00D1300069E436 /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F320D2C00D1300069E436 /* Sequence.swift */; };
 		801BC55A2BCFEF2C00417693 /* StandingsTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFA44AA2B44C06700B4358C /* StandingsTable.swift */; };
 		802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802B98E72BD06C6800278A00 /* MatchCalendar.swift */; };
+		8035B1522CAF647B00FA534E /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F320D2C00D1300069E436 /* Sequence.swift */; };
 		804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804316232BDCFFA5007D1D9A /* AppIntent.swift */; };
 		804316262BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804316252BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift */; };
 		804316272BDD05E8007D1D9A /* UIImageExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC374DF92BAD922000378412 /* UIImageExt.swift */; };
@@ -21,6 +22,9 @@
 		8055E5172BD1739D0096DCBF /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8055E5162BD1739D0096DCBF /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8055E5182BD173A30096DCBF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC425E442B4706CC00D82CFB /* WidgetKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8055E51C2BD187670096DCBF /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8055E51B2BD187670096DCBF /* Launch Screen.storyboard */; };
+		805C8AA32CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805C8AA22CAF32FA00CF7F7D /* CacheAsyncImage.swift */; };
+		805C8AA42CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805C8AA22CAF32FA00CF7F7D /* CacheAsyncImage.swift */; };
+		805C8AA52CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805C8AA22CAF32FA00CF7F7D /* CacheAsyncImage.swift */; };
 		806796CF2CA864C100E9D95D /* TeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806796CE2CA864C100E9D95D /* TeamView.swift */; };
 		806796D02CA888CD00E9D95D /* TeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806796CE2CA864C100E9D95D /* TeamView.swift */; };
 		8075FBB42CA62706004C6438 /* GameExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB32CA62706004C6438 /* GameExtensions.swift */; };
@@ -118,6 +122,7 @@
 		804375A92CAA09FC0041F46D /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		8055E5162BD1739D0096DCBF /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
 		8055E51B2BD187670096DCBF /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		805C8AA22CAF32FA00CF7F7D /* CacheAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheAsyncImage.swift; sourceTree = "<group>"; };
 		806796CE2CA864C100E9D95D /* TeamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamView.swift; sourceTree = "<group>"; };
 		8075FBB32CA62706004C6438 /* GameExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameExtensions.swift; sourceTree = "<group>"; };
 		8075FBB72CA6A1AE004C6438 /* LargeOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeOverview.swift; sourceTree = "<group>"; };
@@ -230,6 +235,7 @@
 		BC374DF82BAD920F00378412 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				805C8AA22CAF32FA00CF7F7D /* CacheAsyncImage.swift */,
 				BC374DF92BAD922000378412 /* UIImageExt.swift */,
 				800F320D2C00D1300069E436 /* Sequence.swift */,
 				80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */,
@@ -527,6 +533,7 @@
 				BC425E4C2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift in Sources */,
 				8075FBB52CA62706004C6438 /* GameExtensions.swift in Sources */,
 				804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */,
+				805C8AA52CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */,
 				80DCA05F2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */,
 				804316262BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift in Sources */,
 			);
@@ -538,7 +545,9 @@
 			files = (
 				BC8848082BB15F4E00844DBB /* ContentView.swift in Sources */,
 				80E0F5892BD935F300A4C232 /* VersusBar.swift in Sources */,
+				8035B1522CAF647B00FA534E /* Sequence.swift in Sources */,
 				806796D02CA888CD00E9D95D /* TeamView.swift in Sources */,
+				805C8AA42CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */,
 				804375AB2CAA09FC0041F46D /* PlayerView.swift in Sources */,
 				80E0F5822BD9346100A4C232 /* Root.swift in Sources */,
 				8075FBB62CA62706004C6438 /* GameExtensions.swift in Sources */,
@@ -565,6 +574,7 @@
 				804375AA2CAA09FC0041F46D /* PlayerView.swift in Sources */,
 				802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */,
 				8075FBB82CA6A1AE004C6438 /* LargeOverview.swift in Sources */,
+				805C8AA32CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */,
 				806796CF2CA864C100E9D95D /* TeamView.swift in Sources */,
 				BC8C15112BAC787B0010AB59 /* MatchOverview.swift in Sources */,
 				BCD7BC182BAF6B9800E208B3 /* MatchListView.swift in Sources */,
@@ -617,7 +627,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.SHLWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -652,7 +662,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.SHLWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -693,7 +703,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.Clip;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -732,7 +742,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.Clip;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -893,7 +903,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -936,7 +946,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

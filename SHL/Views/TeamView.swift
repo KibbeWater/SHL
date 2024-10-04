@@ -149,16 +149,18 @@ struct TeamView: View {
                     HStack {
                         ForEach(line.players, id: \.fullName) { player in
                             if let url = player.renderedLatestPortrait?.url {
-                                AsyncImage(url: .init(string: url)!) { _img in
-                                    NavigationLink {
-                                        PlayerView(player: player, teamColor: $teamColor)
-                                    } label: {
-                                        VStack {
-                                            Text(player.fullName)
-                                                .padding(.horizontal, 4)
-                                                .padding(.top, 8)
-                                                .fontWeight(.semibold)
-                                                .foregroundStyle(Color(uiColor: .label))
+                                
+                                NavigationLink {
+                                    PlayerView(player: player, teamColor: $teamColor)
+                                } label: {
+                                    VStack {
+                                        Text(player.fullName)
+                                            .padding(.horizontal, 4)
+                                            .padding(.top, 8)
+                                            .fontWeight(.semibold)
+                                            .foregroundStyle(Color(uiColor: .label))
+                                        
+                                        CacheAsyncImage(url: .init(string: url)!) { _img in
                                             _img
                                                 .resizable()
                                                 .background(playerCountryColor(player))
@@ -170,14 +172,17 @@ struct TeamView: View {
                                                             .foregroundStyle(Color(uiColor: .label))
                                                     }
                                                 }
+                                        } placeholder: {
+                                            Spacer()
+                                            ProgressView()
+                                                .frame(width: 200)
+                                            Spacer()
                                         }
-                                        .background(.ultraThinMaterial)
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
                                     }
-                                } placeholder: {
-                                    ProgressView()
+                                    .frame(height: 256)
+                                    .background(.ultraThinMaterial)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
                                 }
-                                .frame(height: 256)
                             }
                         }
                     }
@@ -212,7 +217,7 @@ struct TeamView: View {
                         }
                     }
                     Spacer()
-                    Image("Team/\(team.names.code)")
+                    Image("Team/\(team.names.code.uppercased())")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 72, height: 72)
