@@ -9,6 +9,7 @@ import SwiftUI
 import HockeyKit
 
 private enum PlayerTabs: String, CaseIterable {
+    case statistics = "Statistics"
     case history = "History"
 }
 
@@ -19,7 +20,7 @@ struct PlayerView: View {
     @State private var playerInfo: Player? = nil
     @State private var seasonStats: PlayerGameLog? = nil
     
-    @State private var selectedTab: PlayerTabs = .history
+    @State private var selectedTab: PlayerTabs = .statistics
 
     func loadPlayerInfo() async {
         self.playerInfo = try? await PlayerAPI.shared.getPlayer(id: player.uuid)
@@ -32,6 +33,65 @@ struct PlayerView: View {
             print("Error fetching additional stats:")
             print(_err)
         }
+    }
+    
+    var statisticsTab: some View {
+        GeometryReader { geo in
+            LazyVGrid(columns: [
+                .init(.flexible(minimum: 10, maximum: geo.size.width)),
+                .init(.flexible(minimum: 10, maximum: geo.size.width)),
+            ]) {
+                if let GAA = playerInfo?.getStats(for: .goalsPerHour) {
+                    VStack {
+                        Text(String(GAA))
+                            .font(.title)
+                            .fontWeight(.semibold)
+                        Text("Goals / h")
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                if let GPI = playerInfo?.getStats(for: .matches) {
+                    VStack {
+                        Text(String(Int(GPI)))
+                            .font(.title)
+                            .fontWeight(.semibold)
+                        Text("Games")
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                if let SVS = playerInfo?.getStats(for: .saves) {
+                    VStack {
+                        Text(String(Int(SVS)))
+                            .font(.title)
+                            .fontWeight(.semibold)
+                        Text("Saves")
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                if let SVSPerc = playerInfo?.getStats(for: .saves) {
+                    VStack {
+                        Text("\(Int(SVSPerc))%")
+                            .font(.title)
+                            .fontWeight(.semibold)
+                        Text("Saves %")
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+            }
+        }
+        .padding(.horizontal)
     }
     
     var historyTab: some View {
@@ -57,7 +117,11 @@ struct PlayerView: View {
                                             .aspectRatio(contentMode: .fit)
                                             .frame(width: 46, height: 46)
                                     }
-                                    Text("W: \(stat.wins) - L: \(stat.losses)")
+                                    .padding(.trailing, 12)
+                                    VStack {
+                                        VersusBar("\(String(stat.gamesPlayed)) matches (W/L)", homeSide: stat.wins, awaySide: stat.losses, homeColor: .blue, awayColor: .red)
+                                            .fontWeight(.medium)
+                                    }
                                     Spacer()
                                 }
                                 .frame(height: 52)
@@ -70,23 +134,23 @@ struct PlayerView: View {
                                         Text("SHL")
                                             .foregroundStyle(.secondary)
                                             .fontWeight(.semibold)
-                                            .font(.footnote)
-                                            .padding(.horizontal, 12)
-                                            .padding(.top, 8)
+                                            .font(.system(size: 12))
+                                            .padding(.horizontal, 16)
+                                            .padding(.top, 4)
                                     case .finals:
                                         Text("Finals")
                                             .foregroundStyle(.secondary)
                                             .fontWeight(.semibold)
                                             .font(.footnote)
-                                            .padding(.horizontal, 12)
-                                            .padding(.top, 8)
+                                            .padding(.horizontal, 16)
+                                            .padding(.top, 4)
                                     case .unknown:
                                         Text("Unknown")
                                             .foregroundStyle(.secondary)
                                             .fontWeight(.semibold)
                                             .font(.footnote)
-                                            .padding(.horizontal, 12)
-                                            .padding(.top, 8)
+                                            .padding(.horizontal, 16)
+                                            .padding(.top, 4)
                                     }
                                 })
                             }
@@ -180,6 +244,8 @@ struct PlayerView: View {
                     
                     VStack {
                         switch selectedTab {
+                        case .statistics:
+                            statisticsTab
                         case .history:
                             historyTab
                         }
