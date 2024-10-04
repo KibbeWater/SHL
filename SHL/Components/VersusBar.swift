@@ -62,12 +62,15 @@ struct VersusBar: View {
                 if homeSide+awaySide == 0 {
                     Color.secondary
                         .frame(width: geo.size.width, height: 8)
+                        .clipShape(RoundedRectangle(cornerRadius: .infinity))
                 } else if homeSide == 0 {
                     awayColor
                         .frame(width: geo.size.width, height: 8)
+                        .clipShape(RoundedRectangle(cornerRadius: .infinity))
                 } else if awaySide == 0 {
                     homeColor
                         .frame(width: geo.size.width, height: 8)
+                        .clipShape(RoundedRectangle(cornerRadius: .infinity))
                 } else {
                     HStack(spacing: 0) {
                         HStack{}
@@ -95,6 +98,11 @@ struct VersusBar: View {
         
         VersusBar("Penalties %", homePercent: 0.3, awayPercent: 0.7, homeColor: .red, awayColor: .blue)
         VersusBar("Shots %", homePercent: 0.60655, awayPercent: 0.39344, homeColor: .red, awayColor: .blue)
+            .padding(.bottom, 64)
+
+        VersusBar("Penalties", homeSide: 0, awaySide: 7, homeColor: .red, awayColor: .blue)
+        VersusBar("Penalties", homeSide: 3, awaySide: 0, homeColor: .red, awayColor: .blue)
+        VersusBar("Penalties", homeSide: 0, awaySide: 0, homeColor: .red, awayColor: .blue)
     }
     .padding(.horizontal)
 }
