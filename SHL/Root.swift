@@ -11,12 +11,14 @@ import HockeyKit
 enum RootTabs: Equatable, Hashable, Identifiable {
     case home
     case calendar
+    case settings
     case team(SiteTeam)
     
     var id: String {
         switch self {
         case .home: return "home"
         case .calendar: return "calendar"
+        case .settings: return "settings"
         case .team(let team): return "team_\(team.id)"
         }
     }
@@ -52,6 +54,10 @@ struct Root: View {
                         NavigationStack {
                             MatchListView()
                         }
+                    }
+                    
+                    Tab("Settings", systemImage: "gearshape", value: RootTabs.settings) {
+                        SettingsView()
                     }
                     
                     if UIDevice.current.userInterfaceIdiom == .pad {
@@ -158,6 +164,7 @@ struct Root: View {
                 print("Unable to find game")
                 return
             }
+            selectedTab = .home
             openedGame = MatchView(match: Game(game))
             isGameOpen = true
         }

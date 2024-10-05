@@ -27,6 +27,11 @@
 		805C8AA52CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805C8AA22CAF32FA00CF7F7D /* CacheAsyncImage.swift */; };
 		806796CF2CA864C100E9D95D /* TeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806796CE2CA864C100E9D95D /* TeamView.swift */; };
 		806796D02CA888CD00E9D95D /* TeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806796CE2CA864C100E9D95D /* TeamView.swift */; };
+		806BEB152CB0500700CC4565 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806BEB142CB0500700CC4565 /* SettingsView.swift */; };
+		806BEB162CB0500700CC4565 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806BEB142CB0500700CC4565 /* SettingsView.swift */; };
+		806BEB182CB052BB00CC4565 /* CloudStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806BEB172CB052BB00CC4565 /* CloudStorage.swift */; };
+		806BEB192CB052BB00CC4565 /* CloudStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806BEB172CB052BB00CC4565 /* CloudStorage.swift */; };
+		806BEB1A2CB052BB00CC4565 /* CloudStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806BEB172CB052BB00CC4565 /* CloudStorage.swift */; };
 		8075FBB42CA62706004C6438 /* GameExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB32CA62706004C6438 /* GameExtensions.swift */; };
 		8075FBB52CA62706004C6438 /* GameExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB32CA62706004C6438 /* GameExtensions.swift */; };
 		8075FBB62CA62706004C6438 /* GameExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB32CA62706004C6438 /* GameExtensions.swift */; };
@@ -38,6 +43,9 @@
 		80E0F5872BD9359B00A4C232 /* MatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6212E42BB05B81003CCB45 /* MatchView.swift */; };
 		80E0F5882BD935F100A4C232 /* PBPView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC457B1A2BB9BB9100227D75 /* PBPView.swift */; };
 		80E0F5892BD935F300A4C232 /* VersusBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */; };
+		80E9ED8E2CB14DDC00D0E4E9 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9ED8D2CB14DDC00D0E4E9 /* Settings.swift */; };
+		80E9ED8F2CB14DDC00D0E4E9 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9ED8D2CB14DDC00D0E4E9 /* Settings.swift */; };
+		80E9ED902CB14DDC00D0E4E9 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9ED8D2CB14DDC00D0E4E9 /* Settings.swift */; };
 		BC044CEA2BB43F9A0058B12B /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = BC044CE92BB43F9A0058B12B /* HockeyKit */; };
 		BC369E1C2BBAF5CC00940F42 /* VersusBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */; };
 		BC374DFA2BAD922000378412 /* UIImageExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC374DF92BAD922000378412 /* UIImageExt.swift */; };
@@ -124,10 +132,13 @@
 		8055E51B2BD187670096DCBF /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		805C8AA22CAF32FA00CF7F7D /* CacheAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheAsyncImage.swift; sourceTree = "<group>"; };
 		806796CE2CA864C100E9D95D /* TeamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamView.swift; sourceTree = "<group>"; };
+		806BEB142CB0500700CC4565 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		806BEB172CB052BB00CC4565 /* CloudStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudStorage.swift; sourceTree = "<group>"; };
 		8075FBB32CA62706004C6438 /* GameExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameExtensions.swift; sourceTree = "<group>"; };
 		8075FBB72CA6A1AE004C6438 /* LargeOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeOverview.swift; sourceTree = "<group>"; };
 		80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCache.swift; sourceTree = "<group>"; };
 		80E0F5812BD9346100A4C232 /* Root.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Root.swift; sourceTree = "<group>"; };
+		80E9ED8D2CB14DDC00D0E4E9 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersusBar.swift; sourceTree = "<group>"; };
 		BC374DF92BAD922000378412 /* UIImageExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExt.swift; sourceTree = "<group>"; };
 		BC425E3E2B4702F900D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -240,6 +251,8 @@
 				800F320D2C00D1300069E436 /* Sequence.swift */,
 				80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */,
 				8075FBB32CA62706004C6438 /* GameExtensions.swift */,
+				806BEB172CB052BB00CC4565 /* CloudStorage.swift */,
+				80E9ED8D2CB14DDC00D0E4E9 /* Settings.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -363,6 +376,7 @@
 				BC6212E42BB05B81003CCB45 /* MatchView.swift */,
 				806796CE2CA864C100E9D95D /* TeamView.swift */,
 				804375A92CAA09FC0041F46D /* PlayerView.swift */,
+				806BEB142CB0500700CC4565 /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -532,8 +546,10 @@
 				BC425E4A2B4706CC00D82CFB /* SHLWidgetBundle.swift in Sources */,
 				BC425E4C2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift in Sources */,
 				8075FBB52CA62706004C6438 /* GameExtensions.swift in Sources */,
+				80E9ED8E2CB14DDC00D0E4E9 /* Settings.swift in Sources */,
 				804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */,
 				805C8AA52CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */,
+				806BEB1A2CB052BB00CC4565 /* CloudStorage.swift in Sources */,
 				80DCA05F2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */,
 				804316262BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift in Sources */,
 			);
@@ -548,6 +564,7 @@
 				8035B1522CAF647B00FA534E /* Sequence.swift in Sources */,
 				806796D02CA888CD00E9D95D /* TeamView.swift in Sources */,
 				805C8AA42CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */,
+				806BEB182CB052BB00CC4565 /* CloudStorage.swift in Sources */,
 				804375AB2CAA09FC0041F46D /* PlayerView.swift in Sources */,
 				80E0F5822BD9346100A4C232 /* Root.swift in Sources */,
 				8075FBB62CA62706004C6438 /* GameExtensions.swift in Sources */,
@@ -560,7 +577,9 @@
 				BC8848062BB15F4E00844DBB /* LHF_DemoApp.swift in Sources */,
 				8055E5152BD171660096DCBF /* MatchCalendar.swift in Sources */,
 				80DCA0602C9DBEFF0058B6F2 /* ColorCache.swift in Sources */,
+				80E9ED902CB14DDC00D0E4E9 /* Settings.swift in Sources */,
 				BC88481B2BB1642E00844DBB /* MatchOverview.swift in Sources */,
+				806BEB152CB0500700CC4565 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -570,10 +589,13 @@
 			files = (
 				BCAFE2D02B4095170044225A /* ContentView.swift in Sources */,
 				8008FC7E2C9DCC4E00B23669 /* ReminderContext.swift in Sources */,
+				80E9ED8F2CB14DDC00D0E4E9 /* Settings.swift in Sources */,
 				BC369E1C2BBAF5CC00940F42 /* VersusBar.swift in Sources */,
 				804375AA2CAA09FC0041F46D /* PlayerView.swift in Sources */,
 				802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */,
 				8075FBB82CA6A1AE004C6438 /* LargeOverview.swift in Sources */,
+				806BEB162CB0500700CC4565 /* SettingsView.swift in Sources */,
+				806BEB192CB052BB00CC4565 /* CloudStorage.swift in Sources */,
 				805C8AA32CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */,
 				806796CF2CA864C100E9D95D /* TeamView.swift in Sources */,
 				BC8C15112BAC787B0010AB59 /* MatchOverview.swift in Sources */,

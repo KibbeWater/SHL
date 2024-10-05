@@ -47,6 +47,8 @@ struct ContentView: View {
     @State private var date: Date = Date()
     @State private var center: CGPoint = .zero
     
+    @State private var featuredGame: Game? = nil
+    
     func renderFeaturedGame(_ featured: Game) -> some View {
         let content: some View = {
             if UIDevice.current.userInterfaceIdiom == .pad {
@@ -85,7 +87,7 @@ struct ContentView: View {
     
     var body: some View {
         ScrollView {
-            if let featured = SelectFeaturedMatch() {
+            if let featured = featuredGame {
                 if UIDevice.current.userInterfaceIdiom == .pad {
                     renderFeaturedGame(featured)
                 } else {
@@ -161,6 +163,11 @@ struct ContentView: View {
             
             gameListener = GameUpdater(gameId: newGame.id)
         })
+        .onChange(of: matchInfo.latestMatches, perform: { _ in
+            Task {
+                await SelectFeaturedMatch()
+            }
+        })
         .onChange(of: scenePhase, perform: { _ in
             guard scenePhase == .active else {
                 return
@@ -202,8 +209,14 @@ struct ContentView: View {
         return !game.played && game.date < Date.now
     }
     
-    func SelectFeaturedMatch() -> Game? {
-        let lastPlayed = matchInfo.latestMatches.last(where: { $0.played })
+    func SelectFeaturedMatch() async {
+        let scoredMatches = await scoreAndSortHockeyMatches(
+            matchInfo.latestMatches,
+            preferredTeam: Settings.shared.getPreferredTeam()
+        )
+        
+        featuredGame = scoredMatches.first?.0
+        /*let lastPlayed = matchInfo.latestMatches.last(where: { $0.played })
         
         if let lastInPast = matchInfo.latestMatches.last(where: { IsLive($0) }) {
             return lastInPast
@@ -214,7 +227,72 @@ struct ContentView: View {
             return firstInFuture
         }
         
-        return lastPlayed
+        return lastPlayed*/
+    }
+    
+    func getTeamByCode(_ code: String) async -> SiteTeam? {
+        guard let teams = try? await TeamAPI.shared.getTeams() else { return nil }
+        return teams.first(where: { $0.names.code == code })
+    }
+    
+    func scoreAndSortHockeyMatches(_ matches: [Game], preferredTeam: String?) async -> [(Game, Double)] {
+        // First, asynchronously get all team UUIDs
+        let teamUUIDs = await withTaskGroup(of: (String, String).self) { group in
+            for match in matches {
+                group.addTask {
+                    async let homeTeam = getTeamByCode(match.homeTeam.code)
+                    let home = await homeTeam
+                    return (match.homeTeam.code, home?.id ?? "")
+                }
+                group.addTask {
+                    async let awayTeam = getTeamByCode(match.awayTeam.code)
+                    let away = await awayTeam
+                    return (match.awayTeam.code, away?.id ?? "")
+                }
+            }
+            
+            var uuidDict = [String: String]()
+            for await (code, uuid) in group {
+                uuidDict[code] = uuid
+            }
+            return uuidDict
+        }
+        
+        // Now score the matches
+        let scoredMatches = matches.map { game -> (Game, Double) in
+            var score: Double = 0
+            
+            // Live games get the highest base score
+            if game.isLive() {
+                score += 1000
+            }
+            
+            // Preferred team bonus
+            if let preferredTeam = preferredTeam,
+               let homeTeamUUID = teamUUIDs[game.homeTeam.code],
+               let awayTeamUUID = teamUUIDs[game.awayTeam.code] {
+                if homeTeamUUID == preferredTeam || awayTeamUUID == preferredTeam {
+                    score += 500
+                }
+            }
+            
+            // Upcoming games score
+            if !game.played {
+                let timeUntilGame = game.date.timeIntervalSinceNow
+                if timeUntilGame > 0 {
+                    score += max(100 - log10(timeUntilGame / 3600) * 20, 0)
+                }
+            } else {
+                // Played games score
+                let timeSinceGame = -game.date.timeIntervalSinceNow
+                score += max(50 - log10(timeSinceGame / 3600) * 10, 0)
+            }
+            
+            return (game, score)
+        }
+        
+        // Sort the matches based on their scores, highest to lowest
+        return scoredMatches.sorted { $0.1 > $1.1 }
     }
     
     func RemainingTimeUntil(_ targetDate: Date) -> String {
