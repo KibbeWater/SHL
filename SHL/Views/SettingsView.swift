@@ -9,6 +9,8 @@ import SwiftUI
 import HockeyKit
 
 struct SettingsView: View {
+    @Environment(\.openURL) var openURL
+    
     @ObservedObject private var settings = Settings.shared
     
     @State private var selectedTeam: String? = nil
@@ -48,6 +50,16 @@ struct SettingsView: View {
                         Spacer()
                         ProgressView()
                     }
+                }
+            }
+            
+            Section("Support Me") {
+                Button("Leave a Tip") {
+                    
+                }
+                
+                Button("Rate App on the App Store") {
+                    openURL(URL(string: "https://apps.apple.com/app/id\(Settings.appId)?action=write-review")!)
                 }
             }
         }

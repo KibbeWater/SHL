@@ -9,6 +9,7 @@ import SwiftUI
 
 class Settings: ObservableObject {
     public static let shared = Settings()
+    public static let appId = "6479990812"
     
     @CloudStorage(key: "preferredTeam", default: "")
     private var _preferredTeam: String
