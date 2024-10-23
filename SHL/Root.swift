@@ -81,10 +81,29 @@ struct Root: View {
                 }
                 .tabViewStyle(.sidebarAdaptable)
             } else {
-                ContentView()
-                    .navigationDestination(isPresented: $isGameOpen) {
-                        openedGame
+                TabView(selection: $selectedTab) {
+                    NavigationStack {
+                        ContentView()
+                            .navigationDestination(isPresented: $isGameOpen) {
+                                openedGame
+                            }
                     }
+                    .tabItem {
+                        Label("Home", systemImage: "house")
+                    }
+                    
+                    NavigationStack {
+                        MatchListView()
+                    }
+                    .tabItem {
+                        Label("Schedule", systemImage: "calendar")
+                    }
+                    
+                    SettingsView()
+                        .tabItem {
+                            Label("Settings", systemImage: "gearshape")
+                        }
+                }
             }
             
             if !loggedIn {
