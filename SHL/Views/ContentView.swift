@@ -216,18 +216,6 @@ struct ContentView: View {
         )
         
         featuredGame = scoredMatches.first?.0
-        /*let lastPlayed = matchInfo.latestMatches.last(where: { $0.played })
-        
-        if let lastInPast = matchInfo.latestMatches.last(where: { IsLive($0) }) {
-            return lastInPast
-        }
-        
-        if lastPlayed == nil,
-           let firstInFuture = matchInfo.latestMatches.first {
-            return firstInFuture
-        }
-        
-        return lastPlayed*/
     }
     
     func getTeamByCode(_ code: String) async -> SiteTeam? {

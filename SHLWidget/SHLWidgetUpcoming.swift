@@ -33,15 +33,11 @@ struct Provider: AppIntentTimelineProvider {
     func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
         let matchInfo = MatchInfo()
         try? await matchInfo.getLatest()
-        var games = matchInfo.latestMatches
-        
-        games = games.sorted { a, b in
-            a.date < b.date
-        }
+        let games = matchInfo.latestMatches
         
         let nextUpdateDate = Calendar.current.date(byAdding: .minute, value: 30, to: Date.now)!
         
-        let game = games.first(where: {!$0.played})
+        let game = await FeaturedGameAlgo.GetFeaturedGame(games)
 
         return Timeline(
             entries: [

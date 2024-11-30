@@ -12,7 +12,7 @@ struct PromotionBanner: View {
     
     var body: some View {
         Button {
-            openURL(URL(string: "https://apps.apple.com/se/app/shl-matchtracker/id\(Settings.appId)")!)
+            openURL(URL(string: "https://apps.apple.com/se/app/shl-matchtracker/id\(SharedPreferenceKeys.appId)")!)
         } label: {
             Text("This experience is limited, click here to install the full app from the App Store")
                 .fontWeight(.semibold)

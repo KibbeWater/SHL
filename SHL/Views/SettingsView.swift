@@ -17,6 +17,9 @@ struct SettingsView: View {
     @State private var teams: [SiteTeam] = []
     @State private var teamsLoaded: Bool = false
     
+    @CloudStorage(key: "preferredTeam", default: "")
+    private var _preferredTeam: String
+    
     func loadTeams() {
         Task {
             if let newTeams = try? await TeamAPI.shared.getTeams() {
@@ -30,7 +33,7 @@ struct SettingsView: View {
         List {
             Section("General") {
                 if teamsLoaded {
-                    Picker("Preferred Team", selection: settings.binding_preferredTeam()) {
+                    Picker("Preferred Team", selection: $_preferredTeam) {
                         Text("None")
                             .tag("")
                         ForEach(teams.filter({ !$0.id.isEmpty })) { team in
@@ -54,12 +57,12 @@ struct SettingsView: View {
             }
             
             Section("Support Me") {
-                Button("Leave a Tip") {
+                /*Button("Leave a Tip") {
                     
-                }
+                }*/
                 
                 Button("Rate App on the App Store") {
-                    openURL(URL(string: "https://apps.apple.com/app/id\(Settings.appId)?action=write-review")!)
+                    openURL(URL(string: "https://apps.apple.com/app/id\(SharedPreferenceKeys.appId)?action=write-review")!)
                 }
             }
         }

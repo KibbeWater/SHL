@@ -69,6 +69,10 @@ struct SHLWidgetLiveActivity: Widget {
                             Text("0:00")
                                 .font(.largeTitle)
                                 .fontWeight(.semibold)
+                        case .intermission:
+                            Text("Intermission")
+                                .font(.largeTitle)
+                                .fontWeight(.semibold)
                         }
                     }
                 }
@@ -172,6 +176,10 @@ struct SHLWidgetLiveActivity: Widget {
                                 .font(.title)
                                 .fontWeight(.semibold)
                         case .starting:
+                            Text("0:00")
+                                .font(.title)
+                                .fontWeight(.semibold)
+                        case .intermission:
                             Text("0:00")
                                 .font(.title)
                                 .fontWeight(.semibold)
