@@ -12,8 +12,8 @@ import SwiftUI
 
 @MainActor
 class HomeViewModel: ObservableObject {
-    private var api: HockeyAPI
-
+    private var api: HockeyAPI? = nil
+    
     @Published var featuredGame: Game? = nil
     @Published var liveGame: GameData? = nil
     @Published var latestMatches: [Game] = []
@@ -22,7 +22,11 @@ class HomeViewModel: ObservableObject {
     private var liveGameId: String? = nil
     private var cancellable: AnyCancellable?
     
-    init(_ api: HockeyAPI) {
+    deinit {
+        cancellable?.cancel()
+    }
+    
+    func setAPI(_ api: HockeyAPI) {
         self.api = api
         
         Task {
@@ -31,11 +35,7 @@ class HomeViewModel: ObservableObject {
         
         listenForLiveGame()
     }
-    
-    deinit {
-        cancellable?.cancel()
-    }
-    
+
     func selectListenedGame(_ game: Game) {
         liveGameId = game.id
         listenForLiveGame()
@@ -46,7 +46,7 @@ class HomeViewModel: ObservableObject {
             cancellable.cancel()
         }
         
-        cancellable = api.listener.subscribe()
+        cancellable = api?.listener.subscribe()
             .sink { [weak self] event in
                 if event.gameOverview.gameUuid == self?.liveGameId {
                     self?.liveGame = event
@@ -56,14 +56,11 @@ class HomeViewModel: ObservableObject {
     
     func refresh() async throws {
         try await SelectFeaturedMatch()
-        latestMatches = try await api.match.getLatest()
+        latestMatches = try await api?.match.getLatest() ?? []
         
-        if let series = try? await api.series.getCurrentSeries() {
-            standings = formatStandings(
-                try await api.standings.getStandings(
-                    series: series
-                )
-            )
+        if let series = try? await api?.series.getCurrentSeries() {
+            guard let _standings = try await api?.standings.getStandings(series: series) else { return }
+            standings = formatStandings(_standings)
         } else {
             standings = nil
         }
@@ -85,10 +82,13 @@ class HomeViewModel: ObservableObject {
     }
     
     // MARK: - Calculate featured game by relevance
+    // TODO: Use FeaturedGameAlgo functions instead
     
     func SelectFeaturedMatch() async throws {
+        guard let matches = try? await api?.match.getLatest() else { return }
+        
         let scoredMatches = await scoreAndSortHockeyMatches(
-            try await api.match.getLatest(),
+            matches,
             preferredTeam: Settings.shared.getPreferredTeam()
         )
         
@@ -96,7 +96,7 @@ class HomeViewModel: ObservableObject {
     }
     
     func getTeamByCode(_ code: String) async -> SiteTeam? {
-        guard let teams = try? await api.team.getTeams() else { return nil }
+        guard let teams = try? await api?.team.getTeams() else { return nil }
         return teams.first(where: { $0.names.code == code })
     }
     

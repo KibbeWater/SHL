@@ -16,7 +16,7 @@ private enum Tabs: String, CaseIterable {
 }
 
 struct MatchView: View {
-    private var api: HockeyAPI
+    @Environment(\.hockeyAPI) private var api: HockeyAPI
     
     let match: Game
     
@@ -37,11 +37,8 @@ struct MatchView: View {
     @StateObject var viewModel: MatchViewModel
     
     init(_ match: Game) {
-        let api = Environment(\.hockeyAPI).wrappedValue
-        
-        self.api = api
         self.match = match
-        self._viewModel = .init(wrappedValue: .init(api, match: match))
+        self._viewModel = .init(wrappedValue: .init(match))
     }
     
     var trailingButton: some View {
@@ -380,7 +377,7 @@ struct MatchView: View {
                 }
             }
             .refreshable {
-                try? await viewModel.refreshPBP()
+                try? await viewModel.refresh()
                 startTimer()
             }
             .coordinateSpace(name: "scroll")
@@ -398,6 +395,7 @@ struct MatchView: View {
         }
         .task {
             startTimer()
+            viewModel.setAPI(api)
         }
     }
     

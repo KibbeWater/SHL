@@ -11,15 +11,19 @@ import SwiftUI
 
 @MainActor
 class TeamViewModel: ObservableObject {
-    @EnvironmentObject private var api: HockeyAPI
+    private var api: HockeyAPI? = nil
     private var team: SiteTeam
     
     @Published var lineup: [TeamLineup] = []
     @Published var history: [Game] = []
     @Published var standings: Standings? = nil
     
-    init(_ api: HockeyAPI, team: SiteTeam) {
+    init(_ team: SiteTeam) {
         self.team = team
+    }
+    
+    func setAPI(_ api: HockeyAPI) {
+        self.api = api
         
         Task {
             try? await refresh()
@@ -27,12 +31,12 @@ class TeamViewModel: ObservableObject {
     }
     
     func refresh() async throws  {
-        self.lineup = try await api.team.getLineup(team: self.team)
-        if let series = try? await api.series.getCurrentSeries() {
-            self.standings = try await api.standings.getStandings(series: series)
+        self.lineup = try await api?.team.getLineup(team: self.team) ?? []
+        if let series = try? await api?.series.getCurrentSeries() {
+            self.standings = try await api?.standings.getStandings(series: series)
         }
-        if let season = try? await api.season.getCurrent() {
-            self.history = try await api.match.getSeasonSchedule(season, withTeams: [team.id])
+        if let season = try? await api?.season.getCurrent() {
+            self.history = try await api?.match.getSeasonSchedule(season, withTeams: [team.id]) ?? []
         }
     }
 }

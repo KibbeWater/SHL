@@ -14,7 +14,7 @@ private enum PlayerTabs: String, CaseIterable {
 }
 
 struct PlayerView: View {
-    private var api: HockeyAPI
+    @Environment(\.hockeyAPI) private var api: HockeyAPI
     
     @StateObject private var viewModel: PlayerViewModel
 
@@ -25,13 +25,10 @@ struct PlayerView: View {
     @State private var selectedTab: PlayerTabs = .statistics
     
     init(_ player: LineupPlayer, teamColor: Binding<Color>) {
-        let api = Environment(\.hockeyAPI).wrappedValue
-        
-        self.api = api
         self.player = player
         self._teamColor = teamColor
         self._viewModel = StateObject(
-            wrappedValue: PlayerViewModel(api, player: player)
+            wrappedValue: PlayerViewModel(player)
         )
     }
 
@@ -77,7 +74,7 @@ struct PlayerView: View {
                     .background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                if let SVSPerc = viewModel.info?.getStats(for: PlayerStatisticKey.saves) {
+                if let SVSPerc = viewModel.info?.getStats(for: PlayerStatisticKey.savesPercent) {
                     VStack {
                         Text("\(Int(SVSPerc))%")
                             .font(.title)
@@ -254,6 +251,9 @@ struct PlayerView: View {
                 }
                 .padding(.top, 52)
             }
+        }
+        .task {
+            viewModel.setAPI(api)
         }
     }
 }

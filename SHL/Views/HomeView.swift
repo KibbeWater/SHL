@@ -38,21 +38,14 @@ struct HomeView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.scenePhase) private var scenePhase
     
-    private var hockeyApi: HockeyAPI
+    @Environment(\.hockeyAPI) private var hockeyApi: HockeyAPI
     
-    @StateObject private var viewModel: HomeViewModel
+    @StateObject private var viewModel: HomeViewModel = HomeViewModel()
     
     @State private var sortOrder = [KeyPathComparator(\StandingObj.position)]
     
     @State private var date: Date = Date()
     @State private var center: CGPoint = .zero
-    
-    init() {
-        let api = Environment(\.hockeyAPI).wrappedValue
-        
-        self.hockeyApi = api
-        self._viewModel = StateObject(wrappedValue: HomeViewModel(api))
-    }
     
     func renderFeaturedGame(_ featured: Game) -> some View {
         let content: some View = {
@@ -197,6 +190,9 @@ struct HomeView: View {
             .container,
             edges: UIDevice.current.userInterfaceIdiom == .pad ? .all : .horizontal
         )
+        .task {
+            viewModel.setAPI(hockeyApi)
+        }
     }
     
     func remainingTimeUntil(_ targetDate: Date) -> String {

@@ -12,7 +12,7 @@ import SwiftUI
 
 @MainActor
 class MatchViewModel: ObservableObject {
-    @EnvironmentObject private var api: HockeyAPI
+    private var api: HockeyAPI? = nil
 
     @Published var matchStats: GameStats? = nil
     @Published var matchExtra: GameExtra? = nil
@@ -25,9 +25,17 @@ class MatchViewModel: ObservableObject {
     private var cancellable: AnyCancellable?
     
     private var match: Game
-
-    init(_ api: HockeyAPI, match: Game) {
+    
+    init(_ match: Game) {
         self.match = match
+    }
+    
+    deinit {
+        cancellable?.cancel()
+    }
+    
+    func setAPI(_ api: HockeyAPI) {
+        self.api = api
         
         Task {
             try? await refresh()
@@ -36,13 +44,9 @@ class MatchViewModel: ObservableObject {
         listenForLiveGame()
     }
     
-    deinit {
-        cancellable?.cancel()
-    }
-    
     func refresh() async throws {
-        matchStats = try await api.match.getMatchStats(match)
-        matchExtra = try await api.match.getMatchExtra(match)
+        matchStats = try? await api?.match.getMatchStats(match)
+        matchExtra = try await api?.match.getMatchExtra(match)
         
         if let matchExtra { // Yes, technically this will always be true, but we need to make sure it's not nil to satisfy the compiler
             try await fetchTeam(matchExtra)
@@ -52,12 +56,12 @@ class MatchViewModel: ObservableObject {
     }
     
     func refreshPBP() async throws {
-        pbp = try await api.match.getMatchPBP(match)
+        pbp = try await api?.match.getMatchPBP(match)
     }
     
     func fetchTeam(_ extra: GameExtra) async throws {
-        home = try? await api.team.getTeam(withId: extra.homeTeam.uuid)
-        away = try? await api.team.getTeam(withId: extra.awayTeam.uuid)
+        home = try? await api?.team.getTeam(withId: extra.homeTeam.uuid)
+        away = try? await api?.team.getTeam(withId: extra.awayTeam.uuid)
     }
     
     private func listenForLiveGame() {
@@ -65,7 +69,7 @@ class MatchViewModel: ObservableObject {
             cancellable.cancel()
         }
         
-        cancellable = api.listener.subscribe()
+        cancellable = api?.listener.subscribe()
             .sink { [weak self] event in
                 if self?.match.id == event.gameOverview.gameUuid {
                     self?.liveGame = event

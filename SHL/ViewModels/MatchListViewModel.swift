@@ -12,7 +12,7 @@ import SwiftUI
 
 @MainActor
 class MatchListViewModel: ObservableObject {
-    @EnvironmentObject private var api: HockeyAPI
+    private var api: HockeyAPI? = nil
     
     @Published var latestMatches: [Game] = []
     @Published var previousMatches: [Game] = []
@@ -22,22 +22,23 @@ class MatchListViewModel: ObservableObject {
     @Published var matchListeners: [String:GameData] = [:]
     private var cancellable: AnyCancellable?
 
+    deinit {
+        cancellable?.cancel()
+    }
     
-    init(_ api: HockeyAPI) {
+    func setAPI(_ api: HockeyAPI) {
+        self.api = api
+        
         Task {
             try? await refresh()
         }
         
         listenForLiveGame()
     }
-    
-    deinit {
-        cancellable?.cancel()
-    }
 
     func refresh() async throws {
-        if let season = try? await api.season.getCurrent() {
-            latestMatches = try await api.match.getSeasonSchedule(season)
+        if let season = try? await api?.season.getCurrent() {
+            latestMatches = try await api?.match.getSeasonSchedule(season) ?? []
             
             filterMatches()
             removeUnusedListeners()
@@ -58,7 +59,7 @@ class MatchListViewModel: ObservableObject {
             cancellable.cancel()
         }
         
-        cancellable = api.listener.subscribe()
+        cancellable = api?.listener.subscribe()
             .sink { [weak self] event in
                 if self?.todayMatches.contains(where: { $0.id == event.gameOverview.gameUuid }) == true {
                     self?.matchListeners[event.gameOverview.gameUuid] = event

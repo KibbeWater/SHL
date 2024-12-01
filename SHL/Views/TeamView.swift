@@ -14,7 +14,7 @@ private enum TeamTabs: String, CaseIterable {
 }
 
 struct TeamView: View {
-    private var api: HockeyAPI
+    @Environment(\.hockeyAPI) private var api: HockeyAPI
     
     @StateObject var viewModel: TeamViewModel
 
@@ -24,11 +24,8 @@ struct TeamView: View {
     let team: SiteTeam
     
     init(team: SiteTeam) {
-        let api = Environment(\.hockeyAPI).wrappedValue
-
-        self.api = api
         self.team = team
-        self._viewModel = StateObject(wrappedValue: TeamViewModel(api, team: team))
+        self._viewModel = StateObject(wrappedValue: TeamViewModel(team))
     }
     
     func loadTeamColors() {
@@ -42,61 +39,67 @@ struct TeamView: View {
             let upcomingGames = viewModel.history.filter({ !$0.played })
             let playedGames = viewModel.history.filter({ $0.played })
             
-            if UIDevice.current.userInterfaceIdiom == .pad {
+            if viewModel.history.isEmpty {
                 VStack {
-                    VStack {
-                        HStack {
-                            Text("Played Games")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                                .padding(.top)
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        
-                        ForEach(playedGames.prefix(3), id: \.id) { match in
-                            NavigationLink {
-                                MatchView(match)
-                            } label: {
-                                MatchOverview(game: match)
-                                .background(Color(uiColor: .systemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
-                                .padding(.horizontal)
-                            }
-                        }
-                    }
-                    VStack {
-                        HStack {
-                            Text("Upcoming Games")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        
-                        ForEach(upcomingGames, id: \.id) { match in
-                            NavigationLink {
-                                MatchView(match)
-                            } label: {
-                                MatchOverview(game: match)
-                                    .background(Color(uiColor: .systemBackground))
-                                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                                    .padding(.horizontal)
-
-                            }
-                        }
-                    }
-                    .padding(.top)
+                    ProgressView()
                 }
-                .background(.ultraThickMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .padding()
             } else {
-                ForEach(viewModel.history, id: \.id) { match in
-                    MatchOverview(game: match)
-                        .background(Color(uiColor: .systemBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .padding(.horizontal)
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    VStack {
+                        VStack {
+                            HStack {
+                                Text("Played Games")
+                                    .font(.title2)
+                                    .fontWeight(.semibold)
+                                    .padding(.top)
+                                Spacer()
+                            }
+                            .padding(.horizontal)
+                            
+                            ForEach(playedGames.prefix(3), id: \.id) { match in
+                                NavigationLink {
+                                    MatchView(match)
+                                } label: {
+                                    MatchOverview(game: match)
+                                        .background(Color(uiColor: .systemBackground))
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        .padding(.horizontal)
+                                }
+                            }
+                        }
+                        VStack {
+                            HStack {
+                                Text("Upcoming Games")
+                                    .font(.title2)
+                                    .fontWeight(.semibold)
+                                Spacer()
+                            }
+                            .padding(.horizontal)
+                            
+                            ForEach(upcomingGames, id: \.id) { match in
+                                NavigationLink {
+                                    MatchView(match)
+                                } label: {
+                                    MatchOverview(game: match)
+                                        .background(Color(uiColor: .systemBackground))
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        .padding(.horizontal)
+                                    
+                                }
+                            }
+                        }
+                        .padding(.top)
+                    }
+                    .background(.ultraThickMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .padding()
+                } else {
+                    ForEach(viewModel.history, id: \.id) { match in
+                        MatchOverview(game: match)
+                            .background(Color(uiColor: .systemBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .padding(.horizontal)
+                    }
                 }
             }
         }
@@ -252,6 +255,9 @@ struct TeamView: View {
         }
         .onAppear {
             loadTeamColors()
+        }
+        .task {
+            viewModel.setAPI(api)
         }
     }
 }

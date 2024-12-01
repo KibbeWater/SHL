@@ -27,7 +27,7 @@ enum RootTabs: Equatable, Hashable, Identifiable {
 struct Root: View {
     @State private var loggedIn = false
     
-    @EnvironmentObject var hockeyApi: HockeyAPI
+    @Environment(\.hockeyAPI) var hockeyApi: HockeyAPI
     
     @State private var openedGame: MatchView?
     @State private var isGameOpen = false

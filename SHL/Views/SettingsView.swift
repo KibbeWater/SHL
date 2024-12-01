@@ -10,7 +10,7 @@ import HockeyKit
 
 struct SettingsView: View {
     @Environment(\.openURL) var openURL
-    @EnvironmentObject var hockeyApi: HockeyAPI
+    @Environment(\.hockeyAPI) var hockeyApi: HockeyAPI
     
     @ObservedObject private var settings = Settings.shared
     
@@ -55,6 +55,12 @@ struct SettingsView: View {
                         ProgressView()
                     }
                 }
+                
+#if DEBUG
+                Button("Reset Cache", role: .destructive) {
+                    hockeyApi.resetCache()
+                }
+#endif
             }
             
             Section("Support Me") {

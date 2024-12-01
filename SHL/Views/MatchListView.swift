@@ -10,20 +10,13 @@ private enum Tabs: String, CaseIterable {
 
 struct MatchListView: View {
     @Environment(\.scenePhase) private var scenePhase
-    private var api: HockeyAPI
+    @Environment(\.hockeyAPI) private var api: HockeyAPI
     
     @State private var selectedTab: Tabs = .today
     
     @State private var openDates: [String:Bool] = [:]
 
-    @StateObject private var viewModel: MatchListViewModel
-    
-    init() {
-        let api = Environment(\.hockeyAPI).wrappedValue
-        
-        self.api = api
-        self._viewModel = StateObject(wrappedValue: MatchListViewModel(api))
-    }
+    @StateObject private var viewModel = MatchListViewModel()
     
     private func getLiveMatch(gameId: String) -> GameData.GameOverview? {
         return viewModel.matchListeners[gameId]?.gameOverview
@@ -47,6 +40,9 @@ struct MatchListView: View {
                     .tag(Tabs.upcoming)
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+        }
+        .task {
+            viewModel.setAPI(api)
         }
     }
     
