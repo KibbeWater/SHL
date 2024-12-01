@@ -14,7 +14,7 @@ private enum TeamTabs: String, CaseIterable {
 }
 
 struct TeamView: View {
-    @EnvironmentObject private var api: HockeyAPI
+    private var api: HockeyAPI
     
     @StateObject var viewModel: TeamViewModel
 
@@ -24,8 +24,11 @@ struct TeamView: View {
     let team: SiteTeam
     
     init(team: SiteTeam) {
+        let api = Environment(\.hockeyAPI).wrappedValue
+
+        self.api = api
         self.team = team
-        self._viewModel = StateObject(wrappedValue: TeamViewModel(self.api, team: team))
+        self._viewModel = StateObject(wrappedValue: TeamViewModel(api, team: team))
     }
     
     func loadTeamColors() {
@@ -137,46 +140,51 @@ struct TeamView: View {
                 ScrollView(.horizontal) {
                     HStack {
                         ForEach(line.players, id: \.fullName) { player in
-                            if let url = player.renderedLatestPortrait?.url {
-                                
-                                NavigationLink {
-                                    PlayerView(player: player, teamColor: $teamColor)
-                                } label: {
-                                    VStack {
-                                        Text(player.fullName)
-                                            .padding(.horizontal, 4)
-                                            .padding(.top, 8)
-                                            .fontWeight(.semibold)
-                                            .foregroundStyle(Color(uiColor: .label))
-                                        
-                                        CacheAsyncImage(url: .init(string: url)!) { _img in
-                                            _img
-                                                .resizable()
-                                                .background(playerCountryColor(player))
-                                                .aspectRatio(contentMode: .fit)
-                                                .overlay(alignment: .topLeading) {
-                                                    if let _number = player.jerseyNumber {
-                                                        Text("#\(_number)")
-                                                            .padding(.all, 8)
-                                                            .foregroundStyle(Color(uiColor: .label))
-                                                    }
-                                                }
-                                        } placeholder: {
-                                            Spacer()
-                                            ProgressView()
-                                                .frame(width: 200)
-                                            Spacer()
-                                        }
-                                    }
-                                    .frame(height: 256)
-                                    .background(.ultraThinMaterial)
-                                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                                }
-                            }
+                            renderPlayerCard(player)
                         }
                     }
                     .padding(.vertical, 4)
                     .padding(.horizontal)
+                }
+            }
+        }
+    }
+    
+    func renderPlayerCard(_ player: LineupPlayer) -> some View {
+        return VStack {
+            if let url = player.renderedLatestPortrait?.url {
+                NavigationLink {
+                    PlayerView(player, teamColor: $teamColor)
+                } label: {
+                    VStack {
+                        Text(player.fullName)
+                            .padding(.horizontal, 4)
+                            .padding(.top, 8)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Color(uiColor: .label))
+                        
+                        CacheAsyncImage(url: .init(string: url)!) { _img in
+                            _img
+                                .resizable()
+                                .background(playerCountryColor(player))
+                                .aspectRatio(contentMode: .fit)
+                                .overlay(alignment: .topLeading) {
+                                    if let _number = player.jerseyNumber {
+                                        Text("#\(_number)")
+                                            .padding(.all, 8)
+                                            .foregroundStyle(Color(uiColor: .label))
+                                    }
+                                }
+                        } placeholder: {
+                            Spacer()
+                            ProgressView()
+                                .frame(width: 200)
+                            Spacer()
+                        }
+                    }
+                    .frame(height: 256)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
         }

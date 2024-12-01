@@ -38,7 +38,7 @@ struct HomeView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.scenePhase) private var scenePhase
     
-    @EnvironmentObject private var hockeyApi: HockeyAPI
+    private var hockeyApi: HockeyAPI
     
     @StateObject private var viewModel: HomeViewModel
     
@@ -48,7 +48,10 @@ struct HomeView: View {
     @State private var center: CGPoint = .zero
     
     init() {
-        self._viewModel = StateObject(wrappedValue: HomeViewModel(api: self.hockeyApi))
+        let api = Environment(\.hockeyAPI).wrappedValue
+        
+        self.hockeyApi = api
+        self._viewModel = StateObject(wrappedValue: HomeViewModel(api))
     }
     
     func renderFeaturedGame(_ featured: Game) -> some View {

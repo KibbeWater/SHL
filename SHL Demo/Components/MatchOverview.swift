@@ -76,7 +76,8 @@ struct MatchOverview: View {
                 Spacer()
             }
             .overlay(alignment: .top) {
-                Text(game.seriesCode.rawValue)
+                // Text(game.seriesCode.rawValue)
+                Text("SHL")
                     .fontWeight(.semibold)
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 8)
@@ -122,14 +123,12 @@ struct MatchOverview: View {
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12.0))
         .overlay(alignment: .topLeading) {
-            if let _venue = game.venue {
-                Text(_venue)
-                    .font(.caption2)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
-                    .padding(.leading)
-                    .padding(.top, 8)
-            }
+            Text(game.venue)
+                .font(.caption2)
+                .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+                .padding(.leading)
+                .padding(.top, 8)
         }
         .onAppear {
             loadTeamColors()

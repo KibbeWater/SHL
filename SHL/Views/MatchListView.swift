@@ -10,7 +10,7 @@ private enum Tabs: String, CaseIterable {
 
 struct MatchListView: View {
     @Environment(\.scenePhase) private var scenePhase
-    @EnvironmentObject var api: HockeyAPI
+    private var api: HockeyAPI
     
     @State private var selectedTab: Tabs = .today
     
@@ -19,7 +19,10 @@ struct MatchListView: View {
     @StateObject private var viewModel: MatchListViewModel
     
     init() {
-        self._viewModel = StateObject(wrappedValue: MatchListViewModel(self.api))
+        let api = Environment(\.hockeyAPI).wrappedValue
+        
+        self.api = api
+        self._viewModel = StateObject(wrappedValue: MatchListViewModel(api))
     }
     
     private func getLiveMatch(gameId: String) -> GameData.GameOverview? {
@@ -86,12 +89,6 @@ struct MatchListView: View {
                                     }
                                 }
                                 #endif
-                                
-                                #if DEBUG
-                                Button("Debug Activity") {
-                                    try? ActivityUpdater.shared.start(match: GameOverview.generateFake())
-                                }
-                                #endif
                             }
                             .padding(.horizontal)
                     } else {
@@ -104,7 +101,7 @@ struct MatchListView: View {
                 .buttonStyle(PlainButtonStyle())
             } else {
                 NavigationLink {
-                    MatchView(match: match)
+                    MatchView(match)
                 } label: {
                     MatchOverview(game: match)
                         .id("pm-\(match.id)")

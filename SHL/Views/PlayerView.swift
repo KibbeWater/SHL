@@ -14,7 +14,7 @@ private enum PlayerTabs: String, CaseIterable {
 }
 
 struct PlayerView: View {
-    @EnvironmentObject private var api: HockeyAPI
+    private var api: HockeyAPI
     
     @StateObject private var viewModel: PlayerViewModel
 
@@ -25,8 +25,14 @@ struct PlayerView: View {
     @State private var selectedTab: PlayerTabs = .statistics
     
     init(_ player: LineupPlayer, teamColor: Binding<Color>) {
+        let api = Environment(\.hockeyAPI).wrappedValue
+        
+        self.api = api
         self.player = player
-        self._viewModel = StateObject(wrappedValue: PlayerViewModel(api, player: self.player))
+        self._teamColor = teamColor
+        self._viewModel = StateObject(
+            wrappedValue: PlayerViewModel(api, player: player)
+        )
     }
 
     var statisticsTab: some View {

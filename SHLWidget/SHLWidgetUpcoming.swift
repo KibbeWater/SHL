@@ -36,7 +36,7 @@ struct Provider: AppIntentTimelineProvider {
         
         let nextUpdateDate = Calendar.current.date(byAdding: .minute, value: 30, to: Date.now)!
         
-        let game = await FeaturedGameAlgo.GetFeaturedGame(games ?? [])
+        let game = await FeaturedGameAlgo.GetFeaturedGame(api, matches: games ?? [])
 
         return Timeline(
             entries: [

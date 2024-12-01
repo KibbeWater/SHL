@@ -7,17 +7,17 @@
 
 import Foundation
 import HockeyKit
+import SwiftUI
 
 @MainActor
 class PlayerViewModel: ObservableObject {
-    private var api: HockeyAPI
+    @EnvironmentObject private var api: HockeyAPI
     private var player: LineupPlayer
     
     @Published var info: Player? = nil
     @Published var stats: [PlayerGameLog] = []
 
     init(_ api: HockeyAPI, player: LineupPlayer) {
-        self.api = api
         self.player = player
         
         Task {

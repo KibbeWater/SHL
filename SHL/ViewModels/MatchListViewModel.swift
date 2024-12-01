@@ -8,9 +8,12 @@
 import Foundation
 import HockeyKit
 import Combine
+import SwiftUI
 
 @MainActor
 class MatchListViewModel: ObservableObject {
+    @EnvironmentObject private var api: HockeyAPI
+    
     @Published var latestMatches: [Game] = []
     @Published var previousMatches: [Game] = []
     @Published var todayMatches: [Game] = []
@@ -19,11 +22,8 @@ class MatchListViewModel: ObservableObject {
     @Published var matchListeners: [String:GameData] = [:]
     private var cancellable: AnyCancellable?
 
-    private let api: HockeyAPI
     
     init(_ api: HockeyAPI) {
-        self.api = api
-        
         Task {
             try? await refresh()
         }

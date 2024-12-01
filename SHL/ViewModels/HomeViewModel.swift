@@ -8,9 +8,12 @@
 import Foundation
 import HockeyKit
 import Combine
+import SwiftUI
 
 @MainActor
 class HomeViewModel: ObservableObject {
+    private var api: HockeyAPI
+
     @Published var featuredGame: Game? = nil
     @Published var liveGame: GameData? = nil
     @Published var latestMatches: [Game] = []
@@ -19,9 +22,7 @@ class HomeViewModel: ObservableObject {
     private var liveGameId: String? = nil
     private var cancellable: AnyCancellable?
     
-    private let api: HockeyAPI
-    
-    init(api: HockeyAPI) {
+    init(_ api: HockeyAPI) {
         self.api = api
         
         Task {

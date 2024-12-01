@@ -7,10 +7,11 @@
 
 import Foundation
 import HockeyKit
+import SwiftUI
 
 @MainActor
 class TeamViewModel: ObservableObject {
-    private var api: HockeyAPI
+    @EnvironmentObject private var api: HockeyAPI
     private var team: SiteTeam
     
     @Published var lineup: [TeamLineup] = []
@@ -18,7 +19,6 @@ class TeamViewModel: ObservableObject {
     @Published var standings: Standings? = nil
     
     init(_ api: HockeyAPI, team: SiteTeam) {
-        self.api = api
         self.team = team
         
         Task {

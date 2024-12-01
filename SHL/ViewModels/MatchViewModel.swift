@@ -8,9 +8,12 @@
 import Foundation
 import HockeyKit
 import Combine
+import SwiftUI
 
 @MainActor
 class MatchViewModel: ObservableObject {
+    @EnvironmentObject private var api: HockeyAPI
+
     @Published var matchStats: GameStats? = nil
     @Published var matchExtra: GameExtra? = nil
     @Published var pbp: PBPEvents? = nil
@@ -22,10 +25,8 @@ class MatchViewModel: ObservableObject {
     private var cancellable: AnyCancellable?
     
     private var match: Game
-    private var api: HockeyAPI
-    
+
     init(_ api: HockeyAPI, match: Game) {
-        self.api = api
         self.match = match
         
         Task {

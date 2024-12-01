@@ -16,7 +16,7 @@ private enum Tabs: String, CaseIterable {
 }
 
 struct MatchView: View {
-    @EnvironmentObject var api: HockeyAPI
+    private var api: HockeyAPI
     
     let match: Game
     
@@ -37,8 +37,11 @@ struct MatchView: View {
     @StateObject var viewModel: MatchViewModel
     
     init(_ match: Game) {
+        let api = Environment(\.hockeyAPI).wrappedValue
+        
+        self.api = api
         self.match = match
-        self._viewModel = StateObject(wrappedValue: MatchViewModel(self.api, match: self.match))
+        self._viewModel = .init(wrappedValue: .init(api, match: match))
     }
     
     var trailingButton: some View {

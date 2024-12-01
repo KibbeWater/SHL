@@ -9,10 +9,9 @@ import SwiftUI
 import HockeyKit
 
 struct Root: View {
-    @State private var loggedIn = false
+    @EnvironmentObject var api: HockeyAPI
     
-    @EnvironmentObject var matchInfo: MatchInfo
-    @EnvironmentObject var leagueStandings: LeagueStandings
+    @State private var loggedIn = false
     
     var body: some View {
         ZStack {
@@ -36,13 +35,15 @@ struct Root: View {
                 )
                 .task {
                     do {
-                        let _ = try await leagueStandings.fetchLeague(skipCache: true)
+                        if let series = try await api.series.getCurrentSeries() {
+                            let _ = try await api.standings.getStandings(series: series)
+                        }
                     } catch let _err {
                         print(_err)
                     }
                     
                     do {
-                        try await matchInfo.getLatest()
+                        let _ = try await api.match.getLatest()
                     } catch let _err {
                         print(_err)
                     }
@@ -58,4 +59,5 @@ struct Root: View {
 
 #Preview {
     Root()
+        .environmentObject(HockeyAPI())
 }
