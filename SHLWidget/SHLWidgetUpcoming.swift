@@ -31,13 +31,12 @@ struct Provider: AppIntentTimelineProvider {
     }
 
     func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
-        let matchInfo = MatchInfo()
-        try? await matchInfo.getLatest()
-        let games = matchInfo.latestMatches
+        let api = HockeyAPI()
+        let games = try? await api.match.getLatest()
         
         let nextUpdateDate = Calendar.current.date(byAdding: .minute, value: 30, to: Date.now)!
         
-        let game = await FeaturedGameAlgo.GetFeaturedGame(games)
+        let game = await FeaturedGameAlgo.GetFeaturedGame(api, matches: games ?? [])
 
         return Timeline(
             entries: [
@@ -121,7 +120,8 @@ struct SHLWidgetUpcomingEntryView : View {
                         Spacer()
                     }
                     .overlay(alignment: .top) {
-                        Text(entry.game?.seriesCode.rawValue ?? "undefined")
+                        // Text(entry.game?.seriesCode.rawValue ?? "undefined")
+                        Text("SHL")
                             .fontWeight(.semibold)
                             .foregroundStyle(.secondary)
                             .padding(.vertical, 8)
@@ -202,7 +202,7 @@ struct SHLWidgetUpcomingEntryView : View {
                         Text("Venue")
                             .font(.system(size: 14))
                         if let game = entry.game {
-                            Text(game.venue ?? "Unknown")
+                            Text(game.venue)
                                 .font(.system(size: 10))
                         }
                         Spacer()

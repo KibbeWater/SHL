@@ -9,42 +9,17 @@ private enum Tabs: String, CaseIterable {
 }
 
 struct MatchListView: View {
-    @EnvironmentObject var matchInfo: MatchInfo
-    
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.hockeyAPI) private var api: HockeyAPI
     
     @State private var selectedTab: Tabs = .today
-    @State private var latestMatches: SeasonSchedule? = nil
-    @State private var previousMatches: [Game] = []
-    @State private var todayMatches: [Game] = []
-    @State private var upcomingMatches: [Game] = []
     
-    @State private var matchListeners: [GameUpdater] = []
-    
-    @State private var openDates: [String: Bool] = [:]
+    @State private var openDates: [String:Bool] = [:]
 
-    // When matchInfo changes, re-filter the matches
-    private func filterMatches() {
-        let now = Date()
-        let calendar = Calendar.current
-        previousMatches = latestMatches?.gameInfo.filter({ $0.startDateTime < calendar.startOfDay(for: now) }).map { $0.toGame() } ?? []
-        todayMatches = latestMatches?.gameInfo.filter({ calendar.isDateInToday($0.startDateTime) }).map { $0.toGame() } ?? []
-        upcomingMatches = latestMatches?.gameInfo.filter({ calendar.startOfDay(for: $0.startDateTime) >= calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now))! }).map { $0.toGame() } ?? []
-        
-        matchListeners.removeAll(where: { _listener in
-            return !todayMatches.contains(where: { $0.id == _listener.gameId })
-        })
-        let missingListeners = todayMatches.filter({ _match in
-            return !matchListeners.contains(where: { $0.gameId == _match.id })
-        })
-        
-        matchListeners.append(contentsOf: missingListeners.map({ _match in
-            return GameUpdater(gameId: _match.id)
-        }))
-    }
+    @StateObject private var viewModel = MatchListViewModel()
     
-    private func getLiveMatch(gameId: String) -> GameOverview? {
-        return matchListeners.first(where: { $0.gameId == gameId })?.game
+    private func getLiveMatch(gameId: String) -> GameData.GameOverview? {
+        return viewModel.matchListeners[gameId]?.gameOverview
     }
     
     var body: some View {
@@ -52,49 +27,22 @@ struct MatchListView: View {
             tabSelectionView
             
             TabView(selection: $selectedTab) {
-                matchesScrollView(for: previousMatches)
+                matchesScrollView(for: viewModel.previousMatches)
                     .id(Tabs.previous)
                     .tag(Tabs.previous)
                 
-                matchesScrollView(for: todayMatches)
+                matchesScrollView(for: viewModel.todayMatches)
                     .id(Tabs.today)
                     .tag(Tabs.today)
                 
-                matchesScrollView(for: upcomingMatches)
+                matchesScrollView(for: viewModel.upcomingMatches)
                     .id(Tabs.upcoming)
                     .tag(Tabs.upcoming)
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
         }
-        .onAppear {
-            Task {
-                print("Fetching season")
-                if let season = try? await matchInfo.getCurrentSeason() {
-                    print("Current season found")
-                    print(season)
-                    latestMatches = try? await matchInfo.getSchedule(season)
-                }
-            }
-        }
-        .onChange(of: latestMatches) { _ in
-            filterMatches()
-        }
-        .onChange(of: scenePhase) { _ in
-            guard scenePhase == .active else {
-                return
-            }
-            
-            matchListeners.forEach { listener in
-                listener.refreshPoller()
-            }
-            
-            Task {
-                do {
-                    try await matchInfo.getLatest()
-                } catch {
-                    print("Unable to refresh")
-                }
-            }
+        .task {
+            viewModel.setAPI(api)
         }
     }
     
@@ -115,20 +63,11 @@ struct MatchListView: View {
         }
     }
     
-    private func refresh() async {
-        matchListeners.forEach({ $0.refreshPoller() })
-        do {
-            try await matchInfo.getLatest()
-        } catch {
-            print("Unable to refresh matches")
-        }
-    }
-    
     private func matchItem(_ match: Game) -> some View {
         HStack {
             if match.date < Date.now {
                 NavigationLink {
-                    MatchView(match: match)
+                    MatchView(match)
                 } label: {
                     if #available(iOS 17.2, *) {
                         MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
@@ -146,12 +85,6 @@ struct MatchListView: View {
                                     }
                                 }
                                 #endif
-                                
-                                #if DEBUG
-                                Button("Debug Activity") {
-                                    try? ActivityUpdater.shared.start(match: GameOverview.generateFake())
-                                }
-                                #endif
                             }
                             .padding(.horizontal)
                     } else {
@@ -164,7 +97,7 @@ struct MatchListView: View {
                 .buttonStyle(PlainButtonStyle())
             } else {
                 NavigationLink {
-                    MatchView(match: match)
+                    MatchView(match)
                 } label: {
                     MatchOverview(game: match)
                         .id("pm-\(match.id)")
@@ -250,7 +183,7 @@ struct MatchListView: View {
             }
         })
         .refreshable {
-            await refresh()
+            try? await viewModel.refresh()
         }
     }
 }

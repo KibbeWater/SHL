@@ -18,6 +18,15 @@
 		804316272BDD05E8007D1D9A /* UIImageExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC374DF92BAD922000378412 /* UIImageExt.swift */; };
 		804375AA2CAA09FC0041F46D /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804375A92CAA09FC0041F46D /* PlayerView.swift */; };
 		804375AB2CAA09FC0041F46D /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804375A92CAA09FC0041F46D /* PlayerView.swift */; };
+		804EC7EF2CFBA8E90096CA0D /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 804EC7EE2CFBA8E90096CA0D /* HockeyKit */; };
+		804EC7F12CFBA8FE0096CA0D /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 804EC7F02CFBA8FE0096CA0D /* HockeyKit */; };
+		804EC7F32CFBA9030096CA0D /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 804EC7F22CFBA9030096CA0D /* HockeyKit */; };
+		804EC8222CFC02560096CA0D /* ActivityUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8212CFC02560096CA0D /* ActivityUpdater.swift */; };
+		804EC8232CFC02560096CA0D /* ActivityUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8212CFC02560096CA0D /* ActivityUpdater.swift */; };
+		804EC8242CFC02560096CA0D /* ActivityUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8212CFC02560096CA0D /* ActivityUpdater.swift */; };
+		804EC8262CFC0B070096CA0D /* HockeyAPIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8252CFC0B070096CA0D /* HockeyAPIKey.swift */; };
+		804EC8272CFC0B070096CA0D /* HockeyAPIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8252CFC0B070096CA0D /* HockeyAPIKey.swift */; };
+		804EC8282CFC0B070096CA0D /* HockeyAPIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8252CFC0B070096CA0D /* HockeyAPIKey.swift */; };
 		8055E5152BD171660096DCBF /* MatchCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802B98E72BD06C6800278A00 /* MatchCalendar.swift */; };
 		8055E5172BD1739D0096DCBF /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8055E5162BD1739D0096DCBF /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8055E5182BD173A30096DCBF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC425E442B4706CC00D82CFB /* WidgetKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -59,7 +68,6 @@
 		BC425E562B4706CD00D82CFB /* SHLWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC425E432B4706CC00D82CFB /* SHLWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BC457B1B2BB9BB9100227D75 /* PBPView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC457B1A2BB9BB9100227D75 /* PBPView.swift */; };
 		BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6212E42BB05B81003CCB45 /* MatchView.swift */; };
-		BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7645B52B46054A0000B7AB /* DebugView.swift */; };
 		BC8848062BB15F4E00844DBB /* LHF_DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8848052BB15F4E00844DBB /* LHF_DemoApp.swift */; };
 		BC8848082BB15F4E00844DBB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8848072BB15F4E00844DBB /* ContentView.swift */; };
 		BC88480A2BB15F4F00844DBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC8848092BB15F4F00844DBB /* Assets.xcassets */; };
@@ -70,7 +78,7 @@
 		BC8C15112BAC787B0010AB59 /* MatchOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8C15102BAC787B0010AB59 /* MatchOverview.swift */; };
 		BC9490732BB19F63009047E4 /* PromotionBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC9490722BB19F63009047E4 /* PromotionBanner.swift */; };
 		BCAFE2CE2B4095170044225A /* SHLApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CD2B4095170044225A /* SHLApp.swift */; };
-		BCAFE2D02B4095170044225A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CF2B4095170044225A /* ContentView.swift */; };
+		BCAFE2D02B4095170044225A /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CF2B4095170044225A /* HomeView.swift */; };
 		BCAFE2D22B4095180044225A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCAFE2D12B4095180044225A /* Assets.xcassets */; };
 		BCAFE2D52B4095180044225A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCAFE2D42B4095180044225A /* Preview Assets.xcassets */; };
 		BCD7BC152BAF69D500E208B3 /* Root.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD7BC142BAF69D500E208B3 /* Root.swift */; };
@@ -127,6 +135,8 @@
 		804316232BDCFFA5007D1D9A /* AppIntent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
 		804316252BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetUpcoming.swift; sourceTree = "<group>"; };
 		804375A92CAA09FC0041F46D /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+		804EC8212CFC02560096CA0D /* ActivityUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityUpdater.swift; sourceTree = "<group>"; };
+		804EC8252CFC0B070096CA0D /* HockeyAPIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HockeyAPIKey.swift; sourceTree = "<group>"; };
 		8055E5162BD1739D0096DCBF /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
 		8055E51B2BD187670096DCBF /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		805C8AA22CAF32FA00CF7F7D /* CacheAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheAsyncImage.swift; sourceTree = "<group>"; };
@@ -151,7 +161,6 @@
 		BC425E532B4706CD00D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BC457B1A2BB9BB9100227D75 /* PBPView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PBPView.swift; sourceTree = "<group>"; };
 		BC6212E42BB05B81003CCB45 /* MatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchView.swift; sourceTree = "<group>"; };
-		BC7645B52B46054A0000B7AB /* DebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugView.swift; sourceTree = "<group>"; };
 		BC8848032BB15F4E00844DBB /* SHL Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SHL Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC8848052BB15F4E00844DBB /* LHF_DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHF_DemoApp.swift; sourceTree = "<group>"; };
 		BC8848072BB15F4E00844DBB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -167,7 +176,7 @@
 		BC9490742BB1AAF6009047E4 /* SHLWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SHLWidgetExtension.entitlements; sourceTree = "<group>"; };
 		BCAFE2CA2B4095170044225A /* SHL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SHL.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCAFE2CD2B4095170044225A /* SHLApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLApp.swift; sourceTree = "<group>"; };
-		BCAFE2CF2B4095170044225A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		BCAFE2CF2B4095170044225A /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		BCAFE2D12B4095180044225A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BCAFE2D42B4095180044225A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		BCD7BC142BAF69D500E208B3 /* Root.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Root.swift; sourceTree = "<group>"; };
@@ -176,6 +185,31 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		804EC8122CFBDEDD0096CA0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				SHLWidgetAttributes.swift,
+			);
+			target = BCAFE2C92B4095170044225A /* SHL */;
+		};
+		804EC81A2CFBF1670096CA0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				HomeViewModel.swift,
+				MatchListViewModel.swift,
+				MatchViewModel.swift,
+				PlayerViewModel.swift,
+				TeamViewModel.swift,
+			);
+			target = BC8848022BB15F4E00844DBB /* SHL Demo */;
+		};
+		804EC81C2CFBF1870096CA0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				SHLWidgetAttributes.swift,
+			);
+			target = BC8848022BB15F4E00844DBB /* SHL Demo */;
+		};
 		80CF89F82C779212000CE2CE /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -188,6 +222,9 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		804EC7F42CFBA9A00096CA0D /* ViewModels */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (804EC81A2CFBF1670096CA0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ViewModels; sourceTree = "<group>"; };
+		804EC7FB2CFBD1AC0096CA0D /* Types */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (804EC8122CFBDEDD0096CA0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 804EC81C2CFBF1870096CA0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Types; sourceTree = "<group>"; };
+		804EC7FF2CFBD4CF0096CA0D /* Mock */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Mock; sourceTree = "<group>"; };
 		80CF89F52C7791F3000CE2CE /* Pulse Shader */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (80CF89F82C779212000CE2CE /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "Pulse Shader"; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -198,6 +235,7 @@
 			files = (
 				BC425E472B4706CC00D82CFB /* SwiftUI.framework in Frameworks */,
 				BC425E452B4706CC00D82CFB /* WidgetKit.framework in Frameworks */,
+				804EC7F32CFBA9030096CA0D /* HockeyKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -205,6 +243,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				804EC7F12CFBA8FE0096CA0D /* HockeyKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,6 +253,7 @@
 			files = (
 				8055E5182BD173A30096DCBF /* WidgetKit.framework in Frameworks */,
 				8055E5172BD1739D0096DCBF /* ActivityKit.framework in Frameworks */,
+				804EC7EF2CFBA8E90096CA0D /* HockeyKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,6 +281,9 @@
 		BC374DF82BAD920F00378412 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				804EC8252CFC0B070096CA0D /* HockeyAPIKey.swift */,
+				804EC8212CFC02560096CA0D /* ActivityUpdater.swift */,
+				804EC7FF2CFBD4CF0096CA0D /* Mock */,
 				805C8AA22CAF32FA00CF7F7D /* CacheAsyncImage.swift */,
 				BC374DF92BAD922000378412 /* UIImageExt.swift */,
 				800F320D2C00D1300069E436 /* Sequence.swift */,
@@ -256,6 +299,7 @@
 		BC425E482B4706CC00D82CFB /* SHLWidget */ = {
 			isa = PBXGroup;
 			children = (
+				804EC7FB2CFBD1AC0096CA0D /* Types */,
 				804316232BDCFFA5007D1D9A /* AppIntent.swift */,
 				BC425E492B4706CC00D82CFB /* SHLWidgetBundle.swift */,
 				BC425E4B2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift */,
@@ -342,6 +386,7 @@
 			isa = PBXGroup;
 			children = (
 				BC8848252BB1714800844DBB /* SHL.entitlements */,
+				804EC7F42CFBA9A00096CA0D /* ViewModels */,
 				BCD7BC162BAF69E000E208B3 /* Views */,
 				BC374DF82BAD920F00378412 /* Extensions */,
 				BC425E3E2B4702F900D82CFB /* Info.plist */,
@@ -366,7 +411,7 @@
 		BCD7BC162BAF69E000E208B3 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				BCAFE2CF2B4095170044225A /* ContentView.swift */,
+				BCAFE2CF2B4095170044225A /* HomeView.swift */,
 				BCD7BC172BAF6B9800E208B3 /* MatchListView.swift */,
 				BC6212E42BB05B81003CCB45 /* MatchView.swift */,
 				806796CE2CA864C100E9D95D /* TeamView.swift */,
@@ -383,7 +428,6 @@
 				80CF89F52C7791F3000CE2CE /* Pulse Shader */,
 				BC8C150F2BAC780F0010AB59 /* GameDisplays */,
 				BCFA44AA2B44C06700B4358C /* StandingsTable.swift */,
-				BC7645B52B46054A0000B7AB /* DebugView.swift */,
 				BC457B1A2BB9BB9100227D75 /* PBPView.swift */,
 				BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */,
 				802B98E72BD06C6800278A00 /* MatchCalendar.swift */,
@@ -406,8 +450,13 @@
 			);
 			dependencies = (
 			);
+			fileSystemSynchronizedGroups = (
+				804EC7FB2CFBD1AC0096CA0D /* Types */,
+				804EC7FF2CFBD4CF0096CA0D /* Mock */,
+			);
 			name = SHLWidget;
 			packageProductDependencies = (
+				804EC7F22CFBA9030096CA0D /* HockeyKit */,
 			);
 			productName = LHFWidgetExtension;
 			productReference = BC425E432B4706CC00D82CFB /* SHLWidget.appex */;
@@ -425,8 +474,12 @@
 			);
 			dependencies = (
 			);
+			fileSystemSynchronizedGroups = (
+				804EC7FF2CFBD4CF0096CA0D /* Mock */,
+			);
 			name = "SHL Demo";
 			packageProductDependencies = (
+				804EC7F02CFBA8FE0096CA0D /* HockeyKit */,
 			);
 			productName = "LHF Demo";
 			productReference = BC8848032BB15F4E00844DBB /* SHL Demo.app */;
@@ -448,8 +501,13 @@
 				BC425E552B4706CD00D82CFB /* PBXTargetDependency */,
 				BC8848112BB15F4F00844DBB /* PBXTargetDependency */,
 			);
+			fileSystemSynchronizedGroups = (
+				804EC7F42CFBA9A00096CA0D /* ViewModels */,
+				804EC7FF2CFBD4CF0096CA0D /* Mock */,
+			);
 			name = SHL;
 			packageProductDependencies = (
+				804EC7EE2CFBA8E90096CA0D /* HockeyKit */,
 			);
 			productName = LHF;
 			productReference = BCAFE2CA2B4095170044225A /* SHL.app */;
@@ -486,7 +544,7 @@
 			);
 			mainGroup = BCAFE2C12B4095170044225A;
 			packageReferences = (
-				80B5D6C62BD084C400678302 /* XCLocalSwiftPackageReference "../HockeyKit" */,
+				804EC7ED2CFBA8E90096CA0D /* XCRemoteSwiftPackageReference "HockeyKit" */,
 			);
 			productRefGroup = BCAFE2CB2B4095170044225A /* Products */;
 			projectDirPath = "";
@@ -536,8 +594,10 @@
 			files = (
 				808F89BC2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */,
 				804316272BDD05E8007D1D9A /* UIImageExt.swift in Sources */,
+				804EC8262CFC0B070096CA0D /* HockeyAPIKey.swift in Sources */,
 				BC425E4A2B4706CC00D82CFB /* SHLWidgetBundle.swift in Sources */,
 				BC425E4C2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift in Sources */,
+				804EC8242CFC02560096CA0D /* ActivityUpdater.swift in Sources */,
 				8075FBB52CA62706004C6438 /* GameExtensions.swift in Sources */,
 				80E9ED8E2CB14DDC00D0E4E9 /* Settings.swift in Sources */,
 				804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */,
@@ -566,6 +626,8 @@
 				80E0F5882BD935F100A4C232 /* PBPView.swift in Sources */,
 				8008FC7F2C9DD0A400B23669 /* ReminderContext.swift in Sources */,
 				BC88481E2BB1660700844DBB /* UIImageColors.swift in Sources */,
+				804EC8272CFC0B070096CA0D /* HockeyAPIKey.swift in Sources */,
+				804EC8222CFC02560096CA0D /* ActivityUpdater.swift in Sources */,
 				80E0F5872BD9359B00A4C232 /* MatchView.swift in Sources */,
 				BC9490732BB19F63009047E4 /* PromotionBanner.swift in Sources */,
 				BC8848062BB15F4E00844DBB /* LHF_DemoApp.swift in Sources */,
@@ -581,7 +643,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BCAFE2D02B4095170044225A /* ContentView.swift in Sources */,
+				BCAFE2D02B4095170044225A /* HomeView.swift in Sources */,
 				8008FC7E2C9DCC4E00B23669 /* ReminderContext.swift in Sources */,
 				80E9ED8F2CB14DDC00D0E4E9 /* Settings.swift in Sources */,
 				BC369E1C2BBAF5CC00940F42 /* VersusBar.swift in Sources */,
@@ -599,12 +661,13 @@
 				800F320E2C00D1300069E436 /* Sequence.swift in Sources */,
 				80DCA05E2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */,
 				BCD7BC152BAF69D500E208B3 /* Root.swift in Sources */,
-				BC7645B62B46054A0000B7AB /* DebugView.swift in Sources */,
 				8075FBB42CA62706004C6438 /* GameExtensions.swift in Sources */,
 				BCAFE2CE2B4095170044225A /* SHLApp.swift in Sources */,
 				BCFA44AB2B44C06700B4358C /* StandingsTable.swift in Sources */,
+				804EC8282CFC0B070096CA0D /* HockeyAPIKey.swift in Sources */,
 				BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */,
 				BC374DFA2BAD922000378412 /* UIImageExt.swift in Sources */,
+				804EC8232CFC02560096CA0D /* ActivityUpdater.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -644,7 +707,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.SHLWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -679,7 +742,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.SHLWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -720,7 +783,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.Clip;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -759,7 +822,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.Clip;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -919,7 +982,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -961,7 +1024,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1016,12 +1079,34 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		80B5D6C62BD084C400678302 /* XCLocalSwiftPackageReference "../HockeyKit" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../HockeyKit;
+/* Begin XCRemoteSwiftPackageReference section */
+		804EC7ED2CFBA8E90096CA0D /* XCRemoteSwiftPackageReference "HockeyKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/KibbeWater/HockeyKit";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
 		};
-/* End XCLocalSwiftPackageReference section */
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		804EC7EE2CFBA8E90096CA0D /* HockeyKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 804EC7ED2CFBA8E90096CA0D /* XCRemoteSwiftPackageReference "HockeyKit" */;
+			productName = HockeyKit;
+		};
+		804EC7F02CFBA8FE0096CA0D /* HockeyKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 804EC7ED2CFBA8E90096CA0D /* XCRemoteSwiftPackageReference "HockeyKit" */;
+			productName = HockeyKit;
+		};
+		804EC7F22CFBA9030096CA0D /* HockeyKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 804EC7ED2CFBA8E90096CA0D /* XCRemoteSwiftPackageReference "HockeyKit" */;
+			productName = HockeyKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BCAFE2C22B4095170044225A /* Project object */;
 }

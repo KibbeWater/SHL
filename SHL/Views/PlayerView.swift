@@ -14,34 +14,31 @@ private enum PlayerTabs: String, CaseIterable {
 }
 
 struct PlayerView: View {
+    @Environment(\.hockeyAPI) private var api: HockeyAPI
+    
+    @StateObject private var viewModel: PlayerViewModel
+
     let player: LineupPlayer
+    
     @Binding var teamColor: Color
     
-    @State private var playerInfo: Player? = nil
-    @State private var seasonStats: PlayerGameLog? = nil
-    
     @State private var selectedTab: PlayerTabs = .statistics
+    
+    init(_ player: LineupPlayer, teamColor: Binding<Color>) {
+        self.player = player
+        self._teamColor = teamColor
+        self._viewModel = StateObject(
+            wrappedValue: PlayerViewModel(player)
+        )
+    }
 
-    func loadPlayerInfo() async {
-        self.playerInfo = try? await PlayerAPI.shared.getPlayer(id: player.uuid)
-    }
-    
-    func loadAdditionalStats() async {
-        do {
-            self.seasonStats = try await playerInfo?.getSeasonStats()
-        } catch let _err {
-            print("Error fetching additional stats:")
-            print(_err)
-        }
-    }
-    
     var statisticsTab: some View {
         GeometryReader { geo in
             LazyVGrid(columns: [
                 .init(.flexible(minimum: 10, maximum: geo.size.width)),
                 .init(.flexible(minimum: 10, maximum: geo.size.width)),
             ]) {
-                if let GAA = playerInfo?.getStats(for: .goalsPerHour) {
+                if let GAA = viewModel.info?.getStats(for: PlayerStatisticKey.goalsPerHour) {
                     VStack {
                         Text(String(GAA))
                             .font(.title)
@@ -53,7 +50,7 @@ struct PlayerView: View {
                     .background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                if let GPI = playerInfo?.getStats(for: .matches) {
+                if let GPI = viewModel.info?.getStats(for: PlayerStatisticKey.matches) {
                     VStack {
                         Text(String(Int(GPI)))
                             .font(.title)
@@ -65,7 +62,7 @@ struct PlayerView: View {
                     .background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                if let SVS = playerInfo?.getStats(for: .saves) {
+                if let SVS = viewModel.info?.getStats(for: PlayerStatisticKey.saves) {
                     VStack {
                         Text(String(Int(SVS)))
                             .font(.title)
@@ -77,7 +74,7 @@ struct PlayerView: View {
                     .background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                if let SVSPerc = playerInfo?.getStats(for: .saves) {
+                if let SVSPerc = viewModel.info?.getStats(for: PlayerStatisticKey.savesPercent) {
                     VStack {
                         Text("\(Int(SVSPerc))%")
                             .font(.title)
@@ -96,8 +93,8 @@ struct PlayerView: View {
     
     var historyTab: some View {
         VStack {
-            if let stats = seasonStats?.stats {
-                let grouping = stats.groupBy(keySelector: { $0.season })
+            if !viewModel.stats.isEmpty {
+                let grouping = viewModel.stats.groupBy(keySelector: { $0.season })
                 ForEach(grouping.keys.sorted(by: >), id: \.self) { seasonStat in
                     let item = grouping[seasonStat]!
                     VStack {
@@ -186,8 +183,8 @@ struct PlayerView: View {
                                     .font(.title3)
                                     .fontWeight(.medium)
                                     .frame(height: 22)
-                                if let playerInfo {
-                                    Text(playerInfo.position)
+                                if let info = viewModel.info {
+                                    Text(info.position)
                                         .fontWeight(.medium)
                                 } else {
                                     ProgressView()
@@ -195,12 +192,12 @@ struct PlayerView: View {
                                 Divider()
                                     .frame(height: 22)
                             }
-                            if let playerInfo {
-                                Image("Team/\(playerInfo.team.code.uppercased())")
+                            if let info = viewModel.info {
+                                Image("Team/\(info.team.code.uppercased())")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: 22, height: 22)
-                                Text(playerInfo.team.name)
+                                Text(info.team.name)
                             } else {
                                 ProgressView()
                             }
@@ -255,19 +252,12 @@ struct PlayerView: View {
                 .padding(.top, 52)
             }
         }
-        .onChange(of: playerInfo) { _ in
-            Task {
-                await loadAdditionalStats()
-            }
-        }
-        .onAppear {
-            Task {
-                await loadPlayerInfo()
-            }
+        .task {
+            viewModel.setAPI(api)
         }
     }
 }
 
 #Preview {
-    PlayerView(player: .fakeData(), teamColor: .constant(.black))
+    PlayerView(.fakeData(), teamColor: .constant(.black))
 }

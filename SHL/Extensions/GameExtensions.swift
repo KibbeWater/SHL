@@ -28,10 +28,8 @@ extension Game {
     }
     
     func findVenue(_ cgSize: CGSize, completion: @escaping (Result<(MKMapSnapshotter.Snapshot, CLLocation), Error>) -> Void) {
-        guard let _venue = self.venue else { return }
-        
         let request = MKLocalSearch.Request()
-        request.naturalLanguageQuery = "\(_venue)"
+        request.naturalLanguageQuery = "\(venue)"
         
         let search = MKLocalSearch(request: request)
         search.start { (response, error) in
@@ -94,7 +92,7 @@ extension SiteTeam {
     }
 }
 
-extension Game.Team {
+extension Team {
     func getTeamColor(callback: @escaping (Color) -> Void) {
         let teamKey = "Team/\(self.code.uppercased())"
         

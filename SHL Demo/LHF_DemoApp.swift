@@ -10,14 +10,12 @@ import HockeyKit
 
 @main
 struct LHF_DemoApp: App {
-    var matchInfo = MatchInfo()
-    var leagueStandigs = LeagueStandings()
+    var api = HockeyAPI()
     
     var body: some Scene {
         WindowGroup {
             Root()
-                .environmentObject(matchInfo)
-                .environmentObject(leagueStandigs)
+                .environmentObject(api)
         }
     }
 }

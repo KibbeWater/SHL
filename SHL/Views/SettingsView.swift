@@ -10,6 +10,7 @@ import HockeyKit
 
 struct SettingsView: View {
     @Environment(\.openURL) var openURL
+    @Environment(\.hockeyAPI) var hockeyApi: HockeyAPI
     
     @ObservedObject private var settings = Settings.shared
     
@@ -22,7 +23,7 @@ struct SettingsView: View {
     
     func loadTeams() {
         Task {
-            if let newTeams = try? await TeamAPI.shared.getTeams() {
+            if let newTeams = try? await hockeyApi.team.getTeams() {
                 teams = newTeams.sorted(by: { ($0.names.long) ?? "" < ($1.names.long) ?? "" })
                 teamsLoaded = true
             }
@@ -54,6 +55,12 @@ struct SettingsView: View {
                         ProgressView()
                     }
                 }
+                
+#if DEBUG
+                Button("Reset Cache", role: .destructive) {
+                    hockeyApi.resetCache()
+                }
+#endif
             }
             
             Section("Support Me") {
@@ -74,4 +81,5 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView()
+        .environmentObject(HockeyAPI())
 }

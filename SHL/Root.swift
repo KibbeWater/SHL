@@ -27,8 +27,7 @@ enum RootTabs: Equatable, Hashable, Identifiable {
 struct Root: View {
     @State private var loggedIn = false
     
-    @EnvironmentObject var matchInfo: MatchInfo
-    @EnvironmentObject var leagueStandings: LeagueStandings
+    @Environment(\.hockeyAPI) var hockeyApi: HockeyAPI
     
     @State private var openedGame: MatchView?
     @State private var isGameOpen = false
@@ -43,7 +42,7 @@ struct Root: View {
                 TabView(selection: $selectedTab) {
                     Tab("Home", systemImage: "house", value: .home) {
                         NavigationStack {
-                            ContentView()
+                            HomeView()
                                 .navigationDestination(isPresented: $isGameOpen) {
                                     openedGame
                                 }
@@ -83,7 +82,7 @@ struct Root: View {
             } else {
                 TabView(selection: $selectedTab) {
                     NavigationStack {
-                        ContentView()
+                        HomeView()
                             .navigationDestination(isPresented: $isGameOpen) {
                                 openedGame
                             }
@@ -123,13 +122,15 @@ struct Root: View {
                 )
                 .task {
                     do {
-                        let _ = try await leagueStandings.fetchLeague(skipCache: true)
+                        if let series = try await hockeyApi.series.getCurrentSeries() {
+                            let _ = try await hockeyApi.standings.getStandings(series: series)
+                        }
                     } catch let _err {
                         print(_err)
                     }
                     
                     do {
-                        try await matchInfo.getLatest()
+                        let _ = try await hockeyApi.match.getLatest()
                     } catch let _err {
                         print(_err)
                     }
@@ -143,7 +144,7 @@ struct Root: View {
         }
         .task {
             do {
-                teams = try await TeamAPI.shared.getTeams()
+                teams = try await hockeyApi.team.getTeams()
             } catch let _err {
                 print(_err)
             }
@@ -178,20 +179,20 @@ struct Root: View {
             return
         }
         
-        Task {
-            guard let game = try? await matchInfo.getMatchExtra(matchId) else {
+        // TODO: Find Games based on ID and display it
+        /* Task {
+            guard let game = try? await hockeyApi.match.getMatchExtra(matchId) else {
                 print("Unable to find game")
                 return
             }
             selectedTab = .home
             openedGame = MatchView(match: Game(game))
             isGameOpen = true
-        }
+        } */
     }
 }
 
 #Preview {
     Root()
-        .environmentObject(MatchInfo())
-        .environmentObject(LeagueStandings())
+        .environmentObject(HockeyAPI())
 }

@@ -10,7 +10,7 @@ import HockeyKit
 
 struct MatchOverview: View {
     var game: Game
-    var liveGame: GameOverview?
+    var liveGame: GameData.GameOverview?
     
     @State private var homeColor: Color = .black // Default color, updated on appear
     @State private var awayColor: Color = .black // Default color, updated on appear
@@ -29,7 +29,7 @@ struct MatchOverview: View {
         }
     }
     
-    init(game: Game, liveGame: GameOverview? = nil) {
+    init(game: Game, liveGame: GameData.GameOverview? = nil) {
         self.game = game
         if game.id == liveGame?.gameUuid {
             self.liveGame = liveGame
@@ -94,7 +94,8 @@ struct MatchOverview: View {
                 Spacer()
             }
             .overlay(alignment: .top) {
-                Text(game.seriesCode.rawValue)
+                // Text(game.seriesCode.rawValue)
+                Text("SHL")
                     .fontWeight(.semibold)
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 8)
@@ -139,14 +140,12 @@ struct MatchOverview: View {
         .frame(height: 102)
         .background(.ultraThinMaterial)
         .overlay(alignment: .topLeading) {
-            if let _venue = game.venue {
-                Text(_venue)
-                    .font(.caption2)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
-                    .padding(.leading)
-                    .padding(.top, 8)
-            }
+            Text(game.venue)
+                .font(.caption2)
+                .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+                .padding(.leading)
+                .padding(.top, 8)
         }
         .onAppear {
             if awayColor == .black || homeColor == .black {

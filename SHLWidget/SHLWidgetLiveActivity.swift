@@ -236,7 +236,7 @@ struct SHLWidgetLiveActivity: Widget {
                 }
             }
             .widgetURL(URL(string: "http://www.apple.com"))
-            .keylineTint(Color.red)
+            .keylineTint(Color.white)
         }
     }
     
@@ -257,23 +257,23 @@ extension SHLWidgetAttributes {
 #Preview("Notification", as: .content, using: SHLWidgetAttributes.preview) {
    SHLWidgetLiveActivity()
 } contentStates: {
-    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format(.Strategy(includingFractionalSeconds: true)) ?? "2024-03-27T19:55:54.364Z", state: .ongoing))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: SHLWidgetAttributes.ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format(.Strategy(includingFractionalSeconds: true)) ?? "2024-03-27T19:55:54.364Z", state: .ongoing))
 }
 
 #Preview("Minimal", as: .dynamicIsland(.minimal), using: SHLWidgetAttributes.preview) {
    SHLWidgetLiveActivity()
 } contentStates: {
-    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format(.Strategy(includingFractionalSeconds: true)) ?? "2024-03-27T19:55:54.364Z", state: .ongoing))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: SHLWidgetAttributes.ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format(.Strategy(includingFractionalSeconds: true)) ?? "2024-03-27T19:55:54.364Z", state: .ongoing))
 }
 
 #Preview("Compact", as: .dynamicIsland(.compact), using: SHLWidgetAttributes.preview) {
    SHLWidgetLiveActivity()
 } contentStates: {
-    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format(.Strategy(includingFractionalSeconds: true)) ?? "2024-03-27T19:55:54.364Z", state: .ongoing))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: SHLWidgetAttributes.ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format(.Strategy(includingFractionalSeconds: true)) ?? "2024-03-27T19:55:54.364Z", state: .ongoing))
 }
 
 #Preview("Expanded", as: .dynamicIsland(.expanded), using: SHLWidgetAttributes.preview) {
    SHLWidgetLiveActivity()
 } contentStates: {
-    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format(.Strategy(includingFractionalSeconds: true)) ?? "2024-03-27T19:55:54.364Z", state: .ongoing))
+    SHLWidgetAttributes.ContentState(homeScore: 5, awayScore: 3, period: SHLWidgetAttributes.ActivityPeriod(period: 2, periodEnd: Calendar.current.date(byAdding: .minute, value: 1, to: Date.now)?.ISO8601Format(.Strategy(includingFractionalSeconds: true)) ?? "2024-03-27T19:55:54.364Z", state: .ongoing))
 }

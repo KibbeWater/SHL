@@ -9,8 +9,7 @@ import SwiftUI
 import HockeyKit
 
 struct ContentView: View {
-    @EnvironmentObject var matchInfo: MatchInfo
-    @EnvironmentObject var leagueStandings: LeagueStandings
+    @EnvironmentObject private var api: HockeyAPI
     @Environment(\.colorScheme) private var colorScheme
     
     @State private var sortOrder = [KeyPathComparator(\StandingObj.position)]
@@ -18,12 +17,17 @@ struct ContentView: View {
     @State private var selectedLeaderboard: LeaguePages = .SHL
     @State private var numberOfPages = LeaguePages.allCases.count
     
+    @State private var standings: Standings? = nil
+    @State private var latestMatches: [Game] = []
+    
+    public init() {}
+    
     var body: some View {
         PromotionBanner()
         ScrollView {
             if let featured = SelectFeaturedMatch() {
                 NavigationLink {
-                    MatchView(match: featured)
+                    MatchView(featured)
                 } label: {
                     MatchOverview(game: featured)
                         .padding(.horizontal)
@@ -41,43 +45,33 @@ struct ContentView: View {
                     }
                     
                     VStack(spacing: 12) {
-                        MatchCalendar(matches: Array(matchInfo.latestMatches.prefix(5)))
+                        MatchCalendar(matches: Array(latestMatches.prefix(5)))
                     }
                     .padding(.horizontal)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
                 .padding(.vertical)
-
-                StandingsTable(title: "Table", standings: $leagueStandings.standings)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .padding(.horizontal)
             }
         }
         .onAppear {
             Task {
-                try await matchInfo.getLatest()
-            }
-            Task {
-                try? await leagueStandings.fetchLeague(skipCache: true)
+                try? await refresh()
             }
         }
         .refreshable {
-            await Task {
-                try? await matchInfo.getLatest()
-                let _ = try? await leagueStandings.fetchLeague(skipCache: true)
-            }.value
+            try? await refresh()
         }
     }
     
-    func ReformatStandings(_ standings: StandingResults) -> [StandingObj] {
-        return standings.leagueStandings.map { standing in
-            return StandingObj(id: UUID().uuidString, position: standing.Rank, logo: standing.info.teamInfo.teamMedia, team: standing.info.teamInfo.teamNames.long, teamCode: standing.info.code ?? "UNK", matches: String(standing.GP), diff: String(standing.Diff), points: String(standing.Points))
+    func refresh() async throws {
+        latestMatches = try await api.match.getLatest()
+        if let series = try? await api.series.getCurrentSeries() {
+            standings = try await api.standings.getStandings(series: series)
         }
     }
     
     func SelectFeaturedMatch() -> Game? {
-        let lastPlayed = matchInfo.latestMatches.last(where: { $0.played })
+        let lastPlayed = latestMatches.last(where: { $0.played })
         
         return lastPlayed
     }
@@ -155,6 +149,5 @@ extension PageControlView {
 
 #Preview {
     ContentView()
-        .environmentObject(MatchInfo())
-        .environmentObject(LeagueStandings())
+        .environmentObject(HockeyAPI())
 }

@@ -9,32 +9,31 @@ import Foundation
 import HockeyKit
 
 class FeaturedGameAlgo {
-    static func GetFeaturedGame(_ matches: [Game]) async -> Game? {
+    static func GetFeaturedGame(_ api: HockeyAPI, matches: [Game]) async -> Game? {
         let scoredMatches = await scoreAndSortHockeyMatches(
-            matches,
+            api,
+            matches: matches,
             preferredTeam: Settings.shared.getPreferredTeam()
         )
         return scoredMatches.first?.0
     }
     
-    private static func getTeamByCode(_ code: String) async -> SiteTeam? {
-        guard let teams = try? await TeamAPI.shared.getTeams() else { return nil }
+    static func getTeamByCode(_ api: HockeyAPI, code: String) async -> SiteTeam? {
+        guard let teams = try? await api.team.getTeams() else { return nil }
         return teams.first(where: { $0.names.code == code })
     }
     
-    private static func scoreAndSortHockeyMatches(_ matches: [Game], preferredTeam: String?) async -> [(Game, Double)] {
+    private static func scoreAndSortHockeyMatches(_ api: HockeyAPI, matches: [Game], preferredTeam: String?) async -> [(Game, Double)] {
         // First, asynchronously get all team UUIDs
         let teamUUIDs = await withTaskGroup(of: (String, String).self) { group in
             for match in matches {
                 group.addTask {
-                    async let homeTeam = getTeamByCode(match.homeTeam.code)
-                    let home = await homeTeam
-                    return (match.homeTeam.code, home?.id ?? "")
+                    let homeTeam = await self.getTeamByCode(api, code: match.homeTeam.code)
+                    return (match.homeTeam.code, homeTeam?.id ?? "")
                 }
                 group.addTask {
-                    async let awayTeam = getTeamByCode(match.awayTeam.code)
-                    let away = await awayTeam
-                    return (match.awayTeam.code, away?.id ?? "")
+                    let awayTeam = await self.getTeamByCode(api, code: match.awayTeam.code)
+                    return (match.awayTeam.code, awayTeam?.id ?? "")
                 }
             }
             

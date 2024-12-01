@@ -7,96 +7,64 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "B3AC010A-336C-4E88-AC31-1E005796D49F"
+            uuid = "8F4D4A65-2C31-4456-82F0-AA9A90F4172F"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../HockeyKit/Sources/LeagueStandings.swift"
+            filePath = "SHL/ViewModels/MatchViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "189"
-            endingLineNumber = "189"
-            landmarkName = "fetchLeague(skipCache:clearExisting:)"
+            startingLineNumber = "48"
+            endingLineNumber = "48"
+            landmarkName = "refresh()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "073CD2E4-0BD6-4D01-92F0-C4C4BC2A6027"
+            uuid = "5169F8F1-62AE-4743-B318-A20649AA9950"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SHL/Views/MatchView.swift"
+            filePath = "SHL/ViewModels/MatchViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "109"
-            endingLineNumber = "109"
-            landmarkName = "statComponent"
-            landmarkType = "24">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "A8EECF82-700B-4D28-8AEA-6CAE966C8BCD"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SHL/Views/MatchView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "110"
-            endingLineNumber = "110"
-            landmarkName = "statComponent"
-            landmarkType = "24">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "27FC4D66-9704-495F-9C10-A1E6919985C0"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SHL/Extensions/FeaturedGameAlgo.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "13"
-            endingLineNumber = "13"
-            landmarkName = "GetFeaturedGame(_:)"
+            startingLineNumber = "65"
+            endingLineNumber = "65"
+            landmarkName = "fetchTeam(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "39ECD0A7-C056-445C-B3AD-1380664EEFBF"
+            uuid = "560D2086-8322-47FD-BA83-731EFAAAE5D7"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SHL/Extensions/FeaturedGameAlgo.swift"
+            filePath = "SHL/ViewModels/MatchViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "15"
-            endingLineNumber = "15"
-            landmarkName = "GetFeaturedGame(_:)"
+            startingLineNumber = "64"
+            endingLineNumber = "64"
+            landmarkName = "fetchTeam(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "63C7F0BA-25C7-4B87-9E97-3E5F3A948F62"
+            uuid = "93C5A66D-242D-470C-87D1-47C3E2BD342E"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SHL/Extensions/Settings.swift"
+            filePath = "SHL/ViewModels/MatchViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "22"
-            endingLineNumber = "22"
-            landmarkName = "getPreferredTeam()"
+            startingLineNumber = "51"
+            endingLineNumber = "51"
+            landmarkName = "refresh()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
