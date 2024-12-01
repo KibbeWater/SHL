@@ -213,5 +213,5 @@ extension HomeView {
 
 #Preview {
     HomeView()
-        .environmentObject(HockeyAPI())
+        .environment(\.hockeyAPI, HockeyAPI())
 }

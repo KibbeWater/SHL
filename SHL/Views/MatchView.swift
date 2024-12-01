@@ -43,45 +43,7 @@ struct MatchView: View {
     
     var trailingButton: some View {
         Button(action: {
-            guard let _game = viewModel.liveGame?.gameOverview else {
-                return
-            }
             
-            do {
-                if activityRunning {
-                    var activities = Activity<SHLWidgetAttributes>.activities
-                    activities = activities.filter({ $0.attributes.id == match.id })
-                    
-                    let contentState =
-                        SHLWidgetAttributes.ContentState(
-                            homeScore: _game.homeGoals,
-                            awayScore: _game.awayGoals,
-                            period: .init(
-                                period: _game.time.period,
-                                periodEnd: (_game.time.periodEnd ?? Date()).ISO8601Format(),
-                                state: .init(rawValue: _game.state.rawValue) ?? .starting
-                            )
-                        )
-                    
-                    activities.forEach { activity in
-                        Task {
-                            await activity.end(
-                                ActivityContent(
-                                    state: contentState,
-                                    staleDate: .now
-                                ),
-                                dismissalPolicy: .immediate
-                            )
-                        }
-                    }
-                    activityRunning = false
-                } else {
-                    try ActivityUpdater.shared.start(match: _game)
-                    activityRunning = true
-                }
-            } catch let _err {
-                print("Unable to start activity \(_err)")
-            }
         }) {
             Text(activityRunning ? "Stop Activity" : "Start Activity")
         }
@@ -130,6 +92,63 @@ struct MatchView: View {
                 .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
+            
+            HStack {
+                VStack {
+                    Text("Follow the game when it starts")
+                        .fontWeight(.bold)
+                    Text("You will be notified when game starts")
+                        .font(.footnote)
+                }
+                .multilineTextAlignment(.leading)
+                
+                Spacer()
+                
+                VStack {
+                    Button(activityRunning ? "Stop" : "Join") {
+                        do {
+                            if activityRunning {
+                                var activities = Activity<SHLWidgetAttributes>.activities
+                                activities = activities.filter({ $0.attributes.id == match.id })
+                                
+                                let contentState =
+                                SHLWidgetAttributes.ContentState(
+                                    homeScore: match.homeTeam.result,
+                                    awayScore: match.awayTeam.result,
+                                    period: .init(
+                                        period: 1,
+                                        periodEnd: "20:00",
+                                        state: .intermission
+                                    )
+                                )
+                                
+                                activities.forEach { activity in
+                                    Task {
+                                        await activity.end(
+                                            ActivityContent(
+                                                state: contentState,
+                                                staleDate: .now
+                                            ),
+                                            dismissalPolicy: .immediate
+                                        )
+                                    }
+                                }
+                                activityRunning = false
+                            } else {
+                                try ActivityUpdater.shared.start(match: match)
+                                activityRunning = true
+                            }
+                        } catch let _err {
+                            print("Unable to start activity \(_err)")
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
             
             if match.date < Date.now {
                 statComponent
@@ -382,13 +401,13 @@ struct MatchView: View {
             }
             .coordinateSpace(name: "scroll")
         }
-        .toolbar {
+        /* .toolbar {
             #if !APPCLIP
             if viewModel.liveGame != nil {
                 trailingButton
             }
             #endif
-        }
+        } */
         .onAppear {
             loadTeamColors()
             checkActiveActivitites()
@@ -460,10 +479,10 @@ struct ViewOffsetKey: PreferenceKey {
 
 #Preview("Previous") {
     MatchView(.fakeData())
-        .environmentObject(HockeyAPI())
+        .environment(\.hockeyAPI, HockeyAPI())
 }
 
 #Preview("Upcoming") {
     MatchView(.fakeData())
-        .environmentObject(HockeyAPI())
+        .environment(\.hockeyAPI, HockeyAPI())
 }

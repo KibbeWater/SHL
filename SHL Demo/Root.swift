@@ -59,5 +59,5 @@ struct Root: View {
 
 #Preview {
     Root()
-        .environmentObject(HockeyAPI())
+        .environment(\.hockeyAPI, HockeyAPI())
 }

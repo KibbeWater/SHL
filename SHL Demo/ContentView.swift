@@ -149,5 +149,5 @@ extension PageControlView {
 
 #Preview {
     ContentView()
-        .environmentObject(HockeyAPI())
+        .environment(\.hockeyAPI, HockeyAPI())
 }

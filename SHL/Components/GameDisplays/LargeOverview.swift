@@ -126,7 +126,7 @@ struct LargeOverview: View {
                             Image(uiImage: _mapImage)
                                 .frame(width: geo.size.width, height: 128)
                                 .onTapGesture {
-                                    let url = URL(string: "maps://?q=\(game.venue ?? "")")
+                                    let url = URL(string: "maps://?q=\(game.venue)")
                                     if UIApplication.shared.canOpenURL(url!) {
                                         UIApplication.shared.open(url!, options: [:], completionHandler: nil)
                                     }

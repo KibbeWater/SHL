@@ -264,5 +264,5 @@ struct TeamView: View {
 
 #Preview {
     TeamView(team: .fakeData())
-        .environmentObject(HockeyAPI())
+        .environment(\.hockeyAPI, HockeyAPI())
 }

@@ -81,5 +81,5 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView()
-        .environmentObject(HockeyAPI())
+        .environment(\.hockeyAPI, HockeyAPI())
 }

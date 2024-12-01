@@ -281,9 +281,9 @@
 		BC374DF82BAD920F00378412 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				804EC7FF2CFBD4CF0096CA0D /* Mock */,
 				804EC8252CFC0B070096CA0D /* HockeyAPIKey.swift */,
 				804EC8212CFC02560096CA0D /* ActivityUpdater.swift */,
-				804EC7FF2CFBD4CF0096CA0D /* Mock */,
 				805C8AA22CAF32FA00CF7F7D /* CacheAsyncImage.swift */,
 				BC374DF92BAD922000378412 /* UIImageExt.swift */,
 				800F320D2C00D1300069E436 /* Sequence.swift */,

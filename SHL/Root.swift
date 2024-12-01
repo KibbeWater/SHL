@@ -174,7 +174,7 @@ struct Root: View {
             return
         }
         
-        guard let matchId = components.queryItems?.first(where: { $0.name == "id" })?.value else {
+        guard (components.queryItems?.first(where: { $0.name == "id" })?.value) != nil else {
             print("Hello")
             return
         }
@@ -194,5 +194,5 @@ struct Root: View {
 
 #Preview {
     Root()
-        .environmentObject(HockeyAPI())
+        .environment(\.hockeyAPI, HockeyAPI())
 }
