@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/KibbeWater/HockeyKit",
       "state" : {
-        "branch" : "feature/v2",
-        "revision" : "5a625e69758fecabbbdc4827cee336981eab263e"
+        "branch" : "main",
+        "revision" : "b59c4046c14af9eeb9daf5b068cc21af9e0738d7"
       }
     }
   ],
