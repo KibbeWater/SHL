@@ -1,5 +1,5 @@
 {
-  "originHash" : "4a8b9d85aaae5338b9855646ad4460397ac968f08449e5d92a5b36890091b2be",
+  "originHash" : "aee8c32692415d4da1665650fb7e90a8b3419191cec15827e4162e299c8ca640",
   "pins" : [
     {
       "identity" : "cache",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "24e47109e31b2031cb26e25cc1b81b607496066c",
         "version" : "7.4.0"
+      }
+    },
+    {
+      "identity" : "hockeykit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/KibbeWater/HockeyKit",
+      "state" : {
+        "branch" : "feature/v2",
+        "revision" : "778c87505536fb283ea7e9b84fa25d985ad6aa39"
       }
     }
   ],

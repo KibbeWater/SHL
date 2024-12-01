@@ -9,11 +9,11 @@ import SwiftUI
 import HockeyKit
 
 struct PBPView: View {
-    @Binding var events: [PBPEventProtocol]
+    var events: PBPEvents
     
     var body: some View {
-        ForEach(events.indices.reversed(), id: \.self) { _ev in
-            let ev = events[_ev]
+        ForEach(events.events.indices.reversed(), id: \.self) { _ev in
+            let ev = events.events[_ev]
             
             if let _goalkeeperEvent = ev as? GoalkeeperEvent {
                 HStack {
@@ -200,10 +200,4 @@ struct PBPView: View {
             }
         }
     }
-}
-
-#Preview {
-    PBPView(events: .constant([
-        
-    ]))
 }

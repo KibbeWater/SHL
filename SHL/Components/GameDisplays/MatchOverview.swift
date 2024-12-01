@@ -10,7 +10,7 @@ import HockeyKit
 
 struct MatchOverview: View {
     var game: Game
-    var liveGame: GameOverview?
+    var liveGame: GameData.GameOverview?
     
     @State private var homeColor: Color = .black // Default color, updated on appear
     @State private var awayColor: Color = .black // Default color, updated on appear
@@ -29,7 +29,7 @@ struct MatchOverview: View {
         }
     }
     
-    init(game: Game, liveGame: GameOverview? = nil) {
+    init(game: Game, liveGame: GameData.GameOverview? = nil) {
         self.game = game
         if game.id == liveGame?.gameUuid {
             self.liveGame = liveGame

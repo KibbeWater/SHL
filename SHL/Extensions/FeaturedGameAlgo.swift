@@ -9,6 +9,8 @@ import Foundation
 import HockeyKit
 
 class FeaturedGameAlgo {
+    @EnvironmentObject var api: HockeyAPI
+    
     static func GetFeaturedGame(_ matches: [Game]) async -> Game? {
         let scoredMatches = await scoreAndSortHockeyMatches(
             matches,
@@ -17,8 +19,8 @@ class FeaturedGameAlgo {
         return scoredMatches.first?.0
     }
     
-    private static func getTeamByCode(_ code: String) async -> SiteTeam? {
-        guard let teams = try? await TeamAPI.shared.getTeams() else { return nil }
+    func getTeamByCode(_ code: String) async -> SiteTeam? {
+        guard let teams = try? await api.team.getTeams() else { return nil }
         return teams.first(where: { $0.names.code == code })
     }
     

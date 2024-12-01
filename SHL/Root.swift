@@ -27,8 +27,7 @@ enum RootTabs: Equatable, Hashable, Identifiable {
 struct Root: View {
     @State private var loggedIn = false
     
-    @EnvironmentObject var matchInfo: MatchInfo
-    @EnvironmentObject var leagueStandings: LeagueStandings
+    @EnvironmentObject var hockeyApi: HockeyAPI
     
     @State private var openedGame: MatchView?
     @State private var isGameOpen = false
@@ -43,7 +42,7 @@ struct Root: View {
                 TabView(selection: $selectedTab) {
                     Tab("Home", systemImage: "house", value: .home) {
                         NavigationStack {
-                            ContentView()
+                            HomeView()
                                 .navigationDestination(isPresented: $isGameOpen) {
                                     openedGame
                                 }
@@ -192,6 +191,5 @@ struct Root: View {
 
 #Preview {
     Root()
-        .environmentObject(MatchInfo())
-        .environmentObject(LeagueStandings())
+        .environmentObject(HockeyAPI())
 }
