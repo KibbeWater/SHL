@@ -93,62 +93,74 @@ struct MatchView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             
-            HStack {
-                VStack {
-                    Text("Follow the game when it starts")
-                        .fontWeight(.bold)
-                    Text("You will be notified when game starts")
-                        .font(.footnote)
-                }
-                .multilineTextAlignment(.leading)
-                
-                Spacer()
-                
-                VStack {
-                    Button(activityRunning ? "Stop" : "Join") {
-                        do {
-                            if activityRunning {
-                                var activities = Activity<SHLWidgetAttributes>.activities
-                                activities = activities.filter({ $0.attributes.id == match.id })
-                                
-                                let contentState =
-                                SHLWidgetAttributes.ContentState(
-                                    homeScore: match.homeTeam.result,
-                                    awayScore: match.awayTeam.result,
-                                    period: .init(
-                                        period: 1,
-                                        periodEnd: "20:00",
-                                        state: .intermission
-                                    )
-                                )
-                                
-                                activities.forEach { activity in
-                                    Task {
-                                        await activity.end(
-                                            ActivityContent(
-                                                state: contentState,
-                                                staleDate: .now
-                                            ),
-                                            dismissalPolicy: .immediate
-                                        )
-                                    }
-                                }
-                                activityRunning = false
-                            } else {
-                                try ActivityUpdater.shared.start(match: match)
-                                activityRunning = true
-                            }
-                        } catch let _err {
-                            print("Unable to start activity \(_err)")
+            if match.date > Date.now.addingTimeInterval((8 * 60 * 60) * -1),
+               match.played == false {
+                HStack {
+                    if !match.isLive() {
+                        VStack {
+                            Text("Follow the game when it starts")
+                                .fontWeight(.bold)
+                            Text("You will be notified when game starts")
+                                .font(.footnote)
+                        }
+                        .multilineTextAlignment(.leading)
+                    } else {
+                        VStack {
+                            Text("Follow the game")
+                                .fontWeight(.bold)
+                            Text("Match stats and results will be displayed on your lockscreen")
+                                .font(.footnote)
                         }
                     }
-                    .buttonStyle(.borderedProminent)
+                    
+                    Spacer()
+                    
+                    VStack {
+                        Button(activityRunning ? "Stop" : "Join") {
+                            do {
+                                if activityRunning {
+                                    var activities = Activity<SHLWidgetAttributes>.activities
+                                    activities = activities.filter({ $0.attributes.id == match.id })
+                                    
+                                    let contentState =
+                                    SHLWidgetAttributes.ContentState(
+                                        homeScore: match.homeTeam.result,
+                                        awayScore: match.awayTeam.result,
+                                        period: .init(
+                                            period: 1,
+                                            periodEnd: "20:00",
+                                            state: .intermission
+                                        )
+                                    )
+                                    
+                                    activities.forEach { activity in
+                                        Task {
+                                            await activity.end(
+                                                ActivityContent(
+                                                    state: contentState,
+                                                    staleDate: .now
+                                                ),
+                                                dismissalPolicy: .immediate
+                                            )
+                                        }
+                                    }
+                                    activityRunning = false
+                                } else {
+                                    try ActivityUpdater.shared.start(match: match)
+                                    activityRunning = true
+                                }
+                            } catch let _err {
+                                print("Unable to start activity \(_err)")
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
                 }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
             
             if match.date < Date.now {
                 statComponent
@@ -443,8 +455,6 @@ struct MatchView: View {
         print("Starting PBP update timer")
         pbpUpdateTimer?.invalidate()
         pbpUpdateTimer = Timer.scheduledTimer(withTimeInterval: 20.0, repeats: true) { timer in
-            print("Updating PBP events")
-            
             if !match.isLive() {
                 print("Disabling timer, match is not live")
                 timer.invalidate()
@@ -459,7 +469,11 @@ struct MatchView: View {
             }
             
             Task {
-                try? await viewModel.refreshPBP()
+                do {
+                    try await viewModel.refreshPBP()
+                } catch let err {
+                    print(err)
+                }
             }
         }
     }

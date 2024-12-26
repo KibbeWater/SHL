@@ -69,7 +69,8 @@ class MatchViewModel: ObservableObject {
             cancellable.cancel()
         }
         
-        cancellable = api?.listener.subscribe()
+        cancellable = api?.listener.subscribe(self.match.id)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
                 if self?.match.id == event.gameOverview.gameUuid {
                     self?.liveGame = event

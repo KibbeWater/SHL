@@ -42,6 +42,7 @@ class MatchListViewModel: ObservableObject {
             
             filterMatches()
             removeUnusedListeners()
+            api?.listener.requestInitialData(todayMatches.filter({ $0.isLive() || $0.played }).map({ $0.id }))
         }
     }
     
@@ -59,7 +60,8 @@ class MatchListViewModel: ObservableObject {
             cancellable.cancel()
         }
         
-        cancellable = api?.listener.subscribe()
+        cancellable = api?.listener.subscribe(todayMatches.map({ $0.id }))
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
                 if self?.todayMatches.contains(where: { $0.id == event.gameOverview.gameUuid }) == true {
                     self?.matchListeners[event.gameOverview.gameUuid] = event

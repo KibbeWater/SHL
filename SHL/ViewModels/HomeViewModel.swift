@@ -46,12 +46,18 @@ class HomeViewModel: ObservableObject {
             cancellable.cancel()
         }
         
+        
         cancellable = api?.listener.subscribe()
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
                 if event.gameOverview.gameUuid == self?.liveGameId {
                     self?.liveGame = event
                 }
             }
+        
+        if let liveGameId {
+            api?.listener.requestInitialData([liveGameId])
+        }
     }
     
     func refresh() async throws {
