@@ -93,6 +93,35 @@ struct MatchView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             
+#if DEBUG
+            HStack {
+                VStack {
+                    Text("Debug the game \(Image(systemName: "ladybug.fill"))")
+                        .fontWeight(.bold)
+                    Text("Appear with debug information")
+                        .font(.footnote)
+                }
+                
+                Spacer()
+                
+                VStack {
+                    Button("Debug", systemImage: "ladybug.fill") {
+                        print("Attempting debug live activity")
+                        do {
+                            try ActivityUpdater.shared.startDebug()
+                        } catch {
+                            print("Failed to start activity")
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+#endif
+            
             if match.date > Date.now.addingTimeInterval((8 * 60 * 60) * -1),
                match.played == false {
                 HStack {

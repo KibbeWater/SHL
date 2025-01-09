@@ -23,7 +23,15 @@ public class ActivityUpdater {
     var deviceUUID = UUID()
     
     func OverviewToState(_ overview: GameData.GameOverview) -> SHLWidgetAttributes.ContentState {
-        return SHLWidgetAttributes.ContentState(homeScore: overview.homeGoals, awayScore: overview.awayGoals, period: .init(period: overview.time.period, periodEnd: (overview.time.periodEnd ?? Date()).ISO8601Format(), state: .intermission))
+        return SHLWidgetAttributes.ContentState(
+            homeScore: overview.homeGoals,
+            awayScore: overview.awayGoals,
+            period: .init(
+                period: overview.time.period,
+                periodEnd: (overview.time.periodEnd ?? Date()).ISO8601Format(),
+                state: .intermission
+            )
+        )
     }
     
     func OverviewToAttrib(_ overview: GameData.GameOverview) -> SHLWidgetAttributes {
@@ -31,7 +39,68 @@ public class ActivityUpdater {
     }
     
     func OverviewToAttrib(_ match: Game) -> SHLWidgetAttributes {
-        return SHLWidgetAttributes(id: match.id, homeTeam: .init(name: match.homeTeam.name, teamCode: match.homeTeam.code), awayTeam: .init(name: match.awayTeam.name, teamCode: match.awayTeam.code))
+        return SHLWidgetAttributes(
+            id: match.id,
+            homeTeam: .init(
+                name: match.homeTeam.name,
+                teamCode: match.homeTeam.code
+            ),
+            awayTeam: .init(
+                name: match.awayTeam.name,
+                teamCode: match.awayTeam.code
+            )
+        )
+    }
+    
+    @available(iOS 16.2, *)
+    public func startDebug() throws {
+        let attrib = SHLWidgetAttributes(
+            id: "123debug321",
+            homeTeam: .init(
+                name: "Frölunda BK",
+                teamCode: "FBK"
+            ),
+            awayTeam: .init(
+                name: "Luleå Hockey",
+                teamCode: "LHF"
+            )
+        )
+        let initState = SHLWidgetAttributes.ContentState(
+            homeScore: 5,
+            awayScore: 3,
+            period: .init(
+                period: 1,
+                periodEnd: "13:37",
+                state: .ongoing
+            )
+        )
+        
+        let activity = try Activity.request(
+            attributes: attrib,
+            content: .init(state: initState, staleDate: nil),
+            pushType: .token
+        )
+        
+        Task {
+            let center = UNUserNotificationCenter.current()
+            
+            do {
+                try await center.requestAuthorization(options: [.alert])
+            } catch {
+                
+            }
+        }
+        
+        Task {
+            for await pushToken in activity.pushTokenUpdates {
+                let pushTokenString = pushToken.reduce("") {
+                    $0 + String(format: "%02x", $1)
+                }
+                
+                // Send the push token
+                print(pushTokenString)
+            }
+        }
     }
     
     @available(iOS 16.2, *)

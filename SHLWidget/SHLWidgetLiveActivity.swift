@@ -54,17 +54,33 @@ struct SHLWidgetLiveActivity: Widget {
                                 .font(.largeTitle)
                                 .fontWeight(.semibold)
                         case .onbreak:
-                            Text(_periodEnd, style: .timer)
+                            Text(
+                                timerInterval: _periodEnd...Date.now,
+                                pauseTime: _periodEnd,
+                                countsDown: false,
+                                showsHours: false
+                            )
+                            /* Text(_periodEnd, style: .timer)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .multilineTextAlignment(.center)
                                 .font(.largeTitle)
-                                .fontWeight(.semibold)
+                                .fontWeight(.semibold) */
                         case .ongoing, .overtime:
-                            Text(_periodEnd, style: .timer)
+                            Text(
+                                timerInterval: Date.now..._periodEnd,
+                                pauseTime: _periodEnd,
+                                countsDown: true,
+                                showsHours: false
+                            )
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .multilineTextAlignment(.center)
+                            .font(.largeTitle)
+                            .fontWeight(.semibold)
+                            /* Text(_periodEnd, style: .timer)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .multilineTextAlignment(.center)
                                 .font(.largeTitle)
-                                .fontWeight(.semibold)
+                                .fontWeight(.semibold) */
                         case .starting:
                             Text("0:00")
                                 .font(.largeTitle)
