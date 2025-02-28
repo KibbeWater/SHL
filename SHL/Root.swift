@@ -66,10 +66,10 @@ struct Root: View {
                                     TeamView(team: team)
                                 } label: {
                                     HStack {
-                                        svgToImage(named: "Team/\(team.names.code.uppercased())", width: 28)!
+                                        svgToImage(named: "Team/\(team.teamNames.code.uppercased())", width: 28)!
                                             .resizable()
                                             .aspectRatio(contentMode: .fit)
-                                        Text(team.names.longSite ?? team.name)
+                                        Text(team.teamNames.longSite ?? team.name)
                                     }
                                     .frame(height: 32)
                                 }

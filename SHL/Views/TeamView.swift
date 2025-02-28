@@ -205,11 +205,11 @@ struct TeamView: View {
             ScrollView {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text(team.names.longSite ?? team.name)
+                        Text(team.teamNames.longSite ?? team.name)
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundStyle(.white)
-                        if let pos = viewModel.standings?.leagueStandings.first(where: {$0.info.code == team.names.code}) {
+                        if let pos = viewModel.standings?.leagueStandings.first(where: {$0.info.code == team.teamNames.code}) {
                             Text("#\(pos.Rank)")
                                 .font(.title2)
                                 .fontWeight(.semibold)
@@ -217,7 +217,7 @@ struct TeamView: View {
                         }
                     }
                     Spacer()
-                    Image("Team/\(team.names.code.uppercased())")
+                    Image("Team/\(team.teamNames.code.uppercased())")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 72, height: 72)

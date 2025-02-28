@@ -24,7 +24,7 @@ struct SettingsView: View {
     func loadTeams() {
         Task {
             if let newTeams = try? await hockeyApi.team.getTeams() {
-                teams = newTeams.sorted(by: { ($0.names.long) ?? "" < ($1.names.long) ?? "" })
+                teams = newTeams.sorted(by: { ($0.teamNames.long) ?? "" < ($1.teamNames.long) ?? "" })
                 teamsLoaded = true
             }
         }
@@ -39,7 +39,7 @@ struct SettingsView: View {
                             .tag("")
                         ForEach(teams.filter({ !$0.id.isEmpty })) { team in
                             HStack {
-                                Text(team.names.long ?? "")
+                                Text(team.teamNames.long ?? "")
                                 /*Image("Team/\(team.names.code.uppercased())")
                                     .resizable()
                                     .frame(width: 16, height: 16)*/

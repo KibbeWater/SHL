@@ -107,11 +107,11 @@ struct MatchView: View {
                 VStack {
                     Button("Debug", systemImage: "ladybug.fill") {
                         print("Attempting debug live activity")
-                        do {
-                            try ActivityUpdater.shared.startDebug()
+                        /* do {
+                            // try ActivityUpdater.shared.startDebug()
                         } catch {
                             print("Failed to start activity")
-                        }
+                        } */
                     }
                     .buttonStyle(.borderedProminent)
                 }

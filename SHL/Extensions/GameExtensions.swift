@@ -86,7 +86,7 @@ func getCodeColor(teamKey: String, callback: @escaping (Color) -> Void) {
 
 extension SiteTeam {
     func getTeamColor(callback: @escaping (Color) -> Void) {
-        let teamKey = "Team/\(self.names.code.uppercased())"
+        let teamKey = "Team/\(self.teamNames.code.uppercased())"
         
         getCodeColor(teamKey: teamKey, callback: callback)
     }

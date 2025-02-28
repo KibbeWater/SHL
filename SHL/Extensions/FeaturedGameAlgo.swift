@@ -20,7 +20,7 @@ class FeaturedGameAlgo {
     
     static func getTeamByCode(_ api: HockeyAPI, code: String) async -> SiteTeam? {
         guard let teams = try? await api.team.getTeams() else { return nil }
-        return teams.first(where: { $0.names.code == code })
+        return teams.first(where: { $0.teamNames.code == code })
     }
     
     private static func scoreAndSortHockeyMatches(_ api: HockeyAPI, matches: [Game], preferredTeam: String?) async -> [(Game, Double)] {
