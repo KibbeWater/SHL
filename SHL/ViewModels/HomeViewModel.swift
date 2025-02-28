@@ -79,7 +79,7 @@ class HomeViewModel: ObservableObject {
                 position: standing.Rank,
                 logo: standing.info.teamInfo.teamMedia,
                 team: standing.info.teamInfo.teamNames.long,
-                teamCode: standing.info.code ?? "TBD",
+                teamCode: standing.info.id,
                 matches: String(standing.GP),
                 diff: String(standing.Diff),
                 points: String(standing.Points)
