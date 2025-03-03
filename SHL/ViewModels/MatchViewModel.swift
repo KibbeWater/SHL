@@ -14,6 +14,7 @@ import SwiftUI
 class MatchViewModel: ObservableObject {
     private var api: HockeyAPI? = nil
 
+    @Published var match: GameData? = nil
     @Published var matchStats: GameStats? = nil
     @Published var matchExtra: GameExtra? = nil
     @Published var pbp: PBPEvents? = nil
@@ -24,10 +25,10 @@ class MatchViewModel: ObservableObject {
     @Published var liveGame: GameData? = nil
     private var cancellable: AnyCancellable?
     
-    private var match: Game
+    private var game: Game
     
-    init(_ match: Game) {
-        self.match = match
+    init(_ game: Game) {
+        self.game = game
     }
     
     deinit {
@@ -45,8 +46,9 @@ class MatchViewModel: ObservableObject {
     }
     
     func refresh() async throws {
-        matchStats = try? await api?.match.getMatchStats(match)
-        matchExtra = try await api?.match.getMatchExtra(match)
+        match = try await api?.match.getMatch(game.id)
+        matchStats = try? await api?.match.getMatchStats(game)
+        matchExtra = try await api?.match.getMatchExtra(game)
         
         if let matchExtra { // Yes, technically this will always be true, but we need to make sure it's not nil to satisfy the compiler
             try await fetchTeam(matchExtra)
@@ -56,7 +58,7 @@ class MatchViewModel: ObservableObject {
     }
     
     func refreshPBP() async throws {
-        pbp = try await api?.match.getMatchPBP(match)
+        pbp = try await api?.match.getMatchPBP(game)
     }
     
     func fetchTeam(_ extra: GameExtra) async throws {
@@ -69,10 +71,10 @@ class MatchViewModel: ObservableObject {
             cancellable.cancel()
         }
         
-        cancellable = api?.listener.subscribe(self.match.id)
+        cancellable = api?.listener.subscribe(self.game.id)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
-                if self?.match.id == event.gameOverview.gameUuid {
+                if self?.game.id == event.gameOverview.gameUuid {
                     self?.liveGame = event
                 }
             }

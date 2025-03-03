@@ -19,37 +19,136 @@ struct MatchView: View {
     @Environment(\.hockeyAPI) private var api: HockeyAPI
     
     let match: Game
+    @StateObject var viewModel: MatchViewModel
+    
+    @State private var pbpUpdateTimer: Timer?
     
     @State private var location: CLLocation?
     @State private var mapImage: UIImage?
     
-    @State private var pbpUpdateTimer: Timer?
+    @State var homeColor: Color = .black
+    @State var awayColor: Color = .black
     
-    @State private var homeColor: Color = .black // Default color, updated on appear
-    @State private var awayColor: Color = .black // Default color, updated on appear
+    @State var activityRunning: Bool = false
     
     @State private var selectedTab: Tabs = .summary
     
-    @State private var offset = CGFloat.zero
-    
-    @State private var activityRunning = false
-    
-    @StateObject var viewModel: MatchViewModel
+    @State var pos: CGFloat = 0
+    @State private var yPosition: CGFloat = 0
     
     init(_ match: Game) {
         self.match = match
         self._viewModel = .init(wrappedValue: .init(match))
     }
     
-    var trailingButton: some View {
-        Button(action: {
+    func TeamLogo(_ team: Team, opponent: Team) -> some View {
+        VStack {
+            if (match.date < Date.now) {
+                Text(String(team.result))
+                    .font(.system(size: 96))
+                    .fontWidth(.compressed)
+                    .fontWeight(.bold)
+                    .foregroundStyle(
+                        team.result > opponent.result ?
+                            .white : .white.opacity(0.5)
+                    )
+                    .padding(.bottom, -2)
+                Spacer()
+            }
+            Image("Team/\(team.code.uppercased())")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 84, height: 84)
+                .padding(0)
+        }
+        .frame(height: !match.isLive() ? 172 : 84)
+    }
+    
+    func GameHeader() -> some View {
+        HStack {
+            Spacer()
+            NavigationLink {
+                if let _team = viewModel.home {
+                    TeamView(team: _team)
+                } else {
+                    ProgressView()
+                }
+            } label: {
+                TeamLogo(
+                    viewModel.liveGame?.gameOverview.homeTeam.toTeam() ??
+                        viewModel.match?.gameOverview.homeTeam.toTeam() ??
+                        match.homeTeam,
+                    opponent: viewModel.liveGame?.gameOverview.awayTeam.toTeam() ??
+                        viewModel.match?.gameOverview.awayTeam.toTeam() ??
+                        match.awayTeam
+                )
+            }
             
-        }) {
-            Text(activityRunning ? "Stop Activity" : "Start Activity")
+            Spacer()
+            
+            VStack {
+                if let liveGame = viewModel.liveGame {
+                    GameTime(liveGame)
+                } else {
+                    GameTime(match)
+                }
+                Spacer()
+            }
+            .fontWeight(.semibold)
+            .font(.title)
+            .frame(height: 96)
+            .foregroundColor(.white)
+            .overlay(alignment: .top, content: {
+                if let _game = viewModel.liveGame,
+                   _game.gameOverview.state == .ongoing || _game.gameOverview.state == .onbreak {
+                    Label("P\(_game.gameOverview.time.period)", systemImage: "clock")
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+            })
+            .frame(height: !match.isLive() ? 172 : 84)
+            .frame(maxWidth: .infinity)
+            Spacer()
+            
+            NavigationLink {
+                if let _team = viewModel.away {
+                    TeamView(team: _team)
+                } else {
+                    ProgressView()
+                }
+            } label: {
+                TeamLogo(
+                    viewModel.liveGame?.gameOverview.awayTeam.toTeam() ??
+                        viewModel.match?.gameOverview.awayTeam.toTeam() ??
+                        match.awayTeam,
+                    
+                    opponent: viewModel.liveGame?.gameOverview.homeTeam.toTeam() ??
+                        viewModel.match?.gameOverview.homeTeam.toTeam() ??
+                        match.homeTeam
+                )
+            }
+            
+            Spacer()
+        }
+        .padding(.horizontal)
+    }
+    
+    func TabNavigation() -> some View {
+        HStack {
+            Spacer()
+            ForEach(Tabs.allCases, id: \.self) { tab in
+                Button(tab.rawValue) {
+                    selectedTab = tab
+                }
+                .font(.headline)
+                .fontWeight(.semibold)
+                .buttonStyle(.plain)
+                .foregroundStyle(selectedTab == tab ? .white : .white.opacity(0.5))
+                Spacer()
+            }
         }
     }
     
-    var statComponent: some View {
+    func StatsComponent() -> some View {
         VStack {
             let goals: [GoalEvent]? = viewModel.pbp?.getEvents(ofType: PBPEventType.goal)
             // let shots: [ShotEvent] = getEvents(pbpEvents, type: ShotEvent.self)
@@ -78,7 +177,7 @@ struct MatchView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
     
-    var summaryTab: some View {
+    func SummaryTab() -> some View {
         VStack {
             if !match.played && match.date < Date.now {
                 VStack {
@@ -92,35 +191,6 @@ struct MatchView: View {
                 .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-            
-#if DEBUG
-            HStack {
-                VStack {
-                    Text("Debug the game \(Image(systemName: "ladybug.fill"))")
-                        .fontWeight(.bold)
-                    Text("Appear with debug information")
-                        .font(.footnote)
-                }
-                
-                Spacer()
-                
-                VStack {
-                    Button("Debug", systemImage: "ladybug.fill") {
-                        print("Attempting debug live activity")
-                        /* do {
-                            // try ActivityUpdater.shared.startDebug()
-                        } catch {
-                            print("Failed to start activity")
-                        } */
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-#endif
             
             if match.date > Date.now.addingTimeInterval((8 * 60 * 60) * -1),
                match.played == false {
@@ -158,7 +228,7 @@ struct MatchView: View {
                                         period: .init(
                                             period: 1,
                                             periodEnd: "20:00",
-                                            state: .intermission
+                                            state: .ended
                                         )
                                     )
                                     
@@ -192,7 +262,7 @@ struct MatchView: View {
             }
             
             if match.date < Date.now {
-                statComponent
+                StatsComponent()
             }
             
             VStack {
@@ -236,7 +306,7 @@ struct MatchView: View {
         .padding(.horizontal)
     }
     
-    var pbpTab: some View {
+    func PBPTab() -> some View {
         VStack {
             if match.date > Date.now {
                 VStack {
@@ -256,154 +326,6 @@ struct MatchView: View {
         }
     }
     
-    var gameHeader: some View {
-        HStack(spacing: 16) {
-            Spacer()
-            NavigationLink {
-                if let _team = viewModel.home {
-                    TeamView(team: _team)
-                } else {
-                    ProgressView()
-                }
-            } label: {
-                VStack {
-                    if (match.date < Date.now) {
-                        Text(String(viewModel.liveGame?.gameOverview.homeGoals ?? match.homeTeam.result))
-                            .font(.system(size: 96))
-                            .fontWidth(.compressed)
-                            .fontWeight(.bold)
-                            .foregroundStyle(
-                                viewModel.liveGame?.gameOverview.homeGoals ?? match.homeTeam.result >
-                                viewModel.liveGame?.gameOverview.awayGoals ?? match.awayTeam.result ?
-                                    .white : .white.opacity(0.5)
-                            )
-                            .padding(.bottom, -2)
-                        Spacer()
-                    }
-                    Image("Team/\(match.homeTeam.code.uppercased())")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 84, height: 84)
-                        .padding(0)
-                }
-                .frame(height: match.date < Date.now ? 172 : 84)
-            }
-            
-            Spacer()
-            
-            VStack {
-                if let _game = viewModel.liveGame {
-                    switch _game.gameOverview.state {
-                    case .starting:
-                        Text("0:00")
-                            .fontWeight(.semibold)
-                            .font(.title)
-                            .frame(height: 96)
-                            .foregroundColor(.white)
-                    case .ongoing:
-                        Text(_game.gameOverview.time.periodTime)
-                            .fontWeight(.semibold)
-                            .font(.title)
-                            .frame(height: 96)
-                            .foregroundColor(.white)
-                    case .onbreak:
-                        Text("Break")
-                            .fontWeight(.semibold)
-                            .font(.title)
-                            .frame(height: 96)
-                            .foregroundColor(.white)
-                    case .overtime:
-                        Text("OT\n\(_game.gameOverview.time.periodTime)")
-                            .fontWeight(.semibold)
-                            .font(.title)
-                            .frame(height: 96)
-                            .foregroundColor(.white)
-                    case .ended:
-                        Text("Ended")
-                            .fontWeight(.semibold)
-                            .font(.title)
-                            .frame(height: 96)
-                            .foregroundColor(.white)
-                    }
-                } else {
-                    if match.date < Date.now && match.played {
-                        Text(match.shootout ? "OT" : match.overtime ? "OT" : "Full")
-                            .fontWeight(.semibold)
-                            .font(.title)
-                            .frame(height: 96)
-                            .foregroundColor(.white)
-                    } else {
-                        let isToday = Calendar.current.isDate(match.date, inSameDayAs: Date())
-                        Text(isToday ? match.formatTime() : match.formatDate())
-                            .fontWeight(.semibold)
-                            .font(.title)
-                            .frame(height: 96)
-                            .foregroundColor(.white)
-                            .overlay(alignment: .bottom) {
-                                if !isToday {
-                                    Text(String(match.formatTime()))
-                                        .fontWeight(.semibold)
-                                        .font(.title2)
-                                        .foregroundColor(.white)
-                                }
-                            }
-                    }
-                }
-                Spacer()
-            }
-            .overlay(alignment: .top, content: {
-                if let _game = viewModel.liveGame,
-                   _game.gameOverview.state == .ongoing || _game.gameOverview.state == .onbreak {
-                    Label("P\(_game.gameOverview.time.period)", systemImage: "clock")
-                        .foregroundStyle(.white.opacity(0.5))
-                }
-            })
-            .frame(height: match.date < Date.now ? 172 : 84)
-            .frame(maxWidth: .infinity)
-            Spacer()
-            
-            NavigationLink {
-                if let _team = viewModel.away {
-                    TeamView(team: _team)
-                } else {
-                    ProgressView()
-                }
-            } label: {
-                VStack {
-                    if match.date < Date.now {
-                        Text(String(viewModel.liveGame?.gameOverview.awayGoals ?? match.awayTeam.result))
-                            .font(.system(size: 96))
-                            .fontWidth(.compressed)
-                            .fontWeight(.bold)
-                            .foregroundStyle(
-                                viewModel.liveGame?.gameOverview.homeGoals ?? match.homeTeam.result <
-                                viewModel.liveGame?.gameOverview.awayGoals ?? match.awayTeam.result ?
-                                    .white : .white.opacity(0.5)
-                            )
-                            .padding(.bottom, -2)
-                        Spacer()
-                    }
-                    Image("Team/\(match.awayTeam.code.uppercased())")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 84, height: 84)
-                        .padding(0)
-                }
-                .frame(height: match.date < Date.now ? 172 : 84)
-            }
-            
-            Spacer()
-        }
-        .background(GeometryReader {
-            Color.clear.preference(key: ViewOffsetKey.self,
-                                   value: -$0.frame(in: .named("scroll")).origin.y)
-        })
-        .onPreferenceChange(ViewOffsetKey.self) {
-            offset = $0
-        }
-        .padding(.bottom)
-    }
-    
     var body: some View {
         ZStack {
             ZStack {
@@ -413,27 +335,16 @@ struct MatchView: View {
             .ignoresSafeArea()
             
             ScrollView {
-                gameHeader
+                GameHeader()
                 
-                HStack {
-                    Spacer()
-                    ForEach(Tabs.allCases, id: \.self) { tab in
-                        Button(tab.rawValue) {
-                            selectedTab = tab
-                        }
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .buttonStyle(.plain)
-                        .foregroundStyle(selectedTab == tab ? .white : .white.opacity(0.5))
-                        Spacer()
-                    }
-                }
-                .padding(.vertical)
+                TabNavigation()
+                    .padding(.top, 48)
                 
-                if (selectedTab == .summary) {
-                    summaryTab
-                } else if (selectedTab == .pbp) {
-                    pbpTab
+                switch selectedTab {
+                case .summary:
+                    SummaryTab()
+                case .pbp:
+                    PBPTab()
                 }
             }
             .refreshable {
@@ -442,21 +353,34 @@ struct MatchView: View {
             }
             .coordinateSpace(name: "scroll")
         }
-        /* .toolbar {
-            #if !APPCLIP
-            if viewModel.liveGame != nil {
-                trailingButton
-            }
-            #endif
-        } */
-        .onAppear {
-            loadTeamColors()
-            checkActiveActivitites()
-        }
         .task {
-            startTimer()
             viewModel.setAPI(api)
+            checkActiveActivitites()
+            loadTeamColors()
         }
+        .onAppear {
+            Task {
+                try? await viewModel.refresh()
+            }
+            startTimer()
+        }
+        .getScrollPosition($pos)
+        .background(
+            ZStack {
+                LinearGradient(gradient: Gradient(colors: [homeColor, awayColor]), startPoint: .leading, endPoint: .trailing)
+                LinearGradient(gradient: Gradient(colors: [.clear, Color(uiColor: .systemBackground)]), startPoint: .top, endPoint: .bottom)
+            }
+                .clipShape(
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 20,
+                        topTrailingRadius: 20
+                    )
+                )
+                .padding(.horizontal, 24 * (1-pos))
+                .padding(.top, yPosition)
+                .ignoresSafeArea(.all)
+        )
+
     }
     
     private func checkActiveActivitites() {
@@ -465,7 +389,7 @@ struct MatchView: View {
         
         activityRunning = activities.count != 0
     }
-    
+        
     private func loadTeamColors() {
         match.awayTeam.getTeamColor { clr in
             withAnimation {
@@ -505,18 +429,6 @@ struct MatchView: View {
                 }
             }
         }
-    }
-    
-    func getEvents<T: PBPEventProtocol>(_ events: [PBPEventProtocol], type: T.Type) -> [T] {
-        return events.compactMap { $0 as? T }
-    }
-}
-
-struct ViewOffsetKey: PreferenceKey {
-    typealias Value = CGFloat
-    static var defaultValue = CGFloat.zero
-    static func reduce(value: inout Value, nextValue: () -> Value) {
-        value += nextValue()
     }
 }
 

@@ -11,6 +11,11 @@
 		8008FC7F2C9DD0A400B23669 /* ReminderContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8008FC7D2C9DCC4E00B23669 /* ReminderContext.swift */; };
 		800F320E2C00D1300069E436 /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F320D2C00D1300069E436 /* Sequence.swift */; };
 		801BC55A2BCFEF2C00417693 /* StandingsTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFA44AA2B44C06700B4358C /* StandingsTable.swift */; };
+		8020C25D2D7644D500F1FB5E /* ScrollPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */; };
+		8020C25E2D7644D500F1FB5E /* ScrollPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */; };
+		8020C25F2D7644D500F1FB5E /* ScrollPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */; };
+		8020C2612D7651A500F1FB5E /* GameTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C2602D7651A500F1FB5E /* GameTime.swift */; };
+		8020C2622D7651A500F1FB5E /* GameTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C2602D7651A500F1FB5E /* GameTime.swift */; };
 		802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802B98E72BD06C6800278A00 /* MatchCalendar.swift */; };
 		8035B1522CAF647B00FA534E /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F320D2C00D1300069E436 /* Sequence.swift */; };
 		804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804316232BDCFFA5007D1D9A /* AppIntent.swift */; };
@@ -131,6 +136,8 @@
 /* Begin PBXFileReference section */
 		8008FC7D2C9DCC4E00B23669 /* ReminderContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderContext.swift; sourceTree = "<group>"; };
 		800F320D2C00D1300069E436 /* Sequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequence.swift; sourceTree = "<group>"; };
+		8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollPosition.swift; sourceTree = "<group>"; };
+		8020C2602D7651A500F1FB5E /* GameTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTime.swift; sourceTree = "<group>"; };
 		802B98E72BD06C6800278A00 /* MatchCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCalendar.swift; sourceTree = "<group>"; };
 		804316232BDCFFA5007D1D9A /* AppIntent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
 		804316252BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetUpcoming.swift; sourceTree = "<group>"; };
@@ -292,6 +299,7 @@
 				806BEB172CB052BB00CC4565 /* CloudStorage.swift */,
 				80E9ED8D2CB14DDC00D0E4E9 /* Settings.swift */,
 				808F89BA2CC96C5F00452D6E /* FeaturedGameAlgo.swift */,
+				8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -431,6 +439,7 @@
 				BC457B1A2BB9BB9100227D75 /* PBPView.swift */,
 				BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */,
 				802B98E72BD06C6800278A00 /* MatchCalendar.swift */,
+				8020C2602D7651A500F1FB5E /* GameTime.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -602,6 +611,7 @@
 				80E9ED8E2CB14DDC00D0E4E9 /* Settings.swift in Sources */,
 				804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */,
 				805C8AA52CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */,
+				8020C25D2D7644D500F1FB5E /* ScrollPosition.swift in Sources */,
 				806BEB1A2CB052BB00CC4565 /* CloudStorage.swift in Sources */,
 				80DCA05F2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */,
 				804316262BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift in Sources */,
@@ -612,6 +622,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8020C2612D7651A500F1FB5E /* GameTime.swift in Sources */,
 				808F89BB2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */,
 				BC8848082BB15F4E00844DBB /* ContentView.swift in Sources */,
 				80E0F5892BD935F300A4C232 /* VersusBar.swift in Sources */,
@@ -634,6 +645,7 @@
 				8055E5152BD171660096DCBF /* MatchCalendar.swift in Sources */,
 				80DCA0602C9DBEFF0058B6F2 /* ColorCache.swift in Sources */,
 				80E9ED902CB14DDC00D0E4E9 /* Settings.swift in Sources */,
+				8020C25E2D7644D500F1FB5E /* ScrollPosition.swift in Sources */,
 				BC88481B2BB1642E00844DBB /* MatchOverview.swift in Sources */,
 				806BEB152CB0500700CC4565 /* SettingsView.swift in Sources */,
 			);
@@ -648,9 +660,11 @@
 				80E9ED8F2CB14DDC00D0E4E9 /* Settings.swift in Sources */,
 				BC369E1C2BBAF5CC00940F42 /* VersusBar.swift in Sources */,
 				804375AA2CAA09FC0041F46D /* PlayerView.swift in Sources */,
+				8020C2622D7651A500F1FB5E /* GameTime.swift in Sources */,
 				802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */,
 				8075FBB82CA6A1AE004C6438 /* LargeOverview.swift in Sources */,
 				808F89BD2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */,
+				8020C25F2D7644D500F1FB5E /* ScrollPosition.swift in Sources */,
 				806BEB162CB0500700CC4565 /* SettingsView.swift in Sources */,
 				806BEB192CB052BB00CC4565 /* CloudStorage.swift in Sources */,
 				805C8AA32CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */,
@@ -778,7 +792,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -817,7 +831,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -977,7 +991,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1019,7 +1033,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

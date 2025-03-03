@@ -176,15 +176,20 @@ struct HomeView: View {
             }
             .padding(.top)
         }
-        .onChange(of: viewModel.featuredGame) { _ in
+        .onChange(of: viewModel.featuredGame) { _, _ in
             guard let featured = viewModel.featuredGame else { return }
             viewModel.selectListenedGame(featured)
         }
-        .onChange(of: scenePhase) { _ in
+        .onChange(of: scenePhase) { _, _ in
             hockeyApi.listener.connect()
         }
         .refreshable {
             try? await viewModel.refresh()
+        }
+        .onAppear {
+            Task {
+                try? await viewModel.refresh()
+            }
         }
         .ignoresSafeArea(
             .container,
