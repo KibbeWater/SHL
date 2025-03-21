@@ -72,6 +72,17 @@ struct SettingsView: View {
                     openURL(URL(string: "https://apps.apple.com/app/id\(SharedPreferenceKeys.appId)?action=write-review")!)
                 }
             }
+            
+            Section("App Info") {
+                let nsObject: AnyObject? = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as AnyObject
+                let version = nsObject as! String
+                
+#if DEBUG
+                Text("Build Version: \(version) (DEBUG)")
+#else
+                Text("Build Version: \(version)")
+#endif
+            }
         }
         .onAppear {
             loadTeams()
