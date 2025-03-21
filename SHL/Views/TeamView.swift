@@ -58,7 +58,7 @@ struct TeamView: View {
                             
                             ForEach(playedGames.prefix(3), id: \.id) { match in
                                 NavigationLink {
-                                    MatchView(match)
+                                    MatchView(match, referer: "team_view")
                                 } label: {
                                     MatchOverview(game: match)
                                         .background(Color(uiColor: .systemBackground))
@@ -78,7 +78,7 @@ struct TeamView: View {
                             
                             ForEach(upcomingGames, id: \.id) { match in
                                 NavigationLink {
-                                    MatchView(match)
+                                    MatchView(match, referer: "team_view")
                                 } label: {
                                     MatchOverview(game: match)
                                         .background(Color(uiColor: .systemBackground))

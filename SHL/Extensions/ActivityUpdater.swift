@@ -5,6 +5,7 @@
 //  Created by KibbeWater on 3/27/24.
 //
 
+import PostHog
 import HockeyKit
 import Foundation
 import ActivityKit
@@ -12,7 +13,7 @@ import UserNotifications
 
 public class ActivityUpdater {
     @MainActor public static let shared: ActivityUpdater = ActivityUpdater()
-    var deviceUUID = UUID()
+    public var deviceUUID = UUID()
     
     func OverviewToState(_ overview: GameData.GameOverview) -> SHLWidgetAttributes.ContentState {
         return SHLWidgetAttributes.ContentState(homeScore: overview.homeGoals, awayScore: overview.awayGoals, period: .init(period: overview.time.period, periodEnd: (overview.time.periodEnd ?? Date()).ISO8601Format(), state: .intermission))

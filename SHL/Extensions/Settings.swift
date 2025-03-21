@@ -10,6 +10,9 @@ import SwiftUI
 public enum SharedPreferenceKeys {
     static let appId = "6479990812"
     static let groupIdentifier: String = "group.kibbewater.shl"
+    
+    static let POSTHOG_API_KEY = "phc_lPkiCHQ8ZL15IfkCzHRzMaPTv1teimNnfNGrNmpRiPa"
+    static let POSTHOG_HOST = "https://eu.i.posthog.com"
 }
 
 class Settings: ObservableObject {

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PostHog
 import HockeyKit
 import ActivityKit
 
@@ -68,7 +69,7 @@ struct HomeView: View {
         }()
         
         return NavigationLink(destination: {
-            MatchView(featured)
+            MatchView(featured, referer: "home_featured")
         }, label: {
             content
         })
@@ -79,8 +80,31 @@ struct HomeView: View {
                     center = .init(x: geo.size.width / 2, y: geo.size.height / 2)
                 }
         })
+        .onTapGesture {
+            PostHogSDK.shared.capture(
+                "Tapped Featured Game",
+                properties: [
+                    "game_id": featured.id
+                ],
+                userProperties: [
+                    "is_preferred_team": FeaturedGameContainsPreferredTeam(),
+                    "preferred_team": Settings.shared.getPreferredTeam() ?? "N/A"
+                ]
+            )
+        }
     }
-
+    
+    func FeaturedGameContainsPreferredTeam() -> Bool {
+        guard let preferredTeam = Settings.shared.getPreferredTeam()else {
+            return false
+        }
+        
+        guard let featuredGame = viewModel.featuredGame else {
+            return false
+        }
+        
+        return featuredGame.homeTeam.code.lowercased() == preferredTeam.lowercased() || featuredGame.awayTeam.code.lowercased() == preferredTeam.lowercased()
+    }
     
     func getTimeLoop() -> Double {
         let precision: Double = 10000

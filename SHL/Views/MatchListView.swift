@@ -1,4 +1,5 @@
 import SwiftUI
+import PostHog
 import ActivityKit
 import HockeyKit
 
@@ -67,7 +68,7 @@ struct MatchListView: View {
         HStack {
             if match.date < Date.now {
                 NavigationLink {
-                    MatchView(match)
+                    MatchView(match, referer: "match_list")
                 } label: {
                     if #available(iOS 17.2, *) {
                         MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
@@ -78,6 +79,15 @@ struct MatchListView: View {
                                 Button("Start Activity", systemImage: "plus") {
                                     if let live = getLiveMatch(gameId: match.id) {
                                         do {
+                                            PostHogSDK.shared.capture(
+                                                "started_live_activity",
+                                                properties: [
+                                                    "join_type": "match_list_ctx"
+                                                ],
+                                                userProperties: [
+                                                    "activity_id": ActivityUpdater.shared.deviceUUID.uuidString
+                                                ]
+                                            )
                                             try ActivityUpdater.shared.start(match: live)
                                         } catch {
                                             print("Failed to start activity")
@@ -97,7 +107,7 @@ struct MatchListView: View {
                 .buttonStyle(PlainButtonStyle())
             } else {
                 NavigationLink {
-                    MatchView(match)
+                    MatchView(match, referer: "match_list")
                 } label: {
                     MatchOverview(game: match)
                         .id("pm-\(match.id)")

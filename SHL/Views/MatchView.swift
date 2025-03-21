@@ -5,6 +5,7 @@
 //  Created by user242911 on 3/24/24.
 //
 
+import PostHog
 import SwiftUI
 import HockeyKit
 import ActivityKit
@@ -36,9 +37,31 @@ struct MatchView: View {
     @State var pos: CGFloat = 0
     @State private var yPosition: CGFloat = 0
     
-    init(_ match: Game) {
+    init(_ match: Game, referer: String) {
         self.match = match
         self._viewModel = .init(wrappedValue: .init(match))
+        PostHogSDK.shared.capture(
+            "match_view_interaction",
+            properties: [
+                "referer": referer
+            ],
+            userProperties: [
+                "match_id": match.id
+            ]
+        )
+        
+        PostHogSDK.shared.capture(
+            "team_interaction",
+            properties: [
+                "team_code": match.homeTeam.code
+            ]
+        )
+        PostHogSDK.shared.capture(
+            "team_interaction",
+            properties: [
+                "team_code": match.awayTeam.code
+            ]
+        )
     }
     
     func TeamLogo(_ team: Team, opponent: Team) -> some View {
@@ -245,6 +268,15 @@ struct MatchView: View {
                                     }
                                     activityRunning = false
                                 } else {
+                                    PostHogSDK.shared.capture(
+                                        "started_live_activity",
+                                        properties: [
+                                            "join_type": "match_cta"
+                                        ],
+                                        userProperties: [
+                                            "activity_id": ActivityUpdater.shared.deviceUUID.uuidString
+                                        ]
+                                    )
                                     try ActivityUpdater.shared.start(match: match)
                                     activityRunning = true
                                 }
@@ -433,11 +465,11 @@ struct MatchView: View {
 }
 
 #Preview("Previous") {
-    MatchView(.fakeData())
+    MatchView(.fakeData(), referer: "PREVIEW")
         .environment(\.hockeyAPI, HockeyAPI())
 }
 
 #Preview("Upcoming") {
-    MatchView(.fakeData())
+    MatchView(.fakeData(), referer: "PREVIEW")
         .environment(\.hockeyAPI, HockeyAPI())
 }

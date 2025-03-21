@@ -8,61 +8,40 @@
 
 /* Begin PBXBuildFile section */
 		8008FC7E2C9DCC4E00B23669 /* ReminderContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8008FC7D2C9DCC4E00B23669 /* ReminderContext.swift */; };
-		8008FC7F2C9DD0A400B23669 /* ReminderContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8008FC7D2C9DCC4E00B23669 /* ReminderContext.swift */; };
 		800F320E2C00D1300069E436 /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F320D2C00D1300069E436 /* Sequence.swift */; };
-		801BC55A2BCFEF2C00417693 /* StandingsTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFA44AA2B44C06700B4358C /* StandingsTable.swift */; };
 		8020C25D2D7644D500F1FB5E /* ScrollPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */; };
-		8020C25E2D7644D500F1FB5E /* ScrollPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */; };
 		8020C25F2D7644D500F1FB5E /* ScrollPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */; };
-		8020C2612D7651A500F1FB5E /* GameTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C2602D7651A500F1FB5E /* GameTime.swift */; };
 		8020C2622D7651A500F1FB5E /* GameTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C2602D7651A500F1FB5E /* GameTime.swift */; };
 		802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802B98E72BD06C6800278A00 /* MatchCalendar.swift */; };
-		8035B1522CAF647B00FA534E /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F320D2C00D1300069E436 /* Sequence.swift */; };
 		804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804316232BDCFFA5007D1D9A /* AppIntent.swift */; };
 		804316262BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804316252BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift */; };
 		804316272BDD05E8007D1D9A /* UIImageExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC374DF92BAD922000378412 /* UIImageExt.swift */; };
 		804375AA2CAA09FC0041F46D /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804375A92CAA09FC0041F46D /* PlayerView.swift */; };
-		804375AB2CAA09FC0041F46D /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804375A92CAA09FC0041F46D /* PlayerView.swift */; };
 		804EC7EF2CFBA8E90096CA0D /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 804EC7EE2CFBA8E90096CA0D /* HockeyKit */; };
-		804EC7F12CFBA8FE0096CA0D /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 804EC7F02CFBA8FE0096CA0D /* HockeyKit */; };
 		804EC7F32CFBA9030096CA0D /* HockeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 804EC7F22CFBA9030096CA0D /* HockeyKit */; };
-		804EC8222CFC02560096CA0D /* ActivityUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8212CFC02560096CA0D /* ActivityUpdater.swift */; };
 		804EC8232CFC02560096CA0D /* ActivityUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8212CFC02560096CA0D /* ActivityUpdater.swift */; };
 		804EC8242CFC02560096CA0D /* ActivityUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8212CFC02560096CA0D /* ActivityUpdater.swift */; };
 		804EC8262CFC0B070096CA0D /* HockeyAPIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8252CFC0B070096CA0D /* HockeyAPIKey.swift */; };
-		804EC8272CFC0B070096CA0D /* HockeyAPIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8252CFC0B070096CA0D /* HockeyAPIKey.swift */; };
 		804EC8282CFC0B070096CA0D /* HockeyAPIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8252CFC0B070096CA0D /* HockeyAPIKey.swift */; };
-		8055E5152BD171660096DCBF /* MatchCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802B98E72BD06C6800278A00 /* MatchCalendar.swift */; };
 		8055E5172BD1739D0096DCBF /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8055E5162BD1739D0096DCBF /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8055E5182BD173A30096DCBF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC425E442B4706CC00D82CFB /* WidgetKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8055E51C2BD187670096DCBF /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8055E51B2BD187670096DCBF /* Launch Screen.storyboard */; };
 		805C8AA32CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805C8AA22CAF32FA00CF7F7D /* CacheAsyncImage.swift */; };
-		805C8AA42CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805C8AA22CAF32FA00CF7F7D /* CacheAsyncImage.swift */; };
 		805C8AA52CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805C8AA22CAF32FA00CF7F7D /* CacheAsyncImage.swift */; };
 		806796CF2CA864C100E9D95D /* TeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806796CE2CA864C100E9D95D /* TeamView.swift */; };
-		806796D02CA888CD00E9D95D /* TeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806796CE2CA864C100E9D95D /* TeamView.swift */; };
-		806BEB152CB0500700CC4565 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806BEB142CB0500700CC4565 /* SettingsView.swift */; };
 		806BEB162CB0500700CC4565 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806BEB142CB0500700CC4565 /* SettingsView.swift */; };
-		806BEB182CB052BB00CC4565 /* CloudStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806BEB172CB052BB00CC4565 /* CloudStorage.swift */; };
 		806BEB192CB052BB00CC4565 /* CloudStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806BEB172CB052BB00CC4565 /* CloudStorage.swift */; };
 		806BEB1A2CB052BB00CC4565 /* CloudStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806BEB172CB052BB00CC4565 /* CloudStorage.swift */; };
 		8075FBB42CA62706004C6438 /* GameExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB32CA62706004C6438 /* GameExtensions.swift */; };
 		8075FBB52CA62706004C6438 /* GameExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB32CA62706004C6438 /* GameExtensions.swift */; };
-		8075FBB62CA62706004C6438 /* GameExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB32CA62706004C6438 /* GameExtensions.swift */; };
 		8075FBB82CA6A1AE004C6438 /* LargeOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB72CA6A1AE004C6438 /* LargeOverview.swift */; };
-		808F89BB2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808F89BA2CC96C5F00452D6E /* FeaturedGameAlgo.swift */; };
 		808F89BC2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808F89BA2CC96C5F00452D6E /* FeaturedGameAlgo.swift */; };
 		808F89BD2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808F89BA2CC96C5F00452D6E /* FeaturedGameAlgo.swift */; };
+		8095D07D2D8DA059006469A4 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 8095D07C2D8DA059006469A4 /* PostHog */; };
 		80DCA05E2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */; };
 		80DCA05F2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */; };
-		80DCA0602C9DBEFF0058B6F2 /* ColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */; };
-		80E0F5822BD9346100A4C232 /* Root.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E0F5812BD9346100A4C232 /* Root.swift */; };
-		80E0F5872BD9359B00A4C232 /* MatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6212E42BB05B81003CCB45 /* MatchView.swift */; };
-		80E0F5882BD935F100A4C232 /* PBPView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC457B1A2BB9BB9100227D75 /* PBPView.swift */; };
-		80E0F5892BD935F300A4C232 /* VersusBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */; };
 		80E9ED8E2CB14DDC00D0E4E9 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9ED8D2CB14DDC00D0E4E9 /* Settings.swift */; };
 		80E9ED8F2CB14DDC00D0E4E9 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9ED8D2CB14DDC00D0E4E9 /* Settings.swift */; };
-		80E9ED902CB14DDC00D0E4E9 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9ED8D2CB14DDC00D0E4E9 /* Settings.swift */; };
 		BC369E1C2BBAF5CC00940F42 /* VersusBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC369E1B2BBAF5CC00940F42 /* VersusBar.swift */; };
 		BC374DFA2BAD922000378412 /* UIImageExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC374DF92BAD922000378412 /* UIImageExt.swift */; };
 		BC425E452B4706CC00D82CFB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC425E442B4706CC00D82CFB /* WidgetKit.framework */; };
@@ -73,15 +52,7 @@
 		BC425E562B4706CD00D82CFB /* SHLWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC425E432B4706CC00D82CFB /* SHLWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BC457B1B2BB9BB9100227D75 /* PBPView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC457B1A2BB9BB9100227D75 /* PBPView.swift */; };
 		BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6212E42BB05B81003CCB45 /* MatchView.swift */; };
-		BC8848062BB15F4E00844DBB /* LHF_DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8848052BB15F4E00844DBB /* LHF_DemoApp.swift */; };
-		BC8848082BB15F4E00844DBB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8848072BB15F4E00844DBB /* ContentView.swift */; };
-		BC88480A2BB15F4F00844DBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC8848092BB15F4F00844DBB /* Assets.xcassets */; };
-		BC88480D2BB15F4F00844DBB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC88480C2BB15F4F00844DBB /* Preview Assets.xcassets */; };
-		BC8848122BB15F4F00844DBB /* SHL Demo.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = BC8848032BB15F4E00844DBB /* SHL Demo.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		BC88481B2BB1642E00844DBB /* MatchOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88481A2BB1642E00844DBB /* MatchOverview.swift */; };
-		BC88481E2BB1660700844DBB /* UIImageColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC88481D2BB1660700844DBB /* UIImageColors.swift */; };
 		BC8C15112BAC787B0010AB59 /* MatchOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8C15102BAC787B0010AB59 /* MatchOverview.swift */; };
-		BC9490732BB19F63009047E4 /* PromotionBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC9490722BB19F63009047E4 /* PromotionBanner.swift */; };
 		BCAFE2CE2B4095170044225A /* SHLApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CD2B4095170044225A /* SHLApp.swift */; };
 		BCAFE2D02B4095170044225A /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAFE2CF2B4095170044225A /* HomeView.swift */; };
 		BCAFE2D22B4095180044225A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BCAFE2D12B4095180044225A /* Assets.xcassets */; };
@@ -98,13 +69,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = BC425E422B4706CC00D82CFB;
 			remoteInfo = LHFWidgetExtension;
-		};
-		BC8848102BB15F4F00844DBB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BCAFE2C22B4095170044225A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BC8848022BB15F4E00844DBB;
-			remoteInfo = "LHF Demo";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -126,7 +90,6 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
 			dstSubfolderSpec = 16;
 			files = (
-				BC8848122BB15F4F00844DBB /* SHL Demo.app in Embed App Clips */,
 			);
 			name = "Embed App Clips";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -168,7 +131,6 @@
 		BC425E532B4706CD00D82CFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BC457B1A2BB9BB9100227D75 /* PBPView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PBPView.swift; sourceTree = "<group>"; };
 		BC6212E42BB05B81003CCB45 /* MatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchView.swift; sourceTree = "<group>"; };
-		BC8848032BB15F4E00844DBB /* SHL Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SHL Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC8848052BB15F4E00844DBB /* LHF_DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LHF_DemoApp.swift; sourceTree = "<group>"; };
 		BC8848072BB15F4E00844DBB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BC8848092BB15F4F00844DBB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -199,24 +161,6 @@
 			);
 			target = BCAFE2C92B4095170044225A /* SHL */;
 		};
-		804EC81A2CFBF1670096CA0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				HomeViewModel.swift,
-				MatchListViewModel.swift,
-				MatchViewModel.swift,
-				PlayerViewModel.swift,
-				TeamViewModel.swift,
-			);
-			target = BC8848022BB15F4E00844DBB /* SHL Demo */;
-		};
-		804EC81C2CFBF1870096CA0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				SHLWidgetAttributes.swift,
-			);
-			target = BC8848022BB15F4E00844DBB /* SHL Demo */;
-		};
 		80CF89F82C779212000CE2CE /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -229,8 +173,8 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		804EC7F42CFBA9A00096CA0D /* ViewModels */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (804EC81A2CFBF1670096CA0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ViewModels; sourceTree = "<group>"; };
-		804EC7FB2CFBD1AC0096CA0D /* Types */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (804EC8122CFBDEDD0096CA0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 804EC81C2CFBF1870096CA0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Types; sourceTree = "<group>"; };
+		804EC7F42CFBA9A00096CA0D /* ViewModels */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ViewModels; sourceTree = "<group>"; };
+		804EC7FB2CFBD1AC0096CA0D /* Types */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (804EC8122CFBDEDD0096CA0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Types; sourceTree = "<group>"; };
 		804EC7FF2CFBD4CF0096CA0D /* Mock */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Mock; sourceTree = "<group>"; };
 		80CF89F52C7791F3000CE2CE /* Pulse Shader */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (80CF89F82C779212000CE2CE /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "Pulse Shader"; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -246,14 +190,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		BC8848002BB15F4E00844DBB /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				804EC7F12CFBA8FE0096CA0D /* HockeyKit in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		BCAFE2C72B4095170044225A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -261,6 +197,7 @@
 				8055E5182BD173A30096DCBF /* WidgetKit.framework in Frameworks */,
 				8055E5172BD1739D0096DCBF /* ActivityKit.framework in Frameworks */,
 				804EC7EF2CFBA8E90096CA0D /* HockeyKit in Frameworks */,
+				8095D07D2D8DA059006469A4 /* PostHog in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,7 +322,6 @@
 			children = (
 				BCAFE2CA2B4095170044225A /* SHL.app */,
 				BC425E432B4706CC00D82CFB /* SHLWidget.appex */,
-				BC8848032BB15F4E00844DBB /* SHL Demo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -471,29 +407,6 @@
 			productReference = BC425E432B4706CC00D82CFB /* SHLWidget.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		BC8848022BB15F4E00844DBB /* SHL Demo */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = BC8848162BB15F4F00844DBB /* Build configuration list for PBXNativeTarget "SHL Demo" */;
-			buildPhases = (
-				BC8847FF2BB15F4E00844DBB /* Sources */,
-				BC8848002BB15F4E00844DBB /* Frameworks */,
-				BC8848012BB15F4E00844DBB /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				804EC7FF2CFBD4CF0096CA0D /* Mock */,
-			);
-			name = "SHL Demo";
-			packageProductDependencies = (
-				804EC7F02CFBA8FE0096CA0D /* HockeyKit */,
-			);
-			productName = "LHF Demo";
-			productReference = BC8848032BB15F4E00844DBB /* SHL Demo.app */;
-			productType = "com.apple.product-type.application.on-demand-install-capable";
-		};
 		BCAFE2C92B4095170044225A /* SHL */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BCAFE2D82B4095180044225A /* Build configuration list for PBXNativeTarget "SHL" */;
@@ -508,7 +421,6 @@
 			);
 			dependencies = (
 				BC425E552B4706CD00D82CFB /* PBXTargetDependency */,
-				BC8848112BB15F4F00844DBB /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				804EC7F42CFBA9A00096CA0D /* ViewModels */,
@@ -517,6 +429,7 @@
 			name = SHL;
 			packageProductDependencies = (
 				804EC7EE2CFBA8E90096CA0D /* HockeyKit */,
+				8095D07C2D8DA059006469A4 /* PostHog */,
 			);
 			productName = LHF;
 			productReference = BCAFE2CA2B4095170044225A /* SHL.app */;
@@ -535,9 +448,6 @@
 					BC425E422B4706CC00D82CFB = {
 						CreatedOnToolsVersion = 15.1;
 					};
-					BC8848022BB15F4E00844DBB = {
-						CreatedOnToolsVersion = 15.2;
-					};
 					BCAFE2C92B4095170044225A = {
 						CreatedOnToolsVersion = 15.1;
 					};
@@ -554,6 +464,7 @@
 			mainGroup = BCAFE2C12B4095170044225A;
 			packageReferences = (
 				804EC7ED2CFBA8E90096CA0D /* XCRemoteSwiftPackageReference "HockeyKit" */,
+				8095D07B2D8DA059006469A4 /* XCRemoteSwiftPackageReference "posthog-ios" */,
 			);
 			productRefGroup = BCAFE2CB2B4095170044225A /* Products */;
 			projectDirPath = "";
@@ -561,7 +472,6 @@
 			targets = (
 				BCAFE2C92B4095170044225A /* SHL */,
 				BC425E422B4706CC00D82CFB /* SHLWidget */,
-				BC8848022BB15F4E00844DBB /* SHL Demo */,
 			);
 		};
 /* End PBXProject section */
@@ -572,15 +482,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				BC425E522B4706CD00D82CFB /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		BC8848012BB15F4E00844DBB /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				BC88480D2BB15F4F00844DBB /* Preview Assets.xcassets in Resources */,
-				BC88480A2BB15F4F00844DBB /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -615,39 +516,6 @@
 				806BEB1A2CB052BB00CC4565 /* CloudStorage.swift in Sources */,
 				80DCA05F2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */,
 				804316262BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		BC8847FF2BB15F4E00844DBB /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8020C2612D7651A500F1FB5E /* GameTime.swift in Sources */,
-				808F89BB2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */,
-				BC8848082BB15F4E00844DBB /* ContentView.swift in Sources */,
-				80E0F5892BD935F300A4C232 /* VersusBar.swift in Sources */,
-				8035B1522CAF647B00FA534E /* Sequence.swift in Sources */,
-				806796D02CA888CD00E9D95D /* TeamView.swift in Sources */,
-				805C8AA42CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */,
-				806BEB182CB052BB00CC4565 /* CloudStorage.swift in Sources */,
-				804375AB2CAA09FC0041F46D /* PlayerView.swift in Sources */,
-				80E0F5822BD9346100A4C232 /* Root.swift in Sources */,
-				8075FBB62CA62706004C6438 /* GameExtensions.swift in Sources */,
-				801BC55A2BCFEF2C00417693 /* StandingsTable.swift in Sources */,
-				80E0F5882BD935F100A4C232 /* PBPView.swift in Sources */,
-				8008FC7F2C9DD0A400B23669 /* ReminderContext.swift in Sources */,
-				BC88481E2BB1660700844DBB /* UIImageColors.swift in Sources */,
-				804EC8272CFC0B070096CA0D /* HockeyAPIKey.swift in Sources */,
-				804EC8222CFC02560096CA0D /* ActivityUpdater.swift in Sources */,
-				80E0F5872BD9359B00A4C232 /* MatchView.swift in Sources */,
-				BC9490732BB19F63009047E4 /* PromotionBanner.swift in Sources */,
-				BC8848062BB15F4E00844DBB /* LHF_DemoApp.swift in Sources */,
-				8055E5152BD171660096DCBF /* MatchCalendar.swift in Sources */,
-				80DCA0602C9DBEFF0058B6F2 /* ColorCache.swift in Sources */,
-				80E9ED902CB14DDC00D0E4E9 /* Settings.swift in Sources */,
-				8020C25E2D7644D500F1FB5E /* ScrollPosition.swift in Sources */,
-				BC88481B2BB1642E00844DBB /* MatchOverview.swift in Sources */,
-				806BEB152CB0500700CC4565 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -693,11 +561,6 @@
 			target = BC425E422B4706CC00D82CFB /* SHLWidget */;
 			targetProxy = BC425E542B4706CD00D82CFB /* PBXContainerItemProxy */;
 		};
-		BC8848112BB15F4F00844DBB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BC8848022BB15F4E00844DBB /* SHL Demo */;
-			targetProxy = BC8848102BB15F4F00844DBB /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -721,7 +584,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.5;
+				MARKETING_VERSION = 1.2.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.SHLWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -756,7 +619,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.5;
+				MARKETING_VERSION = 1.2.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.SHLWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -768,84 +631,6 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Release;
-		};
-		BC8848142BB15F4F00844DBB /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APPCLIP = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "SHL Demo/SHL_Demo.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"SHL Demo/Preview Content\"";
-				DEVELOPMENT_TEAM = 89625ZHN6X;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "SHL Demo/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = SHL;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.2.5;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.Clip;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		BC8848152BB15F4F00844DBB /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APPCLIP = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "SHL Demo/SHL_Demo.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"SHL Demo/Preview Content\"";
-				DEVELOPMENT_TEAM = 89625ZHN6X;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "SHL Demo/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = SHL;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.2.5;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.Clip;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -996,7 +781,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.5;
+				MARKETING_VERSION = 1.2.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1038,7 +823,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.5;
+				MARKETING_VERSION = 1.2.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1060,15 +845,6 @@
 			buildConfigurations = (
 				BC425E582B4706CD00D82CFB /* Debug */,
 				BC425E592B4706CD00D82CFB /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		BC8848162BB15F4F00844DBB /* Build configuration list for PBXNativeTarget "SHL Demo" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				BC8848142BB15F4F00844DBB /* Debug */,
-				BC8848152BB15F4F00844DBB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1102,6 +878,14 @@
 				kind = branch;
 			};
 		};
+		8095D07B2D8DA059006469A4 /* XCRemoteSwiftPackageReference "posthog-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/PostHog/posthog-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.20.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1110,15 +894,15 @@
 			package = 804EC7ED2CFBA8E90096CA0D /* XCRemoteSwiftPackageReference "HockeyKit" */;
 			productName = HockeyKit;
 		};
-		804EC7F02CFBA8FE0096CA0D /* HockeyKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 804EC7ED2CFBA8E90096CA0D /* XCRemoteSwiftPackageReference "HockeyKit" */;
-			productName = HockeyKit;
-		};
 		804EC7F22CFBA9030096CA0D /* HockeyKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 804EC7ED2CFBA8E90096CA0D /* XCRemoteSwiftPackageReference "HockeyKit" */;
 			productName = HockeyKit;
+		};
+		8095D07C2D8DA059006469A4 /* PostHog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8095D07B2D8DA059006469A4 /* XCRemoteSwiftPackageReference "posthog-ios" */;
+			productName = PostHog;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

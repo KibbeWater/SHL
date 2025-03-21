@@ -14,7 +14,7 @@ struct MatchCalendar: View {
     var body: some View {
         ForEach(matches.filter({!$0.played})) { match in
             NavigationLink {
-                MatchView(match)
+                MatchView(match, referer: "calendar")
             } label: {
                 HStack {
                     Image("Team/\(match.homeTeam.code.uppercased())")
