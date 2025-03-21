@@ -69,7 +69,7 @@ struct HomeView: View {
         }()
         
         return NavigationLink(destination: {
-            MatchView(featured, referer: "home_featured")
+            MatchView(featured, referrer: "home_featured")
         }, label: {
             content
         })

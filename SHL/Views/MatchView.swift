@@ -37,31 +37,13 @@ struct MatchView: View {
     @State var pos: CGFloat = 0
     @State private var yPosition: CGFloat = 0
     
-    init(_ match: Game, referer: String) {
+    @State var hasLogged = false
+    private var referrer: String
+    
+    init(_ match: Game, referrer: String) {
         self.match = match
         self._viewModel = .init(wrappedValue: .init(match))
-        PostHogSDK.shared.capture(
-            "match_view_interaction",
-            properties: [
-                "referer": referer
-            ],
-            userProperties: [
-                "match_id": match.id
-            ]
-        )
-        
-        PostHogSDK.shared.capture(
-            "team_interaction",
-            properties: [
-                "team_code": match.homeTeam.code
-            ]
-        )
-        PostHogSDK.shared.capture(
-            "team_interaction",
-            properties: [
-                "team_code": match.awayTeam.code
-            ]
-        )
+        self.referrer = referrer
     }
     
     func TeamLogo(_ team: Team, opponent: Team) -> some View {
@@ -395,6 +377,33 @@ struct MatchView: View {
                 try? await viewModel.refresh()
             }
             startTimer()
+            
+            // Perform logging
+            if !hasLogged {
+                PostHogSDK.shared.capture(
+                    "match_view_interaction",
+                    properties: [
+                        "referrer": referrer
+                    ],
+                    userProperties: [
+                        "match_id": match.id
+                    ]
+                )
+                
+                PostHogSDK.shared.capture(
+                    "team_interaction",
+                    properties: [
+                        "team_code": match.homeTeam.code
+                    ]
+                )
+                PostHogSDK.shared.capture(
+                    "team_interaction",
+                    properties: [
+                        "team_code": match.awayTeam.code
+                    ]
+                )
+                hasLogged = true
+            }
         }
         .getScrollPosition($pos)
         .background(
@@ -465,11 +474,11 @@ struct MatchView: View {
 }
 
 #Preview("Previous") {
-    MatchView(.fakeData(), referer: "PREVIEW")
+    MatchView(.fakeData(), referrer: "PREVIEW")
         .environment(\.hockeyAPI, HockeyAPI())
 }
 
 #Preview("Upcoming") {
-    MatchView(.fakeData(), referer: "PREVIEW")
+    MatchView(.fakeData(), referrer: "PREVIEW")
         .environment(\.hockeyAPI, HockeyAPI())
 }

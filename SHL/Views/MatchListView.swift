@@ -68,7 +68,7 @@ struct MatchListView: View {
         HStack {
             if match.date < Date.now {
                 NavigationLink {
-                    MatchView(match, referer: "match_list")
+                    MatchView(match, referrer: "match_list")
                 } label: {
                     if #available(iOS 17.2, *) {
                         MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
@@ -107,7 +107,7 @@ struct MatchListView: View {
                 .buttonStyle(PlainButtonStyle())
             } else {
                 NavigationLink {
-                    MatchView(match, referer: "match_list")
+                    MatchView(match, referrer: "match_list")
                 } label: {
                     MatchOverview(game: match)
                         .id("pm-\(match.id)")
