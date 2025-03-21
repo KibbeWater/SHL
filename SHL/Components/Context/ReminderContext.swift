@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PostHog
 import HockeyKit
 
 struct ReminderContext: View {
@@ -48,6 +49,18 @@ struct ReminderContext: View {
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
         
         let request = UNNotificationRequest(identifier: match.id, content: content, trigger: trigger)
+        
+        PostHogSDK.shared.capture(
+            "match_reminder_created",
+            properties: [
+                "match_id": match.id,
+                "teams": [
+                    match.homeTeam.code,
+                    match.awayTeam.code
+                ]
+            ],
+            userProperties: ["preferred_team": Settings.shared.getPreferredTeam() ?? "N/A"]
+        )
         
         let notificationCenter = UNUserNotificationCenter.current()
         do {
