@@ -80,7 +80,8 @@ struct HomeView: View {
                     center = .init(x: geo.size.width / 2, y: geo.size.height / 2)
                 }
         })
-        .onTapGesture {
+        .simultaneousGesture(TapGesture().onEnded {
+            print("Click!")
             PostHogSDK.shared.capture(
                 "featured_interaction",
                 properties: [
@@ -91,7 +92,7 @@ struct HomeView: View {
                     "preferred_team": Settings.shared.getPreferredTeam() ?? "N/A"
                 ]
             )
-        }
+        })
     }
     
     func FeaturedGameContainsPreferredTeam() -> Bool {
