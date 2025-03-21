@@ -82,12 +82,12 @@ struct HomeView: View {
         })
         .onTapGesture {
             PostHogSDK.shared.capture(
-                "Tapped Featured Game",
+                "featured_interaction",
                 properties: [
-                    "game_id": featured.id
+                    "game_id": featured.id,
+                    "is_preferred_team": FeaturedGameContainsPreferredTeam(),
                 ],
                 userProperties: [
-                    "is_preferred_team": FeaturedGameContainsPreferredTeam(),
                     "preferred_team": Settings.shared.getPreferredTeam() ?? "N/A"
                 ]
             )

@@ -5,7 +5,6 @@
 //  Created by KibbeWater on 3/27/24.
 //
 
-import PostHog
 import HockeyKit
 import Foundation
 import ActivityKit
