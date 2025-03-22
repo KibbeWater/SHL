@@ -81,22 +81,23 @@ struct HomeView: View {
                 }
         })
         .simultaneousGesture(TapGesture().onEnded {
-            print("Click!")
-            PostHogSDK.shared.capture(
-                "featured_interaction",
-                properties: [
-                    "game_id": featured.id,
-                    "is_preferred_team": FeaturedGameContainsPreferredTeam(),
-                ],
-                userProperties: [
-                    "preferred_team": Settings.shared.getPreferredTeam() ?? "N/A"
-                ]
-            )
+            Task {
+                PostHogSDK.shared.capture(
+                    "featured_interaction",
+                    properties: [
+                        "game_id": featured.id,
+                        "is_preferred_team": await FeaturedGameContainsPreferredTeam(),
+                    ],
+                    userProperties: [
+                        "preferred_team": Settings.shared.getPreferredTeam() ?? "N/A"
+                    ]
+                )
+            }
         })
     }
     
-    func FeaturedGameContainsPreferredTeam() -> Bool {
-        guard let preferredTeam = Settings.shared.getPreferredTeam()else {
+    func FeaturedGameContainsPreferredTeam() async -> Bool {
+        guard let preferredId = Settings.shared.getPreferredTeam() else {
             return false
         }
         
@@ -104,7 +105,11 @@ struct HomeView: View {
             return false
         }
         
-        return featuredGame.homeTeam.code.lowercased() == preferredTeam.lowercased() || featuredGame.awayTeam.code.lowercased() == preferredTeam.lowercased()
+        guard let preferredTeam = try? await hockeyApi.team.getTeam(withId: preferredId) else {
+            return false
+        }
+        
+        return featuredGame.homeTeam.code.lowercased() == preferredTeam.teamNames.code.lowercased() || featuredGame.awayTeam.code.lowercased() == preferredTeam.teamNames.code.lowercased()
     }
     
     func getTimeLoop() -> Double {
