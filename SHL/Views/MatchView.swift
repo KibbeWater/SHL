@@ -93,6 +93,11 @@ struct MatchView: View {
             
             VStack {
                 if let liveGame = viewModel.liveGame {
+                    if liveGame.gameOverview.state == .ongoing || liveGame.gameOverview.state == .onbreak {
+                        Label("P\(liveGame.gameOverview.time.period)", systemImage: "clock")
+                            .foregroundStyle(.white.opacity(0.5))
+                            .font(.body)
+                    }
                     GameTime(liveGame)
                 } else {
                     GameTime(match)
@@ -103,14 +108,7 @@ struct MatchView: View {
             .font(.title)
             .frame(height: 96)
             .foregroundColor(.white)
-            .overlay(alignment: .top, content: {
-                if let _game = viewModel.liveGame,
-                   _game.gameOverview.state == .ongoing || _game.gameOverview.state == .onbreak {
-                    Label("P\(_game.gameOverview.time.period)", systemImage: "clock")
-                        .foregroundStyle(.white.opacity(0.5))
-                }
-            })
-            .frame(height: !match.isLive() ? 172 : 84)
+            .frame(height: match.isLive() ? 172 : 84)
             .frame(maxWidth: .infinity)
             Spacer()
             
@@ -481,4 +479,26 @@ struct MatchView: View {
 #Preview("Upcoming") {
     MatchView(.fakeData(), referrer: "PREVIEW")
         .environment(\.hockeyAPI, HockeyAPI())
+}
+
+#Preview("Live") {
+    MatchView(.init(
+        id: "v2cb2bt9i8",
+        date: .now,
+        played: false,
+        overtime: false,
+        shootout: false,
+        venue: "Coop Norbotten Arena",
+        homeTeam: .init(
+            name: "Brynäs",
+            code: "BIF",
+            result: 1
+        ),
+        awayTeam: .init(
+            name: "Luleå Hockey",
+            code: "LHF",
+            result: 2
+        )
+    ), referrer: "PREVIEW")
+    .environment(\.hockeyAPI, HockeyAPI())
 }

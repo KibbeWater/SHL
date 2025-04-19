@@ -31,11 +31,11 @@ class TeamViewModel: ObservableObject {
     }
     
     func refresh() async throws  {
-        self.lineup = try await api?.team.getLineup(team: self.team) ?? []
-        if let series = try? await api?.series.getCurrentSeries() {
-            self.standings = try await api?.standings.getStandings(series: series)
+        self.lineup = (try? await api?.team.getLineup(team: self.team)) ?? []
+        if let series = try await api?.series.getCurrentSeries() {
+            self.standings = (try? await api?.standings.getStandings(series: series))
         }
-        if let season = try? await api?.season.getCurrent() {
+        if let season = try await api?.season.getCurrent() {
             self.history = try await api?.match.getSeasonSchedule(season, withTeams: [team.id]) ?? []
         }
     }

@@ -18,6 +18,7 @@ class HomeViewModel: ObservableObject {
     @Published var liveGame: GameData? = nil
     @Published var latestMatches: [Game] = []
     @Published var standings: [StandingObj]? = nil
+    @Published var standingsDisabled: Bool = false
     
     private var liveGameId: String? = nil
     private var cancellable: AnyCancellable?
@@ -65,10 +66,23 @@ class HomeViewModel: ObservableObject {
         latestMatches = try await api?.match.getLatest() ?? []
         
         if let series = try? await api?.series.getCurrentSeries() {
-            guard let _standings = try await api?.standings.getStandings(series: series) else { return }
-            standings = formatStandings(_standings)
+            do {
+                guard let _standings = try await api?.standings.getStandings(series: series) else {
+                    standingsDisabled = true
+                    return
+                }
+                standings = formatStandings(_standings)
+                standingsDisabled = false
+            } catch let error as HockeyAPIError {
+                if case .networkError = error {
+                    standingsDisabled = true
+                } else {
+                    throw error
+                }
+            }
         } else {
             standings = nil
+            standingsDisabled = true
         }
     }
     

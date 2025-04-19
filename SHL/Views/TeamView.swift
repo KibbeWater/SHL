@@ -7,6 +7,7 @@
 
 import SwiftUI
 import HockeyKit
+import Kingfisher
 
 private enum TeamTabs: String, CaseIterable {
     case history = "History"
@@ -25,7 +26,7 @@ struct TeamView: View {
     
     init(team: SiteTeam) {
         self.team = team
-        self._viewModel = StateObject(wrappedValue: TeamViewModel(team))
+        self._viewModel = .init(wrappedValue: .init(team))
     }
     
     func loadTeamColors() {
@@ -35,7 +36,7 @@ struct TeamView: View {
     }
     
     var matchHistoryTab: some View {
-        VStack {
+        LazyVStack {
             let upcomingGames = viewModel.history.filter({ !$0.played })
             let playedGames = viewModel.history.filter({ $0.played })
             
@@ -154,7 +155,7 @@ struct TeamView: View {
     }
     
     func renderPlayerCard(_ player: LineupPlayer) -> some View {
-        return VStack {
+        return LazyVStack {
             if let url = player.renderedLatestPortrait?.url {
                 NavigationLink {
                     PlayerView(player, teamColor: $teamColor)
@@ -166,24 +167,25 @@ struct TeamView: View {
                             .fontWeight(.semibold)
                             .foregroundStyle(Color(uiColor: .label))
                         
-                        CacheAsyncImage(url: .init(string: url)!) { _img in
-                            _img
-                                .resizable()
-                                .background(playerCountryColor(player))
-                                .aspectRatio(contentMode: .fit)
-                                .overlay(alignment: .topLeading) {
-                                    if let _number = player.jerseyNumber {
-                                        Text("#\(_number)")
-                                            .padding(.all, 8)
-                                            .foregroundStyle(Color(uiColor: .label))
-                                    }
+                        KFImage(.init(string: url)!)
+                            .placeholder {
+                                ProgressView()
+                                    .frame(width: 200)
+                            }
+                            .setProcessor(DownsamplingImageProcessor(size: CGSize(
+                                width: 186,
+                                height: 224
+                            )))
+                            .resizable()
+                            .background(playerCountryColor(player))
+                            .aspectRatio(contentMode: .fit)
+                            .overlay(alignment: .topLeading) {
+                                if let _number = player.jerseyNumber {
+                                    Text("#\(_number)")
+                                        .padding(.all, 8)
+                                        .foregroundStyle(Color(uiColor: .label))
                                 }
-                        } placeholder: {
-                            Spacer()
-                            ProgressView()
-                                .frame(width: 200)
-                            Spacer()
-                        }
+                            }
                     }
                     .frame(height: 256)
                     .background(.ultraThinMaterial)
@@ -252,12 +254,21 @@ struct TeamView: View {
                 }
                 .padding(.top, 52)
             }
+            .refreshable {
+                try? await viewModel.refresh()
+            }
         }
         .onAppear {
-            loadTeamColors()
-        }
-        .task {
             viewModel.setAPI(api)
+            Task {
+                do {
+                    try await viewModel.refresh()
+                } catch let err {
+                    print(err)
+                }
+            }
+            
+            loadTeamColors()
         }
     }
 }

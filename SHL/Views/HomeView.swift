@@ -135,6 +135,7 @@ struct HomeView: View {
                 MatchCalendar(
                     matches: Array(viewModel.latestMatches
                         .filter({ !$0.played })
+                        .sorted(by: { $0.date < $1.date })
                         .prefix(5)
                     )
                 )
@@ -154,14 +155,23 @@ struct HomeView: View {
                 Spacer()
             }
             
-            if let standings = viewModel.standings {
-                StandingsTable(title: "Table", items: standings)
-                    .frame(maxWidth: .infinity)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .padding(.horizontal)
+            if viewModel.standingsDisabled {
+                HStack {
+                    Text("Standings are disabled during finals\nWe apologize for the inconvenience")
+                        .font(.callout)
+                    Spacer()
+                }
+                .padding(.horizontal)
             } else {
-                ProgressView()
+                if let standings = viewModel.standings {
+                    StandingsTable(title: "Table", items: standings)
+                        .frame(maxWidth: .infinity)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .padding(.horizontal)
+                } else {
+                    ProgressView()
+                }
             }
         }
     }
@@ -217,6 +227,7 @@ struct HomeView: View {
             try? await viewModel.refresh()
         }
         .onAppear {
+            viewModel.setAPI(hockeyApi)
             Task {
                 try? await viewModel.refresh()
             }
@@ -225,9 +236,6 @@ struct HomeView: View {
             .container,
             edges: UIDevice.current.userInterfaceIdiom == .pad ? .all : .horizontal
         )
-        .task {
-            viewModel.setAPI(hockeyApi)
-        }
     }
     
     func remainingTimeUntil(_ targetDate: Date) -> String {

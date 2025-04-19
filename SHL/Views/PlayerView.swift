@@ -7,6 +7,7 @@
 
 import SwiftUI
 import HockeyKit
+import Kingfisher
 
 private enum PlayerTabs: String, CaseIterable {
     case statistics = "Statistics"
@@ -27,9 +28,7 @@ struct PlayerView: View {
     init(_ player: LineupPlayer, teamColor: Binding<Color>) {
         self.player = player
         self._teamColor = teamColor
-        self._viewModel = StateObject(
-            wrappedValue: PlayerViewModel(player)
-        )
+        self._viewModel = .init(wrappedValue: .init(player))
     }
 
     var statisticsTab: some View {
@@ -91,69 +90,73 @@ struct PlayerView: View {
         .padding(.horizontal)
     }
     
+    func getHistoryStat(stat: String, item: [PlayerGameLog]) -> some View {
+        return VStack {
+            HStack {
+                Text(String(stat))
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                    .fontWeight(.bold)
+                Spacer()
+            }
+            VStack(spacing: 24) {
+                ForEach(item, id: \.self) { stat in
+                    HStack {
+                        VStack {
+                            Image("Team/\(stat.info.teamId.uppercased())")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 46, height: 46)
+                        }
+                        .padding(.trailing, 12)
+                        VStack {
+                            VersusBar("\(String(stat.gamesPlayed ?? 0)) matches (W/L)", homeSide: stat.wins ?? 0, awaySide: stat.losses ?? 0, homeColor: .blue, awayColor: .red)
+                                .fontWeight(.medium)
+                        }
+                        Spacer()
+                    }
+                    .frame(height: 52)
+                    .padding(12)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay(alignment: .topTrailing, content: {
+                        switch stat.gameType {
+                        case .regular:
+                            Text("SHL")
+                                .foregroundStyle(.secondary)
+                                .fontWeight(.semibold)
+                                .font(.system(size: 12))
+                                .padding(.horizontal, 16)
+                                .padding(.top, 4)
+                        case .finals:
+                            Text("Finals")
+                                .foregroundStyle(.secondary)
+                                .fontWeight(.semibold)
+                                .font(.footnote)
+                                .padding(.horizontal, 16)
+                                .padding(.top, 4)
+                        case .unknown:
+                            Text("Unknown")
+                                .foregroundStyle(.secondary)
+                                .fontWeight(.semibold)
+                                .font(.footnote)
+                                .padding(.horizontal, 16)
+                                .padding(.top, 4)
+                        }
+                    })
+                }
+            }
+        }
+        .padding([.horizontal, .bottom])
+    }
+    
     var historyTab: some View {
         VStack {
             if !viewModel.stats.isEmpty {
                 let grouping = viewModel.stats.groupBy(keySelector: { $0.season })
                 ForEach(grouping.keys.sorted(by: >), id: \.self) { seasonStat in
                     let item = grouping[seasonStat]!
-                    VStack {
-                        HStack {
-                            Text(String(seasonStat))
-                                .font(.footnote)
-                                .foregroundColor(.secondary)
-                                .fontWeight(.bold)
-                            Spacer()
-                        }
-                        VStack(spacing: 24) {
-                            ForEach(item, id: \.self) { stat in
-                                HStack {
-                                    VStack {
-                                        Image("Team/\(stat.info.teamId.uppercased())")
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fit)
-                                            .frame(width: 46, height: 46)
-                                    }
-                                    .padding(.trailing, 12)
-                                    VStack {
-                                        VersusBar("\(String(stat.gamesPlayed)) matches (W/L)", homeSide: stat.wins, awaySide: stat.losses, homeColor: .blue, awayColor: .red)
-                                            .fontWeight(.medium)
-                                    }
-                                    Spacer()
-                                }
-                                .frame(height: 52)
-                                .padding(12)
-                                .background(.ultraThinMaterial)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
-                                .overlay(alignment: .topTrailing, content: {
-                                    switch stat.gameType {
-                                    case .regular:
-                                        Text("SHL")
-                                            .foregroundStyle(.secondary)
-                                            .fontWeight(.semibold)
-                                            .font(.system(size: 12))
-                                            .padding(.horizontal, 16)
-                                            .padding(.top, 4)
-                                    case .finals:
-                                        Text("Finals")
-                                            .foregroundStyle(.secondary)
-                                            .fontWeight(.semibold)
-                                            .font(.footnote)
-                                            .padding(.horizontal, 16)
-                                            .padding(.top, 4)
-                                    case .unknown:
-                                        Text("Unknown")
-                                            .foregroundStyle(.secondary)
-                                            .fontWeight(.semibold)
-                                            .font(.footnote)
-                                            .padding(.horizontal, 16)
-                                            .padding(.top, 4)
-                                    }
-                                })
-                            }
-                        }
-                    }
-                    .padding([.horizontal, .bottom])
+                    getHistoryStat(stat: String(seasonStat), item: item)
                 }
             } else {
                 ProgressView()
@@ -208,15 +211,14 @@ struct PlayerView: View {
                     Spacer()
                     
                     if let _url = player.renderedLatestPortrait?.url {
-                        AsyncImage(url: .init(string: _url)!) { img in
-                            img
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(height: 72)
-                        } placeholder: {
-                            ProgressView()
-                                .frame(width: 72, height: 72)
-                        }
+                        KFImage(.init(string: _url)!)
+                            .placeholder {
+                                ProgressView()
+                                    .frame(width: 72, height: 72)
+                            }
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(height: 72)
                     }
                 }
                 .padding()
@@ -251,9 +253,15 @@ struct PlayerView: View {
                 }
                 .padding(.top, 52)
             }
+            .refreshable {
+                try? await viewModel.refresh()
+            }
         }
-        .task {
+        .onAppear {
             viewModel.setAPI(api)
+            Task {
+                try? await viewModel.refresh()
+            }
         }
     }
 }
