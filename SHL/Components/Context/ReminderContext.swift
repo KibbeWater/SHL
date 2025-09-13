@@ -72,6 +72,7 @@ struct ReminderContext: View {
             try await notificationCenter.add(request)
             await ReminderContext.refreshActiveReminders()
         } catch let _err {
+            print("ReminderContext: error scheduling notification")
             print(_err)
         }
     }

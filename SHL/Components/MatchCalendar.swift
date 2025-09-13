@@ -9,12 +9,14 @@ import SwiftUI
 import HockeyKit
 
 struct MatchCalendar: View {
+    @Namespace var animation
+    
     var matches: [Game]
     
     var body: some View {
         ForEach(matches.filter({!$0.played})) { match in
             NavigationLink {
-                MatchView(match, referrer: "calendar")
+                MatchView(match, referrer: "calendar", animation: animation)
             } label: {
                 HStack {
                     Image("Team/\(match.homeTeam.code.uppercased())")

@@ -126,12 +126,14 @@ struct Root: View {
                             let _ = try await hockeyApi.standings.getStandings(series: series)
                         }
                     } catch let _err {
+                        print("Unable to fetch standings")
                         print(_err)
                     }
                     
                     do {
                         let _ = try await hockeyApi.match.getLatest()
                     } catch let _err {
+                        print("Unable to fetch latest matches")
                         print(_err)
                     }
                     
@@ -146,6 +148,7 @@ struct Root: View {
             do {
                 teams = try await hockeyApi.team.getTeams()
             } catch let _err {
+                print("Unable to fetch teams")
                 print(_err)
             }
         }

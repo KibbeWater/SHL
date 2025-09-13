@@ -46,9 +46,9 @@ class MatchViewModel: ObservableObject {
     }
     
     func refresh() async throws {
-        match = try await api?.match.getMatch(game.id)
+        match = try? await api?.match.getMatch(game.id)
         matchStats = try? await api?.match.getMatchStats(game)
-        matchExtra = try await api?.match.getMatchExtra(game)
+        matchExtra = try? await api?.match.getMatchExtra(game)
         
         if let matchExtra { // Yes, technically this will always be true, but we need to make sure it's not nil to satisfy the compiler
             try await fetchTeam(matchExtra)

@@ -40,10 +40,13 @@ struct MatchView: View {
     @State var hasLogged = false
     private var referrer: String
     
-    init(_ match: Game, referrer: String) {
+    var animation: Namespace.ID
+    
+    init(_ match: Game, referrer: String, animation _anim: Namespace.ID) {
         self.match = match
         self._viewModel = .init(wrappedValue: .init(match))
         self.referrer = referrer
+        self.animation = _anim
     }
     
     func TeamLogo(_ team: Team, opponent: Team) -> some View {
@@ -359,16 +362,13 @@ struct MatchView: View {
                     PBPTab()
                 }
             }
-            .refreshable {
-                try? await viewModel.refresh()
-                startTimer()
-            }
             .coordinateSpace(name: "scroll")
         }
         .task {
             viewModel.setAPI(api)
             checkActiveActivitites()
             loadTeamColors()
+            try? await viewModel.refresh()
         }
         .onAppear {
             Task {
@@ -464,6 +464,7 @@ struct MatchView: View {
                 do {
                     try await viewModel.refreshPBP()
                 } catch let err {
+                    print("MatchView: Error refreshing PBP")
                     print(err)
                 }
             }
@@ -472,33 +473,19 @@ struct MatchView: View {
 }
 
 #Preview("Previous") {
-    MatchView(.fakeData(), referrer: "PREVIEW")
-        .environment(\.hockeyAPI, HockeyAPI())
+    PreviewWrapper(match: .fakeData())
 }
 
 #Preview("Upcoming") {
-    MatchView(.fakeData(), referrer: "PREVIEW")
-        .environment(\.hockeyAPI, HockeyAPI())
+    PreviewWrapper(match: .fakeData())
 }
 
-#Preview("Live") {
-    MatchView(.init(
-        id: "v2cb2bt9i8",
-        date: .now,
-        played: false,
-        overtime: false,
-        shootout: false,
-        venue: "Coop Norbotten Arena",
-        homeTeam: .init(
-            name: "Brynäs",
-            code: "BIF",
-            result: 1
-        ),
-        awayTeam: .init(
-            name: "Luleå Hockey",
-            code: "LHF",
-            result: 2
-        )
-    ), referrer: "PREVIEW")
-    .environment(\.hockeyAPI, HockeyAPI())
+private struct PreviewWrapper: View {
+    @Namespace var animation
+    let match: Game
+
+    var body: some View {
+        MatchView(match, referrer: "PREVIEW", animation: animation)
+            .environment(\.hockeyAPI, HockeyAPI())
+    }
 }

@@ -38,7 +38,9 @@ class MatchListViewModel: ObservableObject {
 
     func refresh() async throws {
         if let season = try? await api?.season.getCurrent() {
-            latestMatches = try await api?.match.getSeasonSchedule(season) ?? []
+            guard let series = try? await api?.series.getCurrentSeries() else { return }
+            
+            latestMatches = try await api?.match.getSeasonSchedule(season, series: series) ?? []
             
             filterMatches()
             removeUnusedListeners()

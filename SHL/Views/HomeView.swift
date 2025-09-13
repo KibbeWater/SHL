@@ -48,6 +48,9 @@ struct HomeView: View {
     @State private var date: Date = Date()
     @State private var center: CGPoint = .zero
     
+    @Namespace var animation
+    @State private var presentingFeatured: Bool = false
+    
     func renderFeaturedGame(_ featured: Game) -> some View {
         let content: some View = {
             if UIDevice.current.userInterfaceIdiom == .pad {
@@ -68,8 +71,8 @@ struct HomeView: View {
             }
         }()
         
-        return NavigationLink(destination: {
-            MatchView(featured, referrer: "home_featured")
+        return Button(action: {
+            presentingFeatured = true
         }, label: {
             content
         })
@@ -157,7 +160,7 @@ struct HomeView: View {
             
             if viewModel.standingsDisabled {
                 HStack {
-                    Text("Standings are disabled during finals\nWe apologize for the inconvenience")
+                    Text("Standings are temporarily unavailable\nWe apologize for the inconvenience")
                         .font(.callout)
                     Spacer()
                 }
@@ -180,22 +183,35 @@ struct HomeView: View {
         ScrollView {
             if let featured = viewModel.featuredGame {
                 if UIDevice.current.userInterfaceIdiom == .pad {
-                    renderFeaturedGame(featured)
+                    if #available(iOS 18.0, *) {
+                        renderFeaturedGame(featured)
+                            .matchedTransitionSource(id: featured.id, in: animation)
+                    } else {
+                        renderFeaturedGame(featured)
+                    }
                 } else {
-                    if #available(iOS 17.0, *) {
-                        if featured.isLive() {
-                            TimelineView(.animation) { _ in
+                    if featured.isLive() {
+                        TimelineView(.animation) { _ in
+                            if #available(iOS 18.0, *) {
+                                renderFeaturedGame(featured)
+                                    .matchedTransitionSource(id: featured.id, in: animation)
+                                    .pulseShader(time: getTimeLoop(), center: center, speed: 150.0, amplitude: 0.1, decay: 5.0)
+                                    .padding(.horizontal)
+                            } else {
                                 renderFeaturedGame(featured)
                                     .pulseShader(time: getTimeLoop(), center: center, speed: 150.0, amplitude: 0.1, decay: 5.0)
                                     .padding(.horizontal)
                             }
+                        }
+                    } else {
+                        if #available(iOS 18.0, *) {
+                            renderFeaturedGame(featured)
+                                .matchedTransitionSource(id: featured.id, in: animation)
+                                .padding(.horizontal)
                         } else {
                             renderFeaturedGame(featured)
                                 .padding(.horizontal)
                         }
-                    } else {
-                        renderFeaturedGame(featured)
-                            .padding(.horizontal)
                     }
                 }
             } else {
@@ -216,6 +232,18 @@ struct HomeView: View {
             }
             .padding(.top)
         }
+        .sheet(isPresented: $presentingFeatured, content: {
+            if let featured = viewModel.featuredGame {
+                if #available(iOS 18.0, *) {
+                    MatchView(featured, referrer: "home_featured", animation: animation)
+                        .navigationTransition(.zoom(sourceID: featured.id, in: animation))
+                        .presentationDragIndicator(.visible)
+                } else {
+                    MatchView(featured, referrer: "home_featured", animation: animation)
+                        .presentationDragIndicator(.visible)
+                }
+            }
+        })
         .onChange(of: viewModel.featuredGame) { _, _ in
             guard let featured = viewModel.featuredGame else { return }
             viewModel.selectListenedGame(featured)

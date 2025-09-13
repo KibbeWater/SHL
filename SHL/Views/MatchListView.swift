@@ -19,6 +19,9 @@ struct MatchListView: View {
 
     @StateObject private var viewModel = MatchListViewModel()
     
+    @Namespace var animation
+    @State private var selectedMatch: Game?
+    
     private func getLiveMatch(gameId: String) -> GameData.GameOverview? {
         return viewModel.matchListeners[gameId]?.gameOverview
     }
@@ -64,50 +67,69 @@ struct MatchListView: View {
         }
     }
     
+    @available(iOS 18.0, *)
     private func matchItem(_ match: Game) -> some View {
         HStack {
             if match.date < Date.now {
-                NavigationLink {
-                    MatchView(match, referrer: "match_list")
+                Button {
+                    selectedMatch = match
                 } label: {
-                    if #available(iOS 17.2, *) {
-                        MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
-                            .id("pm-\(match.id)")
-                            .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                            .contextMenu {
-                                #if !APPCLIP
-                                Button("Start Activity", systemImage: "plus") {
-                                    if let live = getLiveMatch(gameId: match.id) {
-                                        do {
-                                            PostHogSDK.shared.capture(
-                                                "started_live_activity",
-                                                properties: [
-                                                    "join_type": "match_list_ctx"
-                                                ],
-                                                userProperties: [
-                                                    "activity_id": ActivityUpdater.shared.deviceUUID.uuidString
-                                                ]
-                                            )
-                                            try ActivityUpdater.shared.start(match: live)
-                                        } catch {
-                                            print("Failed to start activity")
-                                        }
-                                    }
-                                }
-                                #endif
+                    MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
+                        .id("pm-\(match.id)")
+                        .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                        .contextMenu {
+                            if let live = getLiveMatch(gameId: match.id) {
+                                LiveContext(live: live)
                             }
-                            .padding(.horizontal)
-                    } else {
-                        MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
-                            .id("pm-\(match.id)")
-                            .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                            .padding(.horizontal)
-                    }
+                        }
+                        .padding(.horizontal)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .matchedTransitionSource(id: match.id, in: animation)
+            } else {
+                Button {
+                    selectedMatch = match
+                } label: {
+                    MatchOverview(game: match)
+                        .id("pm-\(match.id)")
+                        .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                        .contextMenu {
+                            ReminderContext(game: match)
+                        }
+                        .padding(.horizontal)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .matchedTransitionSource(id: match.id, in: animation)
+            }
+        }
+        .sheet(item: $selectedMatch) { match in
+            MatchView(match, referrer: "match_list", animation: animation)
+                .navigationTransition(.zoom(sourceID: match.id, in: animation))
+                .presentationDragIndicator(.visible)
+        }
+    }
+    
+    @available(iOS 17.0, *)
+    private func matchItem17(_ match: Game) -> some View {
+        HStack {
+            if match.date < Date.now {
+                Button {
+                    selectedMatch = match
+                } label: {
+                    MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
+                        .id("pm-\(match.id)")
+                        .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                        .contextMenu {
+                            if let live = getLiveMatch(gameId: match.id) {
+                                LiveContext(live: live)
+                            }
+                        }
+                        .padding(.horizontal)
                 }
                 .buttonStyle(PlainButtonStyle())
             } else {
-                NavigationLink {
-                    MatchView(match, referrer: "match_list")
+                Button {
+                    selectedMatch = match
                 } label: {
                     MatchOverview(game: match)
                         .id("pm-\(match.id)")
@@ -119,6 +141,10 @@ struct MatchListView: View {
                 }
                 .buttonStyle(PlainButtonStyle())
             }
+        }
+        .sheet(item: $selectedMatch) { match in
+            MatchView(match, referrer: "match_list", animation: animation)
+                .presentationDragIndicator(.visible)
         }
     }
     
@@ -137,54 +163,59 @@ struct MatchListView: View {
     }
     
     private func matchesScrollView(for matches: [Game]) -> some View {
-        VStack {
-            ScrollView {
-                if matches.first?.date ?? Date.now > Date.now {
-                    let matchGroups = matches.groupBy(keySelector: { getDate($0.date) })
-                    ForEach(matchGroups.keys.sorted(), id: \.self) { key in
-                        let matchList = matchGroups[key]!
-                        let isFirst = matchGroups.keys.sorted().first == key
-                        VStack {
-                            HStack {
-                                Text(getGroupDate(matchList.first?.date ?? Date.now))
-                                    .font(.footnote)
-                                    .foregroundColor(.secondary)
-                                    .fontWeight(.bold)
-                                Spacer()
-                                if !isFirst {
-                                    Button(openDates[key] == true ? "Show less" : "Show more", systemImage: openDates[key] == true ? "chevron.up" : "chevron.down") {
-                                        let isOpen = openDates[key] ?? false
-                                        withAnimation {
-                                            if isOpen {
-                                                openDates[key] = false
-                                            } else {
-                                                openDates[key] = true
-                                            }
+        ScrollView {
+            if matches.first?.date ?? Date.now > Date.now {
+                let matchGroups = matches.groupBy(keySelector: { getDate($0.date) })
+                ForEach(matchGroups.keys.sorted(), id: \.self) { key in
+                    let matchList = matchGroups[key]!
+                    let isFirst = matchGroups.keys.sorted().first == key
+                    VStack {
+                        HStack {
+                            Text(getGroupDate(matchList.first?.date ?? Date.now))
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                                .fontWeight(.bold)
+                            Spacer()
+                            if !isFirst {
+                                Button(openDates[key] == true ? "Show less" : "Show more", systemImage: openDates[key] == true ? "chevron.up" : "chevron.down") {
+                                    let isOpen = openDates[key] ?? false
+                                    withAnimation {
+                                        if isOpen {
+                                            openDates[key] = false
+                                        } else {
+                                            openDates[key] = true
                                         }
                                     }
-                                    .buttonStyle(PlainButtonStyle())
-                                    .font(.footnote)
-                                    .foregroundColor(.secondary)
                                 }
+                                .buttonStyle(PlainButtonStyle())
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
                             }
-                            .padding(.horizontal)
-                            if openDates[key] == true || isFirst {
-                                LazyVStack {
-                                    ForEach(matchList, id: \.id) { match in
+                        }
+                        .padding(.horizontal)
+                        if openDates[key] == true || isFirst {
+                            VStack {
+                                ForEach(matchList, id: \.id) { match in
+                                    if #available(iOS 18.0, *) {
                                         matchItem(match)
+                                    } else {
+                                        matchItem17(match)
                                     }
                                 }
                             }
                         }
-                        .padding(.bottom)
                     }
-                } else {
-                    ForEach(matches, id: \.id) { match in
+                    .padding(.bottom)
+                }
+            } else {
+                ForEach(matches, id: \.id) { match in
+                    if #available(iOS 18.0, *) {
                         matchItem(match)
+                    } else {
+                        matchItem17(match)
                     }
                 }
             }
-            Spacer()
         }
         .frame(maxWidth: .infinity)
         .overlay(alignment: .center, content: {
@@ -196,4 +227,9 @@ struct MatchListView: View {
             try? await viewModel.refresh()
         }
     }
+}
+
+#Preview("Preview") {
+    MatchListView()
+        .environment(\.hockeyAPI, HockeyAPI())
 }

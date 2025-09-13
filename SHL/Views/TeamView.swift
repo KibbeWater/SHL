@@ -22,6 +22,8 @@ struct TeamView: View {
     @State var teamColor: Color = .black
     @State private var selectedTab: TeamTabs = .history
     
+    @Namespace var animation
+    
     let team: SiteTeam
     
     init(team: SiteTeam) {
@@ -59,7 +61,7 @@ struct TeamView: View {
                             
                             ForEach(playedGames.prefix(3), id: \.id) { match in
                                 NavigationLink {
-                                    MatchView(match, referrer: "team_view")
+                                    MatchView(match, referrer: "team_view", animation: animation)
                                 } label: {
                                     MatchOverview(game: match)
                                         .background(Color(uiColor: .systemBackground))
@@ -79,7 +81,7 @@ struct TeamView: View {
                             
                             ForEach(upcomingGames, id: \.id) { match in
                                 NavigationLink {
-                                    MatchView(match, referrer: "team_view")
+                                    MatchView(match, referrer: "team_view", animation: animation)
                                 } label: {
                                     MatchOverview(game: match)
                                         .background(Color(uiColor: .systemBackground))
@@ -264,6 +266,7 @@ struct TeamView: View {
                 do {
                     try await viewModel.refresh()
                 } catch let err {
+                    print("TeamView: Error loading team data")
                     print(err)
                 }
             }
