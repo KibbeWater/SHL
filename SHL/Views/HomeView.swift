@@ -157,7 +157,7 @@ struct HomeView: View {
             
             if viewModel.standingsDisabled {
                 HStack {
-                    Text("Standings are disabled during finals\nWe apologize for the inconvenience")
+                    Text("Standings are temporarily unavailable\nWe apologize for the inconvenience")
                         .font(.callout)
                     Spacer()
                 }
