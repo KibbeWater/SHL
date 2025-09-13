@@ -36,7 +36,9 @@ class TeamViewModel: ObservableObject {
             self.standings = (try? await api?.standings.getStandings(series: series))
         }
         if let season = try await api?.season.getCurrent() {
-            self.history = try await api?.match.getSeasonSchedule(season, withTeams: [team.id]) ?? []
+            guard let series = try? await api?.series.getCurrentSeries() else { return }
+            
+            self.history = try await api?.match.getSeasonSchedule(season, series: series, withTeams: [team.id]) ?? []
         }
     }
 }
