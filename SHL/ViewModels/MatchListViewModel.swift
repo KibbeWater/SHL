@@ -36,7 +36,11 @@ class MatchListViewModel: ObservableObject {
         listenForLiveGame()
     }
 
-    func refresh() async throws {
+    func refresh(hard: Bool = false) async throws {
+        if hard {
+            api?.match.resetCache()
+        }
+        
         if let season = try? await api?.season.getCurrent() {
             guard let series = try? await api?.series.getCurrentSeries() else { return }
             

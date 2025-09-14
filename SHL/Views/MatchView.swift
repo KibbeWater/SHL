@@ -360,7 +360,7 @@ struct MatchView: View {
                 }
             }
             .refreshable {
-                try? await viewModel.refresh()
+                try? await viewModel.refresh(hard: true)
                 startTimer()
             }
             .coordinateSpace(name: "scroll")

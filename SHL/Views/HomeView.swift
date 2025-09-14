@@ -224,7 +224,7 @@ struct HomeView: View {
             hockeyApi.listener.connect()
         }
         .refreshable {
-            try? await viewModel.refresh()
+            try? await viewModel.refresh(hard: true)
         }
         .onAppear {
             viewModel.setAPI(hockeyApi)

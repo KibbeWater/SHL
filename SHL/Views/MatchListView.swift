@@ -193,7 +193,7 @@ struct MatchListView: View {
             }
         })
         .refreshable {
-            try? await viewModel.refresh()
+            try? await viewModel.refresh(hard: true)
         }
     }
 }

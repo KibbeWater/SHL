@@ -45,7 +45,12 @@ class MatchViewModel: ObservableObject {
         listenForLiveGame()
     }
     
-    func refresh() async throws {
+    func refresh(hard: Bool = false) async throws {
+        if hard {
+            api?.match.resetCache()
+            api?.team.resetCache()
+        }
+        
         match = try await api?.match.getMatch(game.id)
         matchStats = try? await api?.match.getMatchStats(game)
         matchExtra = try await api?.match.getMatchExtra(game)

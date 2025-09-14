@@ -61,7 +61,12 @@ class HomeViewModel: ObservableObject {
         }
     }
     
-    func refresh() async throws {
+    func refresh(hard: Bool = false) async throws {
+        if hard {
+            api?.match.resetCache()
+            api?.standings.resetCache()
+        }
+        
         try await SelectFeaturedMatch()
         latestMatches = try await api?.match.getLatest() ?? []
         
