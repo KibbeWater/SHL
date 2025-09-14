@@ -32,8 +32,8 @@ class TeamViewModel: ObservableObject {
     
     func refresh() async throws  {
         self.lineup = (try? await api?.team.getLineup(team: self.team)) ?? []
-        if let series = try await api?.series.getCurrentSeries() {
-            self.standings = (try? await api?.standings.getStandings(series: series))
+        if let ssgtUuid = try await api?.season.getCurrentSsgt() {
+            self.standings = (try? await api?.standings.getStandings(ssgtUuid: ssgtUuid))
         }
         if let season = try await api?.season.getCurrent() {
             guard let series = try? await api?.series.getCurrentSeries() else { return }

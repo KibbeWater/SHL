@@ -65,9 +65,9 @@ class HomeViewModel: ObservableObject {
         try await SelectFeaturedMatch()
         latestMatches = try await api?.match.getLatest() ?? []
         
-        if let series = try? await api?.series.getCurrentSeries() {
+        if let ssgtUuid = try? await api?.season.getCurrentSsgt() {
             do {
-                guard let _standings = try await api?.standings.getStandings(series: series) else {
+                guard let _standings = try await api?.standings.getStandings(ssgtUuid: ssgtUuid) else {
                     standingsDisabled = true
                     return
                 }

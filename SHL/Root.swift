@@ -66,10 +66,14 @@ struct Root: View {
                                     TeamView(team: team)
                                 } label: {
                                     HStack {
-                                        svgToImage(named: "Team/\(team.teamNames.code.uppercased())", width: 28)!
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fit)
-                                        Text(team.teamNames.longSite ?? team.name)
+                                        if let img = svgToImage(named: "Team/\(team.teamNames.code.uppercased())", width: 28) {
+                                            img
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                            Text(team.teamNames.longSite ?? team.name)
+                                        } else {
+                                            EmptyView()
+                                        }
                                     }
                                     .frame(height: 32)
                                 }
@@ -122,8 +126,8 @@ struct Root: View {
                 )
                 .task {
                     do {
-                        if let series = try await hockeyApi.series.getCurrentSeries() {
-                            let _ = try await hockeyApi.standings.getStandings(series: series)
+                        if let ssgtUuid = try? await hockeyApi.season.getCurrentSsgt() {
+                            let _ = try await hockeyApi.standings.getStandings(ssgtUuid: ssgtUuid)
                         }
                     } catch let _err {
                         print(_err)
