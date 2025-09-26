@@ -63,8 +63,6 @@ class HomeViewModel: ObservableObject {
     
     func refresh(hard: Bool = false) async throws {
         if hard {
-            api?.match.resetCache()
-            api?.standings.resetCache()
         }
         
         try await SelectFeaturedMatch()

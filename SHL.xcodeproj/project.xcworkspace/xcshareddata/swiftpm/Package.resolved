@@ -2,21 +2,12 @@
   "originHash" : "2e6cea07224c371f657e0cca26d2ac3281cf7bdb80db24d2771f2c8f419aeaaf",
   "pins" : [
     {
-      "identity" : "cache",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/hyperoslo/Cache.git",
-      "state" : {
-        "revision" : "24e47109e31b2031cb26e25cc1b81b607496066c",
-        "version" : "7.4.0"
-      }
-    },
-    {
       "identity" : "hockeykit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/KibbeWater/HockeyKit",
       "state" : {
         "branch" : "main",
-        "revision" : "526b673092ab74a936a84b624825da0fe74cf7bb"
+        "revision" : "6339e5316fcb6f891626f9335d078c1946ebfeaf"
       }
     },
     {

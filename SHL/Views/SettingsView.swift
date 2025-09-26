@@ -58,7 +58,6 @@ struct SettingsView: View {
                 
 #if DEBUG
                 Button("Reset Cache", role: .destructive) {
-                    hockeyApi.resetCache()
                 }
 #endif
             }

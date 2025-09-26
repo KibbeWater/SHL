@@ -38,7 +38,6 @@ class MatchListViewModel: ObservableObject {
 
     func refresh(hard: Bool = false) async throws {
         if hard {
-            api?.match.resetCache()
         }
         
         if let season = try? await api?.season.getCurrent() {

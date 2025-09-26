@@ -81,10 +81,10 @@ struct MatchView: View {
             } label: {
                 TeamLogo(
                     viewModel.liveGame?.gameOverview.homeTeam.toTeam() ??
-                        viewModel.match?.gameOverview.homeTeam.toTeam() ??
+                    viewModel.match?.homeTeam.toTeam() ??
                         match.homeTeam,
                     opponent: viewModel.liveGame?.gameOverview.awayTeam.toTeam() ??
-                        viewModel.match?.gameOverview.awayTeam.toTeam() ??
+                        viewModel.match?.awayTeam.toTeam() ??
                         match.awayTeam
                 )
             }
@@ -121,11 +121,11 @@ struct MatchView: View {
             } label: {
                 TeamLogo(
                     viewModel.liveGame?.gameOverview.awayTeam.toTeam() ??
-                        viewModel.match?.gameOverview.awayTeam.toTeam() ??
+                        viewModel.match?.awayTeam.toTeam() ??
                         match.awayTeam,
                     
                     opponent: viewModel.liveGame?.gameOverview.homeTeam.toTeam() ??
-                        viewModel.match?.gameOverview.homeTeam.toTeam() ??
+                        viewModel.match?.homeTeam.toTeam() ??
                         match.homeTeam
                 )
             }
@@ -330,7 +330,7 @@ struct MatchView: View {
             } else if viewModel.pbp?.events.isEmpty == false {
                 VStack {
                     if let pbp = viewModel.pbp {
-                        PBPView(events: pbp)
+                        PBPView(events: pbp, shouldReverse: viewModel.liveGame != nil)
                     }
                 }
                 .padding(.horizontal)
@@ -366,11 +366,11 @@ struct MatchView: View {
             .coordinateSpace(name: "scroll")
         }
         .task {
-            viewModel.setAPI(api)
             checkActiveActivitites()
             loadTeamColors()
         }
         .onAppear {
+            viewModel.setAPI(api)
             Task {
                 try? await viewModel.refresh()
             }
@@ -464,6 +464,7 @@ struct MatchView: View {
                 do {
                     try await viewModel.refreshPBP()
                 } catch let err {
+                    print("Meow")
                     print(err)
                 }
             }

@@ -10,10 +10,12 @@ import HockeyKit
 
 struct PBPView: View {
     var events: PBPEvents
+    var shouldReverse: Bool
     
     var body: some View {
-        ForEach(events.events.indices.reversed(), id: \.self) { _ev in
-            let ev = events.events[_ev]
+        ForEach(events.events.indices, id: \.self) { _ev in
+            let idx = !shouldReverse ? _ev : (events.events.count-1) - _ev
+            let ev = events.events[idx]
             
             if let _goalkeeperEvent = ev as? GoalkeeperEvent {
                 HStack {
