@@ -330,7 +330,7 @@ struct MatchView: View {
             } else if viewModel.pbp?.events.isEmpty == false {
                 VStack {
                     if let pbp = viewModel.pbp {
-                        PBPView(events: pbp, shouldReverse: viewModel.liveGame != nil)
+                        PBPView(events: pbp, shouldReverse: viewModel.liveGame == nil)
                     }
                 }
                 .padding(.horizontal)
