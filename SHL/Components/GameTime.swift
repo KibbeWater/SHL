@@ -9,14 +9,14 @@ import SwiftUI
 import HockeyKit
 
 struct GameTime: View {
-    let game: Game?
+    let game: Match?
     let liveGame: GameData?
-    
-    init(_ game: Game) {
+
+    init(_ game: Match) {
         self.game = game
         self.liveGame = nil
     }
-    
+
     init(_ game: GameData) {
         self.liveGame = game
         self.game = nil
@@ -54,7 +54,7 @@ struct GameTime: View {
 }
 
 #Preview {
-    GameTime(Game.fakeData())
+    GameTime(Match.fakeData())
         .fontWeight(.semibold)
         .font(.title)
         .frame(height: 96)

@@ -9,27 +9,27 @@ import SwiftUI
 import HockeyKit
 
 struct MatchOverview: View {
-    var game: Game
+    var game: Match
     var liveGame: GameData.GameOverview?
-    
+
     @State private var homeColor: Color = .black // Default color, updated on appear
     @State private var awayColor: Color = .black // Default color, updated on appear
-    
+
     private func loadTeamColors() {
         game.awayTeam.getTeamColor { clr in
             withAnimation {
                 self.awayColor = clr
             }
         }
-        
+
         game.homeTeam.getTeamColor { clr in
             withAnimation {
                 self.homeColor = clr
             }
         }
     }
-    
-    init(game: Game, liveGame: GameData.GameOverview? = nil) {
+
+    init(game: Match, liveGame: GameData.GameOverview? = nil) {
         self.game = game
         if game.id == liveGame?.gameUuid {
             self.liveGame = liveGame
@@ -49,11 +49,11 @@ struct MatchOverview: View {
                         Spacer()
                     }
                     Spacer()
-                    Text(String(liveGame?.homeGoals ?? game.homeTeam.result))
+                    Text(String(liveGame?.homeGoals ?? game.homeScore))
                         .font(.system(size: 48))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
-                        .foregroundStyle(liveGame?.homeGoals ?? game.homeTeam.result > liveGame?.awayGoals ?? game.awayTeam.result ? .primary : .secondary)
+                        .foregroundStyle(liveGame?.homeGoals ?? game.homeScore > liveGame?.awayGoals ?? game.awayScore ? .primary : .secondary)
                 }
                 .overlay(alignment: .bottomLeading) {
                     Text(game.homeTeam.name)
@@ -103,11 +103,11 @@ struct MatchOverview: View {
             Spacer()
             VStack {
                 HStack {
-                    Text(String(liveGame?.awayGoals ?? game.awayTeam.result))
+                    Text(String(liveGame?.awayGoals ?? game.awayScore))
                         .font(.system(size: 48))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
-                        .foregroundStyle(liveGame?.awayGoals ?? game.awayTeam.result > liveGame?.homeGoals ?? game.homeTeam.result ? .primary : .secondary)
+                        .foregroundStyle(liveGame?.awayGoals ?? game.awayScore > liveGame?.homeGoals ?? game.homeScore ? .primary : .secondary)
                     Spacer()
                     VStack {
                         Spacer()
@@ -140,12 +140,14 @@ struct MatchOverview: View {
         .frame(height: 102)
         .background(.ultraThinMaterial)
         .overlay(alignment: .topLeading) {
-            Text(game.venue)
-                .font(.caption2)
-                .fontWeight(.semibold)
-                .foregroundStyle(.secondary)
-                .padding(.leading)
-                .padding(.top, 8)
+            if let venue = game.venue {
+                Text(venue)
+                    .font(.caption2)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.secondary)
+                    .padding(.leading)
+                    .padding(.top, 8)
+            }
         }
         .onAppear {
             if awayColor == .black || homeColor == .black {
@@ -158,7 +160,7 @@ struct MatchOverview: View {
 }
 
 #Preview {
-    MatchOverview(game: Game.fakeData())
+    MatchOverview(game: Match.fakeData())
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
 }

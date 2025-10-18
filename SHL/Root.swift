@@ -12,8 +12,8 @@ enum RootTabs: Equatable, Hashable, Identifiable {
     case home
     case calendar
     case settings
-    case team(SiteTeam)
-    
+    case team(TeamDetail)
+
     var id: String {
         switch self {
         case .home: return "home"
@@ -26,15 +26,15 @@ enum RootTabs: Equatable, Hashable, Identifiable {
 
 struct Root: View {
     @State private var loggedIn = false
-    
-    @Environment(\.hockeyAPI) var hockeyApi: HockeyAPI
-    
+
+    private let api = SHLAPIClient.shared
+
     @State private var openedGame: MatchView?
     @State private var isGameOpen = false
-    
+
     @State private var selectedTab: RootTabs = .home
-    
-    @State private var teams: [SiteTeam] = []
+
+    @State private var teams: [TeamDetail] = []
     
     var body: some View {
         ZStack {
@@ -66,11 +66,11 @@ struct Root: View {
                                     TeamView(team: team)
                                 } label: {
                                     HStack {
-                                        if let img = svgToImage(named: "Team/\(team.teamNames.code.uppercased())", width: 28) {
+                                        if let img = svgToImage(named: "Team/\(team.code.uppercased())", width: 28) {
                                             img
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fit)
-                                            Text(team.teamNames.longSite ?? team.name)
+                                            Text(team.name)
                                         } else {
                                             EmptyView()
                                         }
@@ -126,29 +126,45 @@ struct Root: View {
                 )
                 .task {
                     do {
-                        if let ssgtUuid = try? await hockeyApi.season.getCurrentSsgt() {
-                            let _ = try await hockeyApi.standings.getStandings(ssgtUuid: ssgtUuid)
+                        if let ssgtUuid = try? await api.getCurrentSsgt() {
+                            let _ = try? await api.getStandings(ssgtUuid: ssgtUuid)
                         }
                     } catch let _err {
                         print(_err)
                     }
-                    
+
                     do {
-                        let _ = try await hockeyApi.match.getLatest()
+                        let _ = try await api.getLatestMatches()
                     } catch let _err {
                         print(_err)
                     }
-                    
+
                     withAnimation {
                         loggedIn = true
                     }
                 }
-                
+
             }
         }
         .task {
             do {
-                teams = try await hockeyApi.team.getTeams()
+                // Get basic teams, then fetch details for each
+                let basicTeams = try await api.getTeams()
+                teams = try await withThrowingTaskGroup(of: TeamDetail?.self) { group in
+                    for team in basicTeams {
+                        group.addTask {
+                            try? await api.getTeamDetail(id: team.id)
+                        }
+                    }
+
+                    var details: [TeamDetail] = []
+                    for try await detail in group {
+                        if let detail = detail {
+                            details.append(detail)
+                        }
+                    }
+                    return details
+                }
             } catch let _err {
                 print(_err)
             }
@@ -198,5 +214,4 @@ struct Root: View {
 
 #Preview {
     Root()
-        .environment(\.hockeyAPI, HockeyAPI())
 }

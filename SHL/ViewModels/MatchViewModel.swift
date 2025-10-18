@@ -12,67 +12,64 @@ import SwiftUI
 
 @MainActor
 class MatchViewModel: ObservableObject {
-    private var api: HockeyAPI? = nil
+    private let api = SHLAPIClient.shared
+    private let liveListener = LiveMatchListener()
 
-    @Published var match: GameExtra? = nil
-    @Published var matchStats: GameStats? = nil
+    @Published var match: MatchDetail? = nil
+    @Published var matchStats: MatchStats? = nil
     @Published var pbp: PBPEvents? = nil
-    
-    @Published var home: SiteTeam? = nil
-    @Published var away: SiteTeam? = nil
-    
+
+    @Published var home: TeamDetail? = nil
+    @Published var away: TeamDetail? = nil
+
     @Published var liveGame: GameData? = nil
     private var cancellable: AnyCancellable?
-    
-    private var game: Game
-    
-    init(_ game: Game) {
+
+    private var game: Match
+
+    init(_ game: Match) {
         self.game = game
-    }
-    
-    deinit {
-        cancellable?.cancel()
-    }
-    
-    func setAPI(_ api: HockeyAPI) {
-        self.api = api
-        
+
         Task {
             try? await refresh()
         }
-        
+
         listenForLiveGame()
     }
-    
+
+    deinit {
+        cancellable?.cancel()
+    }
+
     func refresh(hard: Bool = false) async throws {
         if hard {
         }
-        
-        match = try await api?.match.getMatch(game.id)
-        matchStats = try? await api?.match.getMatchStats(game)
-        
+
+        match = try await api.getMatchDetail(id: game.id)
+        matchStats = try? await api.getMatchStats(id: game.id)
+
         if let match {
             try await fetchTeam(match)
         }
-        
+
         try await refreshPBP()
     }
-    
+
     func refreshPBP() async throws {
-        pbp = try await api?.match.getMatchPBP(game)
+        pbp = try await api.getMatchPBP(id: game.id)
     }
-    
-    func fetchTeam(_ extra: GameExtra) async throws {
-        home = try? await api?.team.getTeam(withId: extra.homeTeam.uuid)
-        away = try? await api?.team.getTeam(withId: extra.awayTeam.uuid)
+
+    func fetchTeam(_ matchDetail: MatchDetail) async throws {
+        home = try? await api.getTeamDetail(id: matchDetail.homeTeam.uuid)
+        away = try? await api.getTeamDetail(id: matchDetail.awayTeam.uuid)
     }
-    
+
     private func listenForLiveGame() {
         if let cancellable {
             cancellable.cancel()
         }
-        
-        cancellable = api?.listener.subscribe(self.game.id)
+
+        cancellable = liveListener.subscribe([self.game.id])
             .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
                 if self?.game.id == event.gameOverview.gameUuid {

@@ -1,13 +1,22 @@
 {
-  "originHash" : "2e6cea07224c371f657e0cca26d2ac3281cf7bdb80db24d2771f2c8f419aeaaf",
+  "originHash" : "961c1dfe9d12311feda05892ffcc9efecf7f36db114ce385de340ad960a049bd",
   "pins" : [
+    {
+      "identity" : "alamofire",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Alamofire/Alamofire.git",
+      "state" : {
+        "revision" : "513364f870f6bfc468f9d2ff0a95caccc10044c5",
+        "version" : "5.10.2"
+      }
+    },
     {
       "identity" : "hockeykit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/KibbeWater/HockeyKit",
       "state" : {
         "branch" : "main",
-        "revision" : "6339e5316fcb6f891626f9335d078c1946ebfeaf"
+        "revision" : "ce0d799a37ee28a975bebd9c03dba0319ad162b4"
       }
     },
     {
@@ -20,12 +29,39 @@
       }
     },
     {
+      "identity" : "moya",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Moya/Moya.git",
+      "state" : {
+        "revision" : "c263811c1f3dbf002be9bd83107f7cdc38992b26",
+        "version" : "15.0.3"
+      }
+    },
+    {
       "identity" : "posthog-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PostHog/posthog-ios.git",
       "state" : {
         "revision" : "5077fa8ef9f7823030198fa2dd742f5b3f19f433",
         "version" : "3.20.1"
+      }
+    },
+    {
+      "identity" : "reactiveswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ReactiveCocoa/ReactiveSwift.git",
+      "state" : {
+        "revision" : "c43bae3dac73fdd3cb906bd5a1914686ca71ed3c",
+        "version" : "6.7.0"
+      }
+    },
+    {
+      "identity" : "rxswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ReactiveX/RxSwift.git",
+      "state" : {
+        "revision" : "5dd1907d64f0d36f158f61a466bab75067224893",
+        "version" : "6.9.0"
       }
     }
   ],

@@ -12,42 +12,41 @@ import SwiftUI
 
 @MainActor
 class MatchListViewModel: ObservableObject {
-    private var api: HockeyAPI? = nil
-    
-    @Published var latestMatches: [Game] = []
-    @Published var previousMatches: [Game] = []
-    @Published var todayMatches: [Game] = []
-    @Published var upcomingMatches: [Game] = []
-    
+    private let api = SHLAPIClient.shared
+    private let liveListener = LiveMatchListener()
+
+    @Published var latestMatches: [Match] = []
+    @Published var previousMatches: [Match] = []
+    @Published var todayMatches: [Match] = []
+    @Published var upcomingMatches: [Match] = []
+
     @Published var matchListeners: [String:GameData] = [:]
     private var cancellable: AnyCancellable?
 
-    deinit {
-        cancellable?.cancel()
-    }
-    
-    func setAPI(_ api: HockeyAPI) {
-        self.api = api
-        
+    init() {
         Task {
             try? await refresh()
         }
-        
+
         listenForLiveGame()
+    }
+
+    deinit {
+        cancellable?.cancel()
     }
 
     func refresh(hard: Bool = false) async throws {
         if hard {
         }
-        
-        if let season = try? await api?.season.getCurrent() {
-            guard let series = try? await api?.series.getCurrentSeries() else { return }
-            
-            latestMatches = try await api?.match.getSeasonSchedule(season, series: series) ?? []
-            
+
+        if let season = try? await api.getCurrentSeason() {
+            guard let series = try? await api.getCurrentSeries() else { return }
+
+            latestMatches = (try? await api.getSchedule(seasonId: season.id, seriesId: series.id, teamIds: nil)) ?? []
+
             filterMatches()
             removeUnusedListeners()
-            api?.listener.requestInitialData(todayMatches.filter({ $0.isLive() || $0.played }).map({ $0.id }))
+            liveListener.requestInitialData(todayMatches.filter({ $0.isLive() || $0.played }).map({ $0.id }))
         }
     }
     
@@ -64,8 +63,8 @@ class MatchListViewModel: ObservableObject {
         if let cancellable {
             cancellable.cancel()
         }
-        
-        cancellable = api?.listener.subscribe(todayMatches.map({ $0.id }))
+
+        cancellable = liveListener.subscribe(todayMatches.map({ $0.id }))
             .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
                 if self?.todayMatches.contains(where: { $0.id == event.gameOverview.gameUuid }) == true {

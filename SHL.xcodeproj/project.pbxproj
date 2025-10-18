@@ -39,6 +39,10 @@
 		808F89BC2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808F89BA2CC96C5F00452D6E /* FeaturedGameAlgo.swift */; };
 		808F89BD2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808F89BA2CC96C5F00452D6E /* FeaturedGameAlgo.swift */; };
 		8095D07D2D8DA059006469A4 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 8095D07C2D8DA059006469A4 /* PostHog */; };
+		80DBB7A92EA3FD530051C807 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 80DBB7A82EA3FD530051C807 /* CombineMoya */; };
+		80DBB7AB2EA3FD530051C807 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 80DBB7AA2EA3FD530051C807 /* Moya */; };
+		80DBB7AD2EA3FD530051C807 /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 80DBB7AC2EA3FD530051C807 /* ReactiveMoya */; };
+		80DBB7AF2EA3FD530051C807 /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 80DBB7AE2EA3FD530051C807 /* RxMoya */; };
 		80DCA05E2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */; };
 		80DCA05F2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */; };
 		80E9ED8E2CB14DDC00D0E4E9 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E9ED8D2CB14DDC00D0E4E9 /* Settings.swift */; };
@@ -177,6 +181,7 @@
 		804EC7F42CFBA9A00096CA0D /* ViewModels */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ViewModels; sourceTree = "<group>"; };
 		804EC7FB2CFBD1AC0096CA0D /* Types */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (804EC8122CFBDEDD0096CA0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Types; sourceTree = "<group>"; };
 		804EC7FF2CFBD4CF0096CA0D /* Mock */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Mock; sourceTree = "<group>"; };
+		806DBDE02EA4003300E07695 /* Network */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Network; sourceTree = "<group>"; };
 		80CF89F52C7791F3000CE2CE /* Pulse Shader */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (80CF89F82C779212000CE2CE /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "Pulse Shader"; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -197,8 +202,12 @@
 			files = (
 				8055E5182BD173A30096DCBF /* WidgetKit.framework in Frameworks */,
 				8055E5172BD1739D0096DCBF /* ActivityKit.framework in Frameworks */,
+				80DBB7A92EA3FD530051C807 /* CombineMoya in Frameworks */,
 				804EC7EF2CFBA8E90096CA0D /* HockeyKit in Frameworks */,
 				8095D07D2D8DA059006469A4 /* PostHog in Frameworks */,
+				80DBB7AD2EA3FD530051C807 /* ReactiveMoya in Frameworks */,
+				80DBB7AF2EA3FD530051C807 /* RxMoya in Frameworks */,
+				80DBB7AB2EA3FD530051C807 /* Moya in Frameworks */,
 				803B84242DB3FE98002A15DC /* Kingfisher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -331,6 +340,7 @@
 		BCAFE2CC2B4095170044225A /* SHL */ = {
 			isa = PBXGroup;
 			children = (
+				806DBDE02EA4003300E07695 /* Network */,
 				BC8848252BB1714800844DBB /* SHL.entitlements */,
 				804EC7F42CFBA9A00096CA0D /* ViewModels */,
 				BCD7BC162BAF69E000E208B3 /* Views */,
@@ -427,12 +437,17 @@
 			fileSystemSynchronizedGroups = (
 				804EC7F42CFBA9A00096CA0D /* ViewModels */,
 				804EC7FF2CFBD4CF0096CA0D /* Mock */,
+				806DBDE02EA4003300E07695 /* Network */,
 			);
 			name = SHL;
 			packageProductDependencies = (
 				804EC7EE2CFBA8E90096CA0D /* HockeyKit */,
 				8095D07C2D8DA059006469A4 /* PostHog */,
 				803B84232DB3FE98002A15DC /* Kingfisher */,
+				80DBB7A82EA3FD530051C807 /* CombineMoya */,
+				80DBB7AA2EA3FD530051C807 /* Moya */,
+				80DBB7AC2EA3FD530051C807 /* ReactiveMoya */,
+				80DBB7AE2EA3FD530051C807 /* RxMoya */,
 			);
 			productName = LHF;
 			productReference = BCAFE2CA2B4095170044225A /* SHL.app */;
@@ -469,6 +484,7 @@
 				804EC7ED2CFBA8E90096CA0D /* XCRemoteSwiftPackageReference "HockeyKit" */,
 				8095D07B2D8DA059006469A4 /* XCRemoteSwiftPackageReference "posthog-ios" */,
 				803B84222DB3FE98002A15DC /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				80DBB7A72EA3FD530051C807 /* XCRemoteSwiftPackageReference "Moya" */,
 			);
 			productRefGroup = BCAFE2CB2B4095170044225A /* Products */;
 			projectDirPath = "";
@@ -898,6 +914,14 @@
 				minimumVersion = 3.20.1;
 			};
 		};
+		80DBB7A72EA3FD530051C807 /* XCRemoteSwiftPackageReference "Moya" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Moya/Moya.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 15.0.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -920,6 +944,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8095D07B2D8DA059006469A4 /* XCRemoteSwiftPackageReference "posthog-ios" */;
 			productName = PostHog;
+		};
+		80DBB7A82EA3FD530051C807 /* CombineMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80DBB7A72EA3FD530051C807 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = CombineMoya;
+		};
+		80DBB7AA2EA3FD530051C807 /* Moya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80DBB7A72EA3FD530051C807 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = Moya;
+		};
+		80DBB7AC2EA3FD530051C807 /* ReactiveMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80DBB7A72EA3FD530051C807 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = ReactiveMoya;
+		};
+		80DBB7AE2EA3FD530051C807 /* RxMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80DBB7A72EA3FD530051C807 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = RxMoya;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
