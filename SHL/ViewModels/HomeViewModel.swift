@@ -5,9 +5,9 @@
 //  Created by Linus Rönnbäck Larsson on 30/11/24.
 //
 
+import Combine
 import Foundation
 import HockeyKit
-import Combine
 import SwiftUI
 
 @MainActor
@@ -21,7 +21,7 @@ class HomeViewModel: ObservableObject {
     @Published var standings: [StandingObj]? = nil
     @Published var standingsDisabled: Bool = false
 
-    private var liveGameId: String? = nil
+    private var liveGameId: String?
     private var cancellable: AnyCancellable?
 
     init() {
@@ -58,52 +58,48 @@ class HomeViewModel: ObservableObject {
             liveListener.requestInitialData([liveGameId])
         }
     }
-    
+
     func refresh(hard: Bool = false) async throws {
-        if hard {
-        }
+        if hard {}
 
         try await SelectFeaturedMatch()
-        latestMatches = try await api.getLatestMatches()
+        let recentMatches = try await api.getRecentMatches()
+        latestMatches = recentMatches.upcoming + recentMatches.recent
 
-        if let ssgtUuid = try? await api.getCurrentSsgt() {
-            do {
-                let _standings = try await api.getStandings(ssgtUuid: ssgtUuid)
-                standings = formatStandings(_standings)
-                standingsDisabled = false
-            } catch let error as SHLAPIError {
-                if case .networkError = error {
-                    standingsDisabled = true
-                } else {
-                    throw error
-                }
+        do {
+            let _standings = try await api.getCurrentStandings()
+            standings = formatStandings(_standings)
+            standingsDisabled = false
+        } catch let error as SHLAPIError {
+            if case .networkError = error {
+                standingsDisabled = true
+            } else {
+                throw error
             }
-        } else {
-            standings = nil
-            standingsDisabled = true
         }
     }
 
-    func formatStandings(_ standings: Standings) -> [StandingObj] {
-        return standings.standings.map({ standing in
-            return StandingObj(
+    func formatStandings(_ standings: [Standings]) -> [StandingObj] {
+        return standings.map { standing in
+            StandingObj(
                 id: standing.id,
                 position: standing.rank,
-                logo: standing.logoUrl,
-                team: standing.teamName,
-                teamCode: standing.teamCode,
+                team: standing.team.name,
+                teamCode: standing.team.code,
                 matches: String(standing.gamesPlayed),
-                diff: String(standing.goalDifferential),
+                diff: String(standing.goalDifference),
                 points: String(standing.points)
             )
-        })
+        }
     }
-    
+
     // MARK: - Calculate featured game by relevance
+
     // TODO: Use FeaturedGameAlgo functions instead
 
     func SelectFeaturedMatch() async throws {
-        guard let matches = try? await api.getLatestMatches() else { return }
+        guard let recent = try? await api.getRecentMatches() else { return }
+        let matches = recent.upcoming + recent.recent
 
         let scoredMatches = await scoreAndSortHockeyMatches(
             matches,
@@ -151,7 +147,8 @@ class HomeViewModel: ObservableObject {
             // Preferred team bonus
             if let preferredTeam = preferredTeam,
                let homeTeamUUID = teamUUIDs[game.homeTeam.code],
-               let awayTeamUUID = teamUUIDs[game.awayTeam.code] {
+               let awayTeamUUID = teamUUIDs[game.awayTeam.code]
+            {
                 if homeTeamUUID == preferredTeam || awayTeamUUID == preferredTeam {
                     score += 500
                 }

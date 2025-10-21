@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Match: Codable, Identifiable {
+struct Match: Codable, Identifiable, Equatable {
     let id: String
     let date: Date
     let venue: String?
@@ -15,28 +15,33 @@ struct Match: Codable, Identifiable {
     let awayTeam: TeamBasic
     let homeScore: Int
     let awayScore: Int
-    let gameState: MatchState
+    let state: MatchState
     let overtime: Bool?
     let shootout: Bool?
 
     var played: Bool {
-        gameState == .played
+        state == .played
     }
 
     func isLive() -> Bool {
-        gameState == .ongoing
+        state == .ongoing
     }
 }
 
-struct TeamBasic: Codable {
+public struct TeamBasic: Codable, Equatable {
     let id: String?
     let name: String
     let code: String
 }
 
 enum MatchState: String, Codable {
-    case scheduled = "scheduled"
-    case ongoing = "ongoing"
-    case paused = "paused"
-    case played = "played"
+    case scheduled
+    case ongoing
+    case paused
+    case played
+}
+
+struct RecentMatchesResponse: Codable {
+    let upcoming: [Match]
+    let recent: [Match]
 }

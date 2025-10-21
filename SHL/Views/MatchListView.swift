@@ -11,10 +11,9 @@ private enum Tabs: String, CaseIterable {
 
 struct MatchListView: View {
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(\.hockeyAPI) private var api: HockeyAPI
-    
+
     @State private var selectedTab: Tabs = .today
-    
+
     @State private var openDates: [String:Bool] = [:]
 
     @StateObject private var viewModel = MatchListViewModel()
@@ -42,9 +41,6 @@ struct MatchListView: View {
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
         }
-        .task {
-            viewModel.setAPI(api)
-        }
     }
     
     private var tabSelectionView: some View {
@@ -64,7 +60,7 @@ struct MatchListView: View {
         }
     }
     
-    private func matchItem(_ match: Game) -> some View {
+    private func matchItem(_ match: Match) -> some View {
         HStack {
             if match.date < Date.now {
                 NavigationLink {
@@ -136,7 +132,7 @@ struct MatchListView: View {
         return dateFormatter.string(from: date)
     }
     
-    private func matchesScrollView(for matches: [Game]) -> some View {
+    private func matchesScrollView(for matches: [Match]) -> some View {
         VStack {
             ScrollView {
                 if matches.first?.date ?? Date.now > Date.now {

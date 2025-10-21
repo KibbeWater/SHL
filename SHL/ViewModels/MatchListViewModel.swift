@@ -40,9 +40,7 @@ class MatchListViewModel: ObservableObject {
         }
 
         if let season = try? await api.getCurrentSeason() {
-            guard let series = try? await api.getCurrentSeries() else { return }
-
-            latestMatches = (try? await api.getSchedule(seasonId: season.id, seriesId: series.id, teamIds: nil)) ?? []
+            latestMatches = (try? await api.getSeasonMatches(seasonCode: season.code)) ?? []
 
             filterMatches()
             removeUnusedListeners()
@@ -78,7 +76,7 @@ class MatchListViewModel: ObservableObject {
         let now = Date()
         let calendar = Calendar.current
         
-        previousMatches = latestMatches.filter({ $0.date < calendar.startOfDay(for: now) }).map { $0 }
+        previousMatches = latestMatches.filter({ $0.date < calendar.startOfDay(for: now) }).sorted(by: {$0.date > $1.date}).map { $0 }
         todayMatches = latestMatches.filter({ calendar.isDateInToday($0.date) }).map { $0 }
         upcomingMatches = latestMatches.filter({ calendar.startOfDay(for: $0.date) >= calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now))! }).map { $0 }
     }

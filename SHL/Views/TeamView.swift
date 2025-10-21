@@ -15,16 +15,14 @@ private enum TeamTabs: String, CaseIterable {
 }
 
 struct TeamView: View {
-    @Environment(\.hockeyAPI) private var api: HockeyAPI
-    
     @StateObject var viewModel: TeamViewModel
 
     @State var teamColor: Color = .black
     @State private var selectedTab: TeamTabs = .history
     
-    let team: SiteTeam
+    let team: Team
     
-    init(team: SiteTeam) {
+    init(team: Team) {
         self.team = team
         self._viewModel = .init(wrappedValue: .init(team))
     }
@@ -106,7 +104,7 @@ struct TeamView: View {
         }
     }
     
-    func lineupName(_ position: TeamLineup.PositionCode) -> String {
+    func lineupName(_ position: PositionCode) -> String {
         switch position {
         case .defense:
             return "Defense"
@@ -117,7 +115,7 @@ struct TeamView: View {
         }
     }
     
-    func playerCountryColor(_ player: LineupPlayer) -> LinearGradient {
+    func playerCountryColor(_ player: Player) -> LinearGradient {
         switch player.nationality {
         case .sweden:
             return LinearGradient(colors: [.blue, .yellow], startPoint: .top, endPoint: .bottom)
@@ -129,68 +127,114 @@ struct TeamView: View {
             return LinearGradient(colors: [.red, .blue], startPoint: .top, endPoint: .bottom)
         case .norway:
             return LinearGradient(colors: [.red, .white, .blue], startPoint: .top, endPoint: .bottom)
-        case .unknown(_):
+        case .none, .unknown(_):
             return LinearGradient(colors: [.gray, .gray], startPoint: .top, endPoint: .bottom)
         }
     }
     
     var lineupTab: some View {
-        ForEach(viewModel.lineup, id: \.position) { line in
-            VStack(alignment: .leading) {
-                Text(lineupName(line.positionCode))
-                    .font(.title)
-                    .fontWeight(.semibold)
-                    .padding(.horizontal)
-                ScrollView(.horizontal) {
-                    HStack {
-                        ForEach(line.players, id: \.fullName) { player in
-                            renderPlayerCard(player)
+        Group {
+            if !viewModel.lineup.isEmpty {
+                // Filter concrete arrays for each position
+                let goalkeepers: [Player] = viewModel.lineup.filter { $0.position == .goalkeeper }
+                let defenders: [Player] = viewModel.lineup.filter { $0.position == .defense }
+                let forwards: [Player] = viewModel.lineup.filter { $0.position == .forward }
+
+                VStack(alignment: .leading, spacing: 16) {
+                    // Goalkeepers
+                    if !goalkeepers.isEmpty {
+                        VStack(alignment: .leading) {
+                            Text(lineupName(.goalkeeper))
+                                .font(.title)
+                                .fontWeight(.semibold)
+                                .padding(.horizontal)
+                            ScrollView(.horizontal) {
+                                HStack {
+                                    ForEach(goalkeepers, id: \.id) { player in
+                                        renderPlayerCard(player)
+                                    }
+                                }
+                                .padding(.vertical, 4)
+                                .padding(.horizontal)
+                            }
                         }
                     }
-                    .padding(.vertical, 4)
-                    .padding(.horizontal)
+
+                    // Defenders
+                    if !defenders.isEmpty {
+                        VStack(alignment: .leading) {
+                            Text(lineupName(.defense))
+                                .font(.title)
+                                .fontWeight(.semibold)
+                                .padding(.horizontal)
+                            ScrollView(.horizontal) {
+                                HStack {
+                                    ForEach(defenders, id: \.id) { player in
+                                        renderPlayerCard(player)
+                                    }
+                                }
+                                .padding(.vertical, 4)
+                                .padding(.horizontal)
+                            }
+                        }
+                    }
+
+                    // Forwards
+                    if !forwards.isEmpty {
+                        VStack(alignment: .leading) {
+                            Text(lineupName(.forward))
+                                .font(.title)
+                                .fontWeight(.semibold)
+                                .padding(.horizontal)
+                            ScrollView(.horizontal) {
+                                HStack {
+                                    ForEach(forwards, id: \.id) { player in
+                                        renderPlayerCard(player)
+                                    }
+                                }
+                                .padding(.vertical, 4)
+                                .padding(.horizontal)
+                            }
+                        }
+                    }
                 }
+            } else {
+                VStack { ProgressView() }
             }
         }
     }
     
-    func renderPlayerCard(_ player: LineupPlayer) -> some View {
+    func renderPlayerCard(_ player: Player) -> some View {
         return LazyVStack {
-            if let url = player.renderedLatestPortrait?.url {
-                NavigationLink {
-                    PlayerView(player, teamColor: $teamColor)
-                } label: {
-                    VStack {
-                        Text(player.fullName)
-                            .padding(.horizontal, 4)
-                            .padding(.top, 8)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(Color(uiColor: .label))
-                        
-                        KFImage(.init(string: url)!)
-                            .placeholder {
-                                ProgressView()
-                                    .frame(width: 200)
-                            }
-                            .setProcessor(DownsamplingImageProcessor(size: CGSize(
-                                width: 186,
-                                height: 224
-                            )))
-                            .resizable()
-                            .background(playerCountryColor(player))
-                            .aspectRatio(contentMode: .fit)
-                            .overlay(alignment: .topLeading) {
-                                if let _number = player.jerseyNumber {
-                                    Text("#\(_number)")
-                                        .padding(.all, 8)
-                                        .foregroundStyle(Color(uiColor: .label))
-                                }
-                            }
+            NavigationLink {
+                PlayerView(player, teamColor: $teamColor)
+            } label: {
+                VStack {
+                    Text(player.fullName)
+                        .padding(.horizontal, 4)
+                        .padding(.top, 8)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Color(uiColor: .label))
+
+                    // TODO: Add player portrait when API provides it
+                    ZStack {
+                        Rectangle()
+                            .fill(playerCountryColor(player))
+                        VStack {
+                            Text("#\(player.jerseyNumber ?? -1)")
+                                .font(.system(size: 48))
+                                .fontWeight(.bold)
+                                .foregroundStyle(Color(uiColor: .label))
+                            Text(player.position?.rawValue ?? "")
+                                .font(.caption)
+                                .foregroundStyle(Color(uiColor: .secondaryLabel))
+                        }
                     }
-                    .frame(height: 256)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .frame(width: 186, height: 224)
                 }
+                .frame(height: 256)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }
     }
@@ -207,19 +251,19 @@ struct TeamView: View {
             ScrollView {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text(team.teamNames.longSite ?? team.name)
+                        Text(team.name)
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundStyle(.white)
-                        if let pos = viewModel.standings?.leagueStandings.first(where: {$0.info.code == team.teamNames.code}) {
-                            Text("#\(pos.Rank)")
+                        if let pos = viewModel.standings.first(where: { $0.team.code == team.code }) {
+                            Text("#\(pos.rank)")
                                 .font(.title2)
                                 .fontWeight(.semibold)
                                 .foregroundStyle(.white)
                         }
                     }
                     Spacer()
-                    Image("Team/\(team.teamNames.code.uppercased())")
+                    Image("Team/\(team.code.uppercased())")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 72, height: 72)
@@ -259,7 +303,6 @@ struct TeamView: View {
             }
         }
         .onAppear {
-            viewModel.setAPI(api)
             Task {
                 do {
                     try await viewModel.refresh()
@@ -267,7 +310,7 @@ struct TeamView: View {
                     print(err)
                 }
             }
-            
+
             loadTeamColors()
         }
     }
@@ -277,3 +320,4 @@ struct TeamView: View {
     TeamView(team: .fakeData())
         .environment(\.hockeyAPI, HockeyAPI())
 }
+

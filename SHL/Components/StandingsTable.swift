@@ -11,7 +11,6 @@ import HockeyKit
 struct StandingObj: Identifiable, Equatable {
     public var id: String
     public var position: Int
-    public var logo: String
     public var team: String
     public var teamCode: String
     public var matches: String
@@ -74,7 +73,7 @@ struct StandingsTable: View {
                 StandingObj(
                     id: "1",
                     position: 1,
-                    logo: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg",
+                    // logo: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg",
                     team: "Luleå Hockey",
                     teamCode: "LHF",
                     matches: "123",

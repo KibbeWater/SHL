@@ -5,11 +5,11 @@
 //  Created by user242911 on 3/24/24.
 //
 
+import ActivityKit
+import HockeyKit
+import MapKit
 import PostHog
 import SwiftUI
-import HockeyKit
-import ActivityKit
-import MapKit
 
 private enum Tabs: String, CaseIterable {
     case summary = "Summary"
@@ -17,50 +17,48 @@ private enum Tabs: String, CaseIterable {
 }
 
 struct MatchView: View {
-    @Environment(\.hockeyAPI) private var api: HockeyAPI
-    
-    let match: Game
+    let match: Match
     @StateObject var viewModel: MatchViewModel
-    
+
     @State private var pbpUpdateTimer: Timer?
-    
+
     @State private var location: CLLocation?
     @State private var mapImage: UIImage?
-    
+
     @State var homeColor: Color = .black
     @State var awayColor: Color = .black
-    
+
     @State var activityRunning: Bool = false
-    
+
     @State private var selectedTab: Tabs = .summary
-    
+
     @State var pos: CGFloat = 0
     @State private var yPosition: CGFloat = 0
-    
+
     @State var hasLogged = false
     private var referrer: String
-    
-    init(_ match: Game, referrer: String) {
+
+    init(_ match: Match, referrer: String) {
         self.match = match
         self._viewModel = .init(wrappedValue: .init(match))
         self.referrer = referrer
     }
     
-    func TeamLogo(_ team: Team, opponent: Team) -> some View {
+    func TeamLogo(teamCode: String, score: Int, opponentScore: Int) -> some View {
         VStack {
-            if (match.date < Date.now) {
-                Text(String(team.result))
+            if match.date < Date.now {
+                Text(String(score))
                     .font(.system(size: 96))
                     .fontWidth(.compressed)
                     .fontWeight(.bold)
                     .foregroundStyle(
-                        team.result > opponent.result ?
+                        score > opponentScore ?
                             .white : .white.opacity(0.5)
                     )
                     .padding(.bottom, -2)
                 Spacer()
             }
-            Image("Team/\(team.code.uppercased())")
+            Image("Team/\(teamCode.uppercased())")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 84, height: 84)
@@ -72,20 +70,21 @@ struct MatchView: View {
     func GameHeader() -> some View {
         HStack {
             Spacer()
-            NavigationLink {
-                if let _team = viewModel.home {
+            if let _team = viewModel.home {
+                NavigationLink {
                     TeamView(team: _team)
-                } else {
-                    ProgressView()
+                } label: {
+                    TeamLogo(
+                        teamCode: viewModel.match?.homeTeam.code ?? match.homeTeam.code,
+                        score: viewModel.liveGame?.gameOverview.homeGoals ?? viewModel.match?.homeScore ?? match.homeScore,
+                        opponentScore: viewModel.liveGame?.gameOverview.awayGoals ?? viewModel.match?.awayScore ?? match.awayScore
+                    )
                 }
-            } label: {
+            } else {
                 TeamLogo(
-                    viewModel.liveGame?.gameOverview.homeTeam.toTeam() ??
-                    viewModel.match?.homeTeam.toTeam() ??
-                        match.homeTeam,
-                    opponent: viewModel.liveGame?.gameOverview.awayTeam.toTeam() ??
-                        viewModel.match?.awayTeam.toTeam() ??
-                        match.awayTeam
+                    teamCode: viewModel.match?.homeTeam.code ?? match.homeTeam.code,
+                    score: viewModel.liveGame?.gameOverview.homeGoals ?? viewModel.match?.homeScore ?? match.homeScore,
+                    opponentScore: viewModel.liveGame?.gameOverview.awayGoals ?? viewModel.match?.awayScore ?? match.awayScore
                 )
             }
             
@@ -112,21 +111,21 @@ struct MatchView: View {
             .frame(maxWidth: .infinity)
             Spacer()
             
-            NavigationLink {
-                if let _team = viewModel.away {
+            if let _team = viewModel.away {
+                NavigationLink {
                     TeamView(team: _team)
-                } else {
-                    ProgressView()
+                } label: {
+                    TeamLogo(
+                        teamCode: viewModel.match?.awayTeam.code ?? match.awayTeam.code,
+                        score: viewModel.liveGame?.gameOverview.awayGoals ?? viewModel.match?.awayScore ?? match.awayScore,
+                        opponentScore: viewModel.liveGame?.gameOverview.homeGoals ?? viewModel.match?.homeScore ?? match.homeScore
+                    )
                 }
-            } label: {
+            } else {
                 TeamLogo(
-                    viewModel.liveGame?.gameOverview.awayTeam.toTeam() ??
-                        viewModel.match?.awayTeam.toTeam() ??
-                        match.awayTeam,
-                    
-                    opponent: viewModel.liveGame?.gameOverview.homeTeam.toTeam() ??
-                        viewModel.match?.homeTeam.toTeam() ??
-                        match.homeTeam
+                    teamCode: viewModel.match?.awayTeam.code ?? match.awayTeam.code,
+                    score: viewModel.liveGame?.gameOverview.awayGoals ?? viewModel.match?.awayScore ?? match.awayScore,
+                    opponentScore: viewModel.liveGame?.gameOverview.homeGoals ?? viewModel.match?.homeScore ?? match.homeScore
                 )
             }
             
@@ -153,27 +152,52 @@ struct MatchView: View {
     
     func StatsComponent() -> some View {
         VStack {
-            let goals: [GoalEvent]? = viewModel.pbp?.getEvents(ofType: PBPEventType.goal)
-            // let shots: [ShotEvent] = getEvents(pbpEvents, type: ShotEvent.self)
-            let penalties: [PenaltyEvent]? = viewModel.pbp?.getEvents(ofType: PBPEventType.penalty)
-            
-            let homePenalties = penalties?.filter({ $0.eventTeam.teamCode == match.homeTeam.code }) ?? []
-            let awayPenalties = penalties?.filter({ $0.eventTeam.teamCode == match.awayTeam.code }) ?? []
+            let goals = viewModel.pbp?.events.filter { $0.type == .goal } ?? []
+            let penalties = viewModel.pbp?.events.filter { $0.type == .penalty } ?? []
+
+            // Count penalties for each team
+            let homePenalties = penalties.filter { event in
+                if let penaltyEvent = event as? AdaptedPenaltyEvent {
+                    return penaltyEvent.eventTeam.teamCode == match.homeTeam.code
+                }
+                return false
+            }
+            let awayPenalties = penalties.filter { event in
+                if let penaltyEvent = event as? AdaptedPenaltyEvent {
+                    return penaltyEvent.eventTeam.teamCode == match.awayTeam.code
+                }
+                return false
+            }
             VersusBar("Penalties", homeSide: homePenalties.count, awaySide: awayPenalties.count, homeColor: homeColor, awayColor: awayColor)
-            
-            let homeShotsGoal = viewModel.matchStats?.home.getStat(for: GameStatKey.shotsOnGoal) ?? 0
-            let awayShotsGoal = viewModel.matchStats?.away.getStat(for: GameStatKey.shotsOnGoal) ?? 0
-            VersusBar("Shots on goals", homeSide: homeShotsGoal, awaySide: awayShotsGoal, homeColor: homeColor, awayColor: awayColor)
-            
-            let homeGoals = goals?.filter({ $0.eventTeam.teamCode == match.homeTeam.code }) ?? []
-            let awayGoals = goals?.filter({ $0.eventTeam.teamCode == match.awayTeam.code }) ?? []
-            let homeSavesPercent = homeShotsGoal == 0 ? 0 : (Float(homeShotsGoal - awayGoals.count) / Float(homeShotsGoal)) * 100.0
-            let awaySavesPercent = awayShotsGoal == 0 ? 0 : (Float(awayShotsGoal - homeGoals.count) / Float(awayShotsGoal)) * 100.0
-            VersusBar("Save %", homeSide: Int(homeSavesPercent), awaySide: Int(awaySavesPercent), homeColor: homeColor, awayColor: awayColor)
-            
-            let homeFaceoffs = viewModel.matchStats?.home.getStat(for: .wonFaceoffs) ?? 0
-            let awayFaceoffs = viewModel.matchStats?.away.getStat(for: .wonFaceoffs) ?? 0
-            VersusBar("Won Faceoffs", homeSide: homeFaceoffs, awaySide: awayFaceoffs, homeColor: homeColor, awayColor: awayColor)
+
+            if let homeId = match.homeTeam.id, let awayId = match.awayTeam.id,
+               let homeStats = viewModel.matchStats.first(where: { $0.teamID == homeId }),
+               let awayStats = viewModel.matchStats.first(where: { $0.teamID == awayId }) {
+                let homeShotsGoal = homeStats.shotsOnGoal
+                let awayShotsGoal = awayStats.shotsOnGoal
+                VersusBar("Shots on goals", homeSide: homeShotsGoal, awaySide: awayShotsGoal, homeColor: homeColor, awayColor: awayColor)
+                
+                // Count goals for each team
+                let homeGoals = goals.filter { event in
+                    if let goalEvent = event as? AdaptedGoalEvent {
+                        return goalEvent.eventTeam.teamCode == match.homeTeam.code
+                    }
+                    return false
+                }
+                let awayGoals = goals.filter { event in
+                    if let goalEvent = event as? AdaptedGoalEvent {
+                        return goalEvent.eventTeam.teamCode == match.awayTeam.code
+                    }
+                    return false
+                }
+                let homeSavesPercent = homeShotsGoal == 0 ? 0 : (Float(homeShotsGoal - awayGoals.count) / Float(homeShotsGoal)) * 100.0
+                let awaySavesPercent = awayShotsGoal == 0 ? 0 : (Float(awayShotsGoal - homeGoals.count) / Float(awayShotsGoal)) * 100.0
+                VersusBar("Save %", homeSide: Int(homeSavesPercent), awaySide: Int(awaySavesPercent), homeColor: homeColor, awayColor: awayColor)
+
+                let homeFaceoffs = homeStats.faceoffsWon
+                let awayFaceoffs = awayStats.faceoffsWon
+                VersusBar("Won Faceoffs", homeSide: homeFaceoffs, awaySide: awayFaceoffs, homeColor: homeColor, awayColor: awayColor)
+            }
         }
         .padding()
         .background(.ultraThinMaterial)
@@ -196,7 +220,8 @@ struct MatchView: View {
             }
             
             if match.date > Date.now.addingTimeInterval((8 * 60 * 60) * -1),
-               match.played == false {
+               match.played == false
+            {
                 HStack {
                     if !match.isLive() {
                         VStack {
@@ -222,20 +247,20 @@ struct MatchView: View {
                             do {
                                 if activityRunning {
                                     var activities = Activity<SHLWidgetAttributes>.activities
-                                    activities = activities.filter({ $0.attributes.id == match.id })
+                                    activities = activities.filter { $0.attributes.id == match.id }
                                     
                                     let contentState =
-                                    SHLWidgetAttributes.ContentState(
-                                        homeScore: match.homeTeam.result,
-                                        awayScore: match.awayTeam.result,
-                                        period: .init(
-                                            period: 1,
-                                            periodEnd: "20:00",
-                                            state: .ended
+                                        SHLWidgetAttributes.ContentState(
+                                            homeScore: match.homeScore,
+                                            awayScore: match.awayScore,
+                                            period: .init(
+                                                period: 1,
+                                                periodEnd: "20:00",
+                                                state: .ended
+                                            )
                                         )
-                                    )
                                     
-                                    activities.forEach { activity in
+                                    for activity in activities {
                                         Task {
                                             await activity.end(
                                                 ActivityContent(
@@ -257,8 +282,10 @@ struct MatchView: View {
                                             "activity_id": ActivityUpdater.shared.deviceUUID.uuidString
                                         ]
                                     )
-                                    try ActivityUpdater.shared.start(match: match)
-                                    activityRunning = true
+                                    if let liveMatch = viewModel.liveGame?.gameOverview {
+                                        try ActivityUpdater.shared.start(match: liveMatch)
+                                        activityRunning = true
+                                    }
                                 }
                             } catch let _err {
                                 print("Unable to start activity \(_err)")
@@ -360,7 +387,11 @@ struct MatchView: View {
                 }
             }
             .refreshable {
-                try? await viewModel.refresh(hard: true)
+                do {
+                    try await viewModel.refresh(hard: true)
+                } catch let err {
+                    print("MatchView: Failed to refresh: \(err)")
+                }
                 startTimer()
             }
             .coordinateSpace(name: "scroll")
@@ -370,7 +401,6 @@ struct MatchView: View {
             loadTeamColors()
         }
         .onAppear {
-            viewModel.setAPI(api)
             Task {
                 try? await viewModel.refresh()
             }
@@ -409,22 +439,21 @@ struct MatchView: View {
                 LinearGradient(gradient: Gradient(colors: [homeColor, awayColor]), startPoint: .leading, endPoint: .trailing)
                 LinearGradient(gradient: Gradient(colors: [.clear, Color(uiColor: .systemBackground)]), startPoint: .top, endPoint: .bottom)
             }
-                .clipShape(
-                    UnevenRoundedRectangle(
-                        topLeadingRadius: 20,
-                        topTrailingRadius: 20
-                    )
+            .clipShape(
+                UnevenRoundedRectangle(
+                    topLeadingRadius: 20,
+                    topTrailingRadius: 20
                 )
-                .padding(.horizontal, 24 * (1-pos))
-                .padding(.top, yPosition)
-                .ignoresSafeArea(.all)
+            )
+            .padding(.horizontal, 24 * (1 - pos))
+            .padding(.top, yPosition)
+            .ignoresSafeArea(.all)
         )
-
     }
     
     private func checkActiveActivitites() {
         var activities = Activity<SHLWidgetAttributes>.activities
-        activities = activities.filter({ $0.attributes.id == match.id })
+        activities = activities.filter { $0.attributes.id == match.id }
         
         activityRunning = activities.count != 0
     }
@@ -454,7 +483,8 @@ struct MatchView: View {
             }
             
             if let _game = viewModel.liveGame?.gameOverview,
-               _game.state == .ended {
+               _game.state == .ended
+            {
                 print("Disabling timer, game has ended")
                 timer.invalidate()
                 return
@@ -473,33 +503,35 @@ struct MatchView: View {
 }
 
 #Preview("Previous") {
-    MatchView(.fakeData(), referrer: "PREVIEW")
-        .environment(\.hockeyAPI, HockeyAPI())
+    MatchView(Match.fakeData(), referrer: "PREVIEW")
 }
 
 #Preview("Upcoming") {
-    MatchView(.fakeData(), referrer: "PREVIEW")
-        .environment(\.hockeyAPI, HockeyAPI())
+    MatchView(Match.fakeData(), referrer: "PREVIEW")
 }
 
 #Preview("Live") {
-    MatchView(.init(
-        id: "v2cb2bt9i8",
-        date: .now,
-        played: false,
-        overtime: false,
-        shootout: false,
-        venue: "Coop Norbotten Arena",
-        homeTeam: .init(
-            name: "Brynäs",
-            code: "BIF",
-            result: 1
+    MatchView(
+        Match(
+            id: "v2cb2bt9i8",
+            date: .now,
+            venue: "Coop Norbotten Arena",
+            homeTeam: TeamBasic(
+                id: "team-1",
+                name: "Brynäs",
+                code: "BIF"
+            ),
+            awayTeam: TeamBasic(
+                id: "team-2",
+                name: "Luleå Hockey",
+                code: "LHF"
+            ),
+            homeScore: 1,
+            awayScore: 2,
+            state: .ongoing,
+            overtime: false,
+            shootout: false
         ),
-        awayTeam: .init(
-            name: "Luleå Hockey",
-            code: "LHF",
-            result: 2
-        )
-    ), referrer: "PREVIEW")
-    .environment(\.hockeyAPI, HockeyAPI())
+        referrer: "PREVIEW"
+    )
 }

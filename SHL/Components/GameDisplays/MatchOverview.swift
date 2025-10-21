@@ -88,7 +88,7 @@ struct MatchOverview: View {
                         Text("Ended")
                     }
                 } else {
-                    Text(game.shootout ? "Shootout" : game.overtime ? "Overtime" : game.played ? "Full-Time" : Calendar.current.isDate(game.date, inSameDayAs: Date()) ? game.formatTime() : game.formatDate())
+                    Text((game.shootout ?? false) ? "Shootout" : (game.overtime ?? false) ? "Overtime" : game.played ? "Full-Time" : Calendar.current.isDate(game.date, inSameDayAs: Date()) ? game.formatTime() : game.formatDate())
                         .fontWeight(.medium)
                 }
                 Spacer()

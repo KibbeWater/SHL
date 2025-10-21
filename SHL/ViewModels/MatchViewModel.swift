@@ -5,9 +5,9 @@
 //  Created by Linus Rönnbäck Larsson on 1/12/24.
 //
 
+import Combine
 import Foundation
 import HockeyKit
-import Combine
 import SwiftUI
 
 @MainActor
@@ -15,12 +15,12 @@ class MatchViewModel: ObservableObject {
     private let api = SHLAPIClient.shared
     private let liveListener = LiveMatchListener()
 
-    @Published var match: MatchDetail? = nil
-    @Published var matchStats: MatchStats? = nil
-    @Published var pbp: PBPEvents? = nil
+    @Published var match: Match? = nil
+    @Published var matchStats: [MatchStats] = []
+    @Published var pbp: PBPEventsAdapter? = nil
 
-    @Published var home: TeamDetail? = nil
-    @Published var away: TeamDetail? = nil
+    @Published var home: Team? = nil
+    @Published var away: Team? = nil
 
     @Published var liveGame: GameData? = nil
     private var cancellable: AnyCancellable?
@@ -42,26 +42,34 @@ class MatchViewModel: ObservableObject {
     }
 
     func refresh(hard: Bool = false) async throws {
-        if hard {
-        }
+        if hard {}
 
         match = try await api.getMatchDetail(id: game.id)
-        matchStats = try? await api.getMatchStats(id: game.id)
-
+        
         if let match {
             try await fetchTeam(match)
         }
+        
+        matchStats = (try? await api.getMatchStats(id: game.id)) ?? []
 
         try await refreshPBP()
     }
 
     func refreshPBP() async throws {
-        pbp = try await api.getMatchPBP(id: game.id)
+        let backendEvents = try await api.getMatchEvents(id: game.id)
+        // Use the current match if available, otherwise use the initial game
+        let matchForMapping = match ?? game
+        pbp = PBPEventsAdapter.from(backendEvents: backendEvents, match: matchForMapping)
     }
 
-    func fetchTeam(_ matchDetail: MatchDetail) async throws {
-        home = try? await api.getTeamDetail(id: matchDetail.homeTeam.uuid)
-        away = try? await api.getTeamDetail(id: matchDetail.awayTeam.uuid)
+    func fetchTeam(_ matchDetail: Match) async throws {
+        if let homeId = matchDetail.homeTeam.id {
+            self.home = try? await api.getTeamDetail(id: homeId)
+        }
+        
+        if let awayId = matchDetail.awayTeam.id {
+            self.away = try? await api.getTeamDetail(id: awayId)
+        }
     }
 
     private func listenForLiveGame() {
@@ -69,7 +77,7 @@ class MatchViewModel: ObservableObject {
             cancellable.cancel()
         }
 
-        cancellable = liveListener.subscribe([self.game.id])
+        cancellable = liveListener.subscribe([game.id])
             .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
                 if self?.game.id == event.gameOverview.gameUuid {

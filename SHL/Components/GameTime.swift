@@ -38,7 +38,7 @@ struct GameTime: View {
             }
         } else if let match = game {
             if match.date > Date.now && match.played {
-                Text(match.shootout ? "OT" : match.overtime ? "OT" : "Full")
+                Text((match.shootout ?? false) ? "OT" : (match.overtime ?? false) ? "OT" : "Full")
             } else {
                 let isToday = Calendar.current.isDate(match.date, inSameDayAs: Date())
                 VStack {

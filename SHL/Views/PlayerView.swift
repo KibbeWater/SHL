@@ -5,9 +5,9 @@
 //  Created by Linus Rönnbäck Larsson on 30/9/24.
 //
 
-import SwiftUI
 import HockeyKit
 import Kingfisher
+import SwiftUI
 
 private enum PlayerTabs: String, CaseIterable {
     case statistics = "Statistics"
@@ -19,75 +19,26 @@ struct PlayerView: View {
     
     @StateObject private var viewModel: PlayerViewModel
 
-    let player: LineupPlayer
+    let player: Player
     
     @Binding var teamColor: Color
     
     @State private var selectedTab: PlayerTabs = .statistics
     
-    init(_ player: LineupPlayer, teamColor: Binding<Color>) {
+    init(_ player: Player, teamColor: Binding<Color>) {
         self.player = player
         self._teamColor = teamColor
         self._viewModel = .init(wrappedValue: .init(player))
     }
 
     var statisticsTab: some View {
-        GeometryReader { geo in
-            LazyVGrid(columns: [
-                .init(.flexible(minimum: 10, maximum: geo.size.width)),
-                .init(.flexible(minimum: 10, maximum: geo.size.width)),
-            ]) {
-                if let GAA = viewModel.info?.getStats(for: PlayerStatisticKey.goalsPerHour) {
-                    VStack {
-                        Text(String(GAA))
-                            .font(.title)
-                            .fontWeight(.semibold)
-                        Text("Goals / h")
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding()
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-                if let GPI = viewModel.info?.getStats(for: PlayerStatisticKey.matches) {
-                    VStack {
-                        Text(String(Int(GPI)))
-                            .font(.title)
-                            .fontWeight(.semibold)
-                        Text("Games")
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding()
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-                if let SVS = viewModel.info?.getStats(for: PlayerStatisticKey.saves) {
-                    VStack {
-                        Text(String(Int(SVS)))
-                            .font(.title)
-                            .fontWeight(.semibold)
-                        Text("Saves")
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding()
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-                if let SVSPerc = viewModel.info?.getStats(for: PlayerStatisticKey.savesPercent) {
-                    VStack {
-                        Text("\(Int(SVSPerc))%")
-                            .font(.title)
-                            .fontWeight(.semibold)
-                        Text("Saves %")
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding()
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-            }
+        VStack {
+            Text("Player statistics coming soon")
+                .foregroundColor(.secondary)
+                .padding()
         }
-        .padding(.horizontal)
+        // TODO: Aggregate statistics are not available from the new backend API yet
+        // Will need to either calculate from game logs or wait for backend support
     }
     
     func getHistoryStat(stat: String, item: [PlayerGameLog]) -> some View {
@@ -100,50 +51,33 @@ struct PlayerView: View {
                 Spacer()
             }
             VStack(spacing: 24) {
-                ForEach(item, id: \.self) { stat in
+                ForEach(item, id: \.id) { stat in
                     HStack {
                         VStack {
-                            Image("Team/\(stat.info.teamId.uppercased())")
+                            Image("Team/\("TBD")")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 46, height: 46)
                         }
                         .padding(.trailing, 12)
-                        VStack {
-                            VersusBar("\(String(stat.gamesPlayed ?? 0)) matches (W/L)", homeSide: stat.wins ?? 0, awaySide: stat.losses ?? 0, homeColor: .blue, awayColor: .red)
-                                .fontWeight(.medium)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("TBD")
+                                .fontWeight(.semibold)
+                            HStack {
+                                Text("\(stat.goals)G \(stat.assists)A \(stat.points)P")
+                                    .font(.footnote)
+                                    .foregroundColor(.secondary)
+                            }
                         }
                         Spacer()
+                        Text("TBD")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                     .frame(height: 52)
                     .padding(12)
                     .background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .overlay(alignment: .topTrailing, content: {
-                        switch stat.gameType {
-                        case .regular:
-                            Text("SHL")
-                                .foregroundStyle(.secondary)
-                                .fontWeight(.semibold)
-                                .font(.system(size: 12))
-                                .padding(.horizontal, 16)
-                                .padding(.top, 4)
-                        case .finals:
-                            Text("Finals")
-                                .foregroundStyle(.secondary)
-                                .fontWeight(.semibold)
-                                .font(.footnote)
-                                .padding(.horizontal, 16)
-                                .padding(.top, 4)
-                        case .unknown:
-                            Text("Unknown")
-                                .foregroundStyle(.secondary)
-                                .fontWeight(.semibold)
-                                .font(.footnote)
-                                .padding(.horizontal, 16)
-                                .padding(.top, 4)
-                        }
-                    })
                 }
             }
         }
@@ -153,11 +87,7 @@ struct PlayerView: View {
     var historyTab: some View {
         VStack {
             if !viewModel.stats.isEmpty {
-                let grouping = viewModel.stats.groupBy(keySelector: { $0.season })
-                ForEach(grouping.keys.sorted(by: >), id: \.self) { seasonStat in
-                    let item = grouping[seasonStat]!
-                    getHistoryStat(stat: String(seasonStat), item: item)
-                }
+                getHistoryStat(stat: "Recent Games", item: viewModel.stats)
             } else {
                 ProgressView()
             }
@@ -171,7 +101,7 @@ struct PlayerView: View {
                 .clear,
                 .clear,
             ], startPoint: .top, endPoint: .bottom)
-            .ignoresSafeArea()
+                .ignoresSafeArea()
             
             ScrollView {
                 HStack {
@@ -181,26 +111,36 @@ struct PlayerView: View {
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
                         HStack {
-                            if let jerseyNumber = player.jerseyNumber {
-                                Text(String(jerseyNumber))
-                                    .font(.title3)
-                                    .fontWeight(.medium)
-                                    .frame(height: 22)
-                                if let info = viewModel.info {
-                                    Text(info.position)
-                                        .fontWeight(.medium)
-                                } else {
-                                    ProgressView()
-                                }
-                                Divider()
-                                    .frame(height: 22)
-                            }
+                            Text(String(player.jerseyNumber ?? -1))
+                                .font(.title3)
+                                .fontWeight(.medium)
+                                .frame(height: 22)
                             if let info = viewModel.info {
-                                Image("Team/\(info.team.code.uppercased())")
+                                switch info.position {
+                                case .goalkeeper:
+                                    Text("Goalkeeper")
+                                        .fontWeight(.medium)
+                                case .defense:
+                                    Text("Defense")
+                                        .fontWeight(.medium)
+                                case .forward:
+                                    Text("Forward")
+                                        .fontWeight(.medium)
+                                case .none:
+                                    Text("None")
+                                        .fontWeight(.medium)
+                                }
+                            } else {
+                                ProgressView()
+                            }
+                            Divider()
+                                .frame(height: 22)
+                            if let info = viewModel.info, let team = info.team {
+                                Image("Team/\(team.code.uppercased())")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: 22, height: 22)
-                                Text(info.team.name)
+                                Text(team.name)
                             } else {
                                 ProgressView()
                             }
@@ -210,8 +150,8 @@ struct PlayerView: View {
                     
                     Spacer()
                     
-                    if let _url = player.renderedLatestPortrait?.url {
-                        KFImage(.init(string: _url)!)
+                    if let info = viewModel.info, let imageUrl = info.portraitURL {
+                        KFImage(.init(string: imageUrl)!)
                             .placeholder {
                                 ProgressView()
                                     .frame(width: 72, height: 72)
@@ -258,7 +198,6 @@ struct PlayerView: View {
             }
         }
         .onAppear {
-            viewModel.setAPI(api)
             Task {
                 try? await viewModel.refresh()
             }

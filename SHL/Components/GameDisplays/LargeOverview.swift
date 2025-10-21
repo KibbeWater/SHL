@@ -10,7 +10,7 @@ import SwiftUI
 import HockeyKit
 
 struct LargeOverview: View {
-    var game: Game
+    var game: Match
     var liveGame: GameData.GameOverview?
     
     @State private var homeColor: Color = .black // Default color, updated on appear
@@ -33,15 +33,15 @@ struct LargeOverview: View {
         }
     }
     
-    init(game: Game, liveGame: GameData.GameOverview? = nil) {
+    init(game: Match, liveGame: GameData.GameOverview? = nil) {
         self.game = game
         if game.id == liveGame?.gameUuid {
             self.liveGame = liveGame
         }
     }
-    
+
     func isHomeLeading() -> Bool {
-        liveGame?.homeGoals ?? game.homeTeam.result > liveGame?.awayGoals ?? game.awayTeam.result
+        liveGame?.homeGoals ?? game.homeScore > liveGame?.awayGoals ?? game.awayScore
     }
     
     func isToday() -> Bool {
@@ -63,7 +63,7 @@ struct LargeOverview: View {
                 return Text("Ended")
             }
         } else {
-            return Text(game.shootout ? "Shootout" : game.overtime ? "Overtime" : game.played ? "Full-Time" : isToday() ? game.formatTime() : game.formatDate())
+            return Text((game.shootout ?? false) ? "Shootout" : (game.overtime ?? false) ? "Overtime" : game.played ? "Full-Time" : isToday() ? game.formatTime() : game.formatDate())
                 .fontWeight(.medium)
         }
     }
@@ -76,7 +76,7 @@ struct LargeOverview: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 128, height: 128)
-                    Text(String(liveGame?.homeGoals ?? game.homeTeam.result))
+                    Text(String(liveGame?.homeGoals ?? game.homeScore))
                         .font(.system(size: 100))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
@@ -93,7 +93,7 @@ struct LargeOverview: View {
                 }
                 Spacer()
                 HStack(spacing: 34) {
-                    Text(String(liveGame?.awayGoals ?? game.awayTeam.result))
+                    Text(String(liveGame?.awayGoals ?? game.awayScore))
                         .font(.system(size: 100))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
@@ -172,7 +172,7 @@ struct LargeOverview: View {
 
 #Preview {
     VStack {
-        LargeOverview(game: .fakeData())
+        LargeOverview(game: Match.fakeData())
         Spacer()
     }
 }

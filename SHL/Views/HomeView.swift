@@ -5,30 +5,30 @@
 //  Created by KibbeWater on 12/30/23.
 //
 
-import SwiftUI
-import PostHog
-import HockeyKit
 import ActivityKit
+import HockeyKit
+import PostHog
+import SwiftUI
 
 public struct LiveGame {
     public var id: String
     public var homeTeam: LiveTeam
     public var awayTeam: LiveTeam
     public var time: LiveTime
-    
-    init (game: Game) {
+
+    init(game: Match) {
         self.id = game.id
-        self.homeTeam = LiveTeam(name: game.homeTeam.name, code: game.homeTeam.code, score: game.homeTeam.result)
-        self.awayTeam = LiveTeam(name: game.awayTeam.name, code: game.awayTeam.code, score: game.awayTeam.result)
+        self.homeTeam = LiveTeam(name: game.homeTeam.name, code: game.homeTeam.code, score: game.homeScore)
+        self.awayTeam = LiveTeam(name: game.awayTeam.name, code: game.awayTeam.code, score: game.awayScore)
         self.time = LiveTime(period: 0, time: "00:00")
     }
-    
+
     public struct LiveTeam {
         public var name: String
         public var code: String
         public var score: Int
     }
-    
+
     public struct LiveTime {
         public var period: Int
         public var time: String
@@ -38,17 +38,15 @@ public struct LiveGame {
 struct HomeView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.scenePhase) private var scenePhase
-    
-    @Environment(\.hockeyAPI) private var hockeyApi: HockeyAPI
-    
-    @StateObject private var viewModel: HomeViewModel = HomeViewModel()
+
+    @StateObject private var viewModel: HomeViewModel = .init()
     
     @State private var sortOrder = [KeyPathComparator(\StandingObj.position)]
     
-    @State private var date: Date = Date()
+    @State private var date: Date = .init()
     @State private var center: CGPoint = .zero
     
-    func renderFeaturedGame(_ featured: Game) -> some View {
+    func renderFeaturedGame(_ featured: Match) -> some View {
         let content: some View = {
             if UIDevice.current.userInterfaceIdiom == .pad {
                 return AnyView(
@@ -89,7 +87,7 @@ struct HomeView: View {
                         "is_preferred_team": await FeaturedGameContainsPreferredTeam(),
                     ],
                     userProperties: [
-                        "preferred_team": Settings.shared.getPreferredTeam() ?? "N/A"
+                        "preferred_team": Settings.shared.getPreferredTeam() ?? "N/A",
                     ]
                 )
             }
@@ -100,24 +98,24 @@ struct HomeView: View {
         guard let preferredId = Settings.shared.getPreferredTeam() else {
             return false
         }
-        
+
         guard let featuredGame = viewModel.featuredGame else {
             return false
         }
-        
-        guard let preferredTeam = try? await hockeyApi.team.getTeam(withId: preferredId) else {
+
+        guard let preferredTeam = try? await SHLAPIClient.shared.getTeamDetail(id: preferredId) else {
             return false
         }
-        
-        return featuredGame.homeTeam.code.lowercased() == preferredTeam.teamNames.code.lowercased() || featuredGame.awayTeam.code.lowercased() == preferredTeam.teamNames.code.lowercased()
+
+        return featuredGame.homeTeam.code.lowercased() == preferredTeam.code.lowercased() || featuredGame.awayTeam.code.lowercased() == preferredTeam.code.lowercased()
     }
     
     func getTimeLoop() -> Double {
         let precision: Double = 10000
         if UIDevice.current.userInterfaceIdiom == .pad {
-            return Double(Int((date.timeIntervalSinceNow * -1)*precision)%(4*Int(precision)))/precision
+            return Double(Int((date.timeIntervalSinceNow * -1)*precision)%(4*Int(precision))) / precision
         } else {
-            return Double(Int((date.timeIntervalSinceNow * -1)*precision)%(3*Int(precision)))/precision
+            return Double(Int((date.timeIntervalSinceNow * -1)*precision)%(3*Int(precision))) / precision
         }
     }
     
@@ -134,7 +132,7 @@ struct HomeView: View {
             VStack(spacing: 12) {
                 MatchCalendar(
                     matches: Array(viewModel.latestMatches
-                        .filter({ !$0.played })
+                        .filter { !$0.played }
                         .sorted(by: { $0.date < $1.date })
                         .prefix(5)
                     )
@@ -199,14 +197,12 @@ struct HomeView: View {
                     }
                 }
             } else {
-                HStack {
-                    
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 96)
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                .padding(.horizontal)
+                HStack {}
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 96)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                    .padding(.horizontal)
             }
             
             VStack(spacing: 24) {
@@ -220,18 +216,13 @@ struct HomeView: View {
             guard let featured = viewModel.featuredGame else { return }
             viewModel.selectListenedGame(featured)
         }
-        .onChange(of: scenePhase) { _, _ in
-            hockeyApi.listener.connect()
-        }
         .refreshable {
-            try? await viewModel.refresh(hard: true)
-        }
-        .onAppear {
-            viewModel.setAPI(hockeyApi)
-            Task {
-                try? await viewModel.refresh()
+            do {
+                try await viewModel.refresh(hard: true)
+            } catch let err {
+                print("HomeView: Error refreshing: ", err)
             }
-        }
+         }
         .ignoresSafeArea(
             .container,
             edges: UIDevice.current.userInterfaceIdiom == .pad ? .all : .horizontal
@@ -256,5 +247,4 @@ extension HomeView {
 
 #Preview {
     HomeView()
-        .environment(\.hockeyAPI, HockeyAPI())
 }

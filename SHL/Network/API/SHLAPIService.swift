@@ -10,26 +10,29 @@ import Moya
 
 enum SHLAPIService {
     // Match endpoints
-    case latestMatches
+    case latestMatches(page: Int, limit: Int)
+    case liveMatches
     case matchDetail(id: String)
     case matchStats(id: String)
-    case matchPBP(id: String)
-    case schedule(seasonId: String, seriesId: String, teamIds: [String]?)
+    case matchEvents(id: String)
+    case seasonMatches(seasonCode: String)
+    case recentMatches(limit: Int = 10)
 
     // Team endpoints
     case teams
     case teamDetail(id: String)
-    case teamLineup(id: String)
+    case teamRoster(id: String)
+    case teamMatches(id: String)
 
     // Player endpoints
     case playerDetail(id: String)
-    case playerGameLog(id: String)
+    case playerStats(id: String)
 
     // Season/League endpoints
     case currentSeason
-    case currentSsgt
-    case standings(ssgtUuid: String)
-    case currentSeries
+    case allSeasons
+    case standings(seasonId: String)
+    case currentStandings
 }
 
 extension SHLAPIService: TargetType {
@@ -43,39 +46,42 @@ extension SHLAPIService: TargetType {
         switch self {
         // Match paths
         case .latestMatches:
-            return "/api/matches/latest"
-        case .matchDetail(let id):
-            return "/api/matches/\(id)"
-        case .matchStats(let id):
-            return "/api/matches/\(id)/stats"
-        case .matchPBP(let id):
-            return "/api/matches/\(id)/pbp"
-        case .schedule:
-            return "/api/matches/schedule"
-
+            return "/api/v1/matches"
+        case .liveMatches:
+            return "/api/v1/matches/live"
+        case let .matchDetail(id):
+            return "/api/v1/matches/\(id)"
+        case let .matchStats(id):
+            return "/api/v1/matches/\(id)/stats"
+        case let .matchEvents(id):
+            return "/api/v1/matches/\(id)/events"
+        case let .seasonMatches(seasonCode):
+            return "/api/v1/matches/season/\(seasonCode)"
+        case .recentMatches(_):
+            return "/api/v1/matches/recent"
         // Team paths
         case .teams:
-            return "/api/teams"
-        case .teamDetail(let id):
-            return "/api/teams/\(id)"
-        case .teamLineup(let id):
-            return "/api/teams/\(id)/lineup"
-
+            return "/api/v1/teams"
+        case let .teamDetail(id):
+            return "/api/v1/teams/\(id)"
+        case let .teamRoster(id):
+            return "/api/v1/teams/\(id)/roster"
+        case let .teamMatches(id):
+            return "/api/v1/teams/\(id)/matches"
         // Player paths
-        case .playerDetail(let id):
-            return "/api/players/\(id)"
-        case .playerGameLog(let id):
-            return "/api/players/\(id)/gamelog"
-
+        case let .playerDetail(id):
+            return "/api/v1/players/\(id)"
+        case let .playerStats(id):
+            return "/api/v1/players/\(id)/stats"
         // Season/League paths
         case .currentSeason:
-            return "/api/seasons/current"
-        case .currentSsgt:
-            return "/api/seasons/current/ssgt"
-        case .standings(let ssgtUuid):
-            return "/api/standings/\(ssgtUuid)"
-        case .currentSeries:
-            return "/api/series/current"
+            return "/api/v1/seasons/current"
+        case .allSeasons:
+            return "/api/v1/seasons"
+        case let .standings(seasonId):
+            return "/api/v1/standings/\(seasonId)"
+        case .currentStandings:
+            return "/api/v1/standings"
         }
     }
 
@@ -85,15 +91,13 @@ extension SHLAPIService: TargetType {
 
     var task: Task {
         switch self {
-        case .schedule(let seasonId, let seriesId, let teamIds):
-            var params: [String: Any] = [
-                "seasonId": seasonId,
-                "seriesId": seriesId
-            ]
-            if let teamIds = teamIds, !teamIds.isEmpty {
-                params["teamIds"] = teamIds
-            }
-            return .requestParameters(parameters: params, encoding: URLEncoding.queryString)
+        case let .latestMatches(page, limit):
+            return .requestParameters(
+                parameters: ["page": page, "limit": limit],
+                encoding: URLEncoding.queryString
+            )
+        case let .recentMatches(limit):
+            return .requestParameters(parameters: ["upcoming": limit], encoding: URLEncoding.queryString)
         default:
             return .requestPlain
         }
@@ -102,7 +106,7 @@ extension SHLAPIService: TargetType {
     var headers: [String: String]? {
         return [
             "Content-Type": "application/json",
-            "Accept": "application/json"
+            "Accept": "application/json",
         ]
     }
 

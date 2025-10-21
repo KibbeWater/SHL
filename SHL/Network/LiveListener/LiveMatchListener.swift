@@ -5,17 +5,17 @@
 //  Created by Migration Script
 //
 
+import Combine
 import Foundation
 import HockeyKit
-import Combine
 
 /// Wrapper class for HockeyKit's live match listener functionality.
 /// This is the ONLY class that should import and use HockeyKit in the app.
 class LiveMatchListener: ObservableObject {
-    private let listener: HockeyKit.Listener
+    private let listener: ListenerServiceProtocol
 
     init() {
-        self.listener = HockeyKit.Listener()
+        self.listener = HockeyAPI().listener
     }
 
     /// Subscribe to live updates for specific match IDs

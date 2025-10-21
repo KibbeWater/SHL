@@ -6,19 +6,18 @@
 //
 
 import Foundation
-import HockeyKit
 import SwiftUI
 
 @MainActor
 class TeamViewModel: ObservableObject {
     private let api = SHLAPIClient.shared
-    private var team: TeamDetail
+    private var team: Team
 
-    @Published var lineup: TeamLineup? = nil
+    @Published var lineup: [Player] = []
     @Published var history: [Match] = []
-    @Published var standings: Standings? = nil
+    @Published var standings: [Standings] = []
 
-    init(_ team: TeamDetail) {
+    init(_ team: Team) {
         self.team = team
 
         Task {
@@ -27,14 +26,8 @@ class TeamViewModel: ObservableObject {
     }
 
     func refresh() async throws  {
-        self.lineup = try? await api.getTeamLineup(id: team.id)
-        if let ssgtUuid = try? await api.getCurrentSsgt() {
-            self.standings = try? await api.getStandings(ssgtUuid: ssgtUuid)
-        }
-        if let season = try? await api.getCurrentSeason() {
-            guard let series = try? await api.getCurrentSeries() else { return }
-
-            self.history = (try? await api.getSchedule(seasonId: season.id, seriesId: series.id, teamIds: [team.id])) ?? []
-        }
+        self.lineup = (try? await api.getTeamRoster(id: team.id)) ?? []
+        self.standings = (try? await api.getCurrentStandings()) ?? []
+        self.history = (try? await api.getTeamMatches(id: team.id)) ?? []
     }
 }

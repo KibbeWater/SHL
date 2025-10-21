@@ -25,22 +25,10 @@ extension Match {
             ),
             homeScore: 3,
             awayScore: 2,
-            gameState: .played,
+            state: .played,
             overtime: true,
             shootout: false
         )
-    }
-
-    func formatTime() -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
-    }
-
-    func formatDate() -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        return formatter.string(from: date)
     }
 }
 
@@ -52,6 +40,11 @@ extension Team {
             code: "IKO",
             city: "Oskarshamn",
             founded: 1970,
+            venue: "Coop Norrbottens Arena",
+            golds: 2,
+            goldYears: [2024],
+            finals: 2,
+            finalYears: [2020, 2024],
             isActive: true
         )
     }

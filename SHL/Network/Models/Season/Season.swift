@@ -9,8 +9,10 @@ import Foundation
 
 struct Season: Codable, Identifiable {
     let id: String
+    let externalUUID: String
+    let code: String
     let name: String
-    let startDate: Date
-    let endDate: Date
+    let startDate: Date?
+    let endDate: Date?
     let isCurrent: Bool
 }

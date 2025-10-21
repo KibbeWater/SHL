@@ -8,11 +8,26 @@
 import Foundation
 
 struct MatchStats: Codable {
-    let matchId: String
-    let homeTeamStats: TeamStats
-    let awayTeamStats: TeamStats
-    let homePlayerStats: [PlayerMatchStats]?
-    let awayPlayerStats: [PlayerMatchStats]?
+    let id: String
+    let matchID: String
+    let teamID: String
+
+    // Core statistics
+    let goals: Int
+    let shotsOnGoal: Int
+    let saves: Int
+    let faceoffsWon: Int
+
+    // Extended statistics
+    let faceoffsLost: Int?
+    let penaltyMinutes: Int?
+    let powerplayGoals: Int?
+    let powerplayOpportunities: Int?
+    let hits: Int?
+    let blockedShots: Int?
+
+    // Flexible storage for all raw statistics
+    let extraStats: [String: Int]?
 }
 
 struct TeamStats: Codable {

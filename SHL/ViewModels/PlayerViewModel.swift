@@ -12,12 +12,12 @@ import SwiftUI
 @MainActor
 class PlayerViewModel: ObservableObject {
     private let api = SHLAPIClient.shared
-    private var player: LineupPlayer
+    private var player: Player
 
     @Published var info: Player? = nil
     @Published var stats: [PlayerGameLog] = []
 
-    init(_ player: LineupPlayer) {
+    init(_ player: Player) {
         self.player = player
 
         Task {
@@ -26,9 +26,9 @@ class PlayerViewModel: ObservableObject {
     }
 
     func refresh() async throws {
-        self.info = try await api.getPlayerDetail(id: player.uuid)
+        self.info = try await api.getPlayerDetail(id: player.id)
         if let info {
-            self.stats = (try? await api.getPlayerGameLog(id: info.id)) ?? []
+            self.stats = (try? await api.getPlayerStats(id: info.id)) ?? []
         }
     }
 }

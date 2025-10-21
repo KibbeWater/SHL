@@ -12,7 +12,7 @@ enum RootTabs: Equatable, Hashable, Identifiable {
     case home
     case calendar
     case settings
-    case team(TeamDetail)
+    case team(Team)
 
     var id: String {
         switch self {
@@ -34,7 +34,7 @@ struct Root: View {
 
     @State private var selectedTab: RootTabs = .home
 
-    @State private var teams: [TeamDetail] = []
+    @State private var teams: [Team] = []
     
     var body: some View {
         ZStack {
@@ -126,9 +126,7 @@ struct Root: View {
                 )
                 .task {
                     do {
-                        if let ssgtUuid = try? await api.getCurrentSsgt() {
-                            let _ = try? await api.getStandings(ssgtUuid: ssgtUuid)
-                        }
+                        let _ = try? await api.getCurrentStandings()
                     } catch let _err {
                         print(_err)
                     }
@@ -150,21 +148,7 @@ struct Root: View {
             do {
                 // Get basic teams, then fetch details for each
                 let basicTeams = try await api.getTeams()
-                teams = try await withThrowingTaskGroup(of: TeamDetail?.self) { group in
-                    for team in basicTeams {
-                        group.addTask {
-                            try? await api.getTeamDetail(id: team.id)
-                        }
-                    }
-
-                    var details: [TeamDetail] = []
-                    for try await detail in group {
-                        if let detail = detail {
-                            details.append(detail)
-                        }
-                    }
-                    return details
-                }
+                teams = try await api.getTeams()
             } catch let _err {
                 print(_err)
             }

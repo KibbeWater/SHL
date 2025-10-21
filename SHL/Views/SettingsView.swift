@@ -10,21 +10,22 @@ import HockeyKit
 
 struct SettingsView: View {
     @Environment(\.openURL) var openURL
-    @Environment(\.hockeyAPI) var hockeyApi: HockeyAPI
     
     @ObservedObject private var settings = Settings.shared
     
     @State private var selectedTeam: String? = nil
-    @State private var teams: [SiteTeam] = []
+    @State private var teams: [Team] = []
     @State private var teamsLoaded: Bool = false
     
     @CloudStorage(key: "preferredTeam", default: "")
     private var _preferredTeam: String
     
+    private let api = SHLAPIClient.shared
+    
     func loadTeams() {
         Task {
-            if let newTeams = try? await hockeyApi.team.getTeams() {
-                teams = newTeams.sorted(by: { ($0.teamNames.long) ?? "" < ($1.teamNames.long) ?? "" })
+            if let newTeams = try? await api.getTeams() {
+                teams = newTeams.sorted(by: { ($0.name) < ($1.name) })
                 teamsLoaded = true
             }
         }
@@ -39,7 +40,7 @@ struct SettingsView: View {
                             .tag("")
                         ForEach(teams.filter({ !$0.id.isEmpty })) { team in
                             HStack {
-                                Text(team.teamNames.long ?? "")
+                                Text(team.name)
                                 /*Image("Team/\(team.names.code.uppercased())")
                                     .resizable()
                                     .frame(width: 16, height: 16)*/

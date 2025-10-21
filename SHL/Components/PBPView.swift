@@ -9,15 +9,15 @@ import SwiftUI
 import HockeyKit
 
 struct PBPView: View {
-    var events: PBPEvents
+    var events: PBPEventsAdapter
     var shouldReverse: Bool
-    
+
     var body: some View {
         ForEach(events.events.indices, id: \.self) { _ev in
             let idx = !shouldReverse ? _ev : (events.events.count-1) - _ev
             let ev = events.events[idx]
             
-            if let _goalkeeperEvent = ev as? GoalkeeperEvent {
+            if let _goalkeeperEvent = ev as? AdaptedGoalkeeperEvent {
                 HStack {
                     if _goalkeeperEvent.eventTeam.place == .home {
                         VStack {
@@ -52,7 +52,7 @@ struct PBPView: View {
                 .padding(8)
                 .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-            } else if let _penaltyEvent = ev as? PenaltyEvent {
+            } else if let _penaltyEvent = ev as? AdaptedPenaltyEvent {
                 HStack {
                     if _penaltyEvent.eventTeam.place == .home {
                         VStack {
@@ -92,7 +92,7 @@ struct PBPView: View {
                 .padding(8)
                 .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-            } else if let _shotEvent = ev as? ShotEvent {
+            } else if let _shotEvent = ev as? AdaptedShotEvent {
                 HStack {
                     if _shotEvent.eventTeam.place == .home {
                         VStack {
@@ -127,7 +127,7 @@ struct PBPView: View {
                 .padding(8)
                 .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-            } else if let _periodEvent = ev as? PeriodEvent {
+            } else if let _periodEvent = ev as? AdaptedPeriodEvent {
                 if _periodEvent.finished {
                     Text("Period \(_periodEvent.period) ended")
                         .font(.title2)
@@ -139,7 +139,7 @@ struct PBPView: View {
                         .fontWeight(.semibold)
                         .padding(.vertical)
                 }
-            } else if let _goalEvent = ev as? GoalEvent {
+            } else if let _goalEvent = ev as? AdaptedGoalEvent {
                 HStack {
                     VStack {
                         HStack {
@@ -173,7 +173,7 @@ struct PBPView: View {
                 .padding(.leading)
                 .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-            } else if let _timeoutEvent = ev as? TimeoutEvent {
+            } else if let _timeoutEvent = ev as? AdaptedTimeoutEvent {
                 HStack {
                     VStack {
                         HStack {

@@ -21,9 +21,9 @@ class SHLAPIClient {
 
         // Configure provider with plugins
         #if DEBUG
-        let plugins: [PluginType] = [NetworkLoggerPlugin(verbose: true)]
+            let plugins: [PluginType] = [NetworkLoggerPlugin(verbose: true)]
         #else
-        let plugins: [PluginType] = []
+            let plugins: [PluginType] = []
         #endif
 
         provider = MoyaProvider<SHLAPIService>(plugins: plugins)
@@ -32,23 +32,32 @@ class SHLAPIClient {
     // MARK: - Match Endpoints
 
     func getLatestMatches() async throws -> [Match] {
-        try await request(.latestMatches)
+        let response: PaginatedResponse<Match> = try await request(.latestMatches(page: 1, limit: 20))
+        return response.data
     }
 
-    func getMatchDetail(id: String) async throws -> MatchDetail {
+    func getLiveMatches() async throws -> [Match] {
+        try await request(.liveMatches)
+    }
+
+    func getMatchDetail(id: String) async throws -> Match {
         try await request(.matchDetail(id: id))
     }
 
-    func getMatchStats(id: String) async throws -> MatchStats {
+    func getMatchStats(id: String) async throws -> [MatchStats] {
         try await request(.matchStats(id: id))
     }
 
-    func getMatchPBP(id: String) async throws -> PBPEvents {
-        try await request(.matchPBP(id: id))
+    func getMatchEvents(id: String) async throws -> [PBPEvent] {
+        try await request(.matchEvents(id: id))
     }
 
-    func getSchedule(seasonId: String, seriesId: String, teamIds: [String]? = nil) async throws -> [Match] {
-        try await request(.schedule(seasonId: seasonId, seriesId: seriesId, teamIds: teamIds))
+    func getSeasonMatches(seasonCode: String) async throws -> [Match] {
+        try await request(.seasonMatches(seasonCode: seasonCode))
+    }
+
+    func getRecentMatches(limit: Int = 10) async throws -> RecentMatchesResponse {
+        try await request(.recentMatches(limit: limit))
     }
 
     // MARK: - Team Endpoints
@@ -57,12 +66,16 @@ class SHLAPIClient {
         try await request(.teams)
     }
 
-    func getTeamDetail(id: String) async throws -> TeamDetail {
+    func getTeamDetail(id: String) async throws -> Team {
         try await request(.teamDetail(id: id))
     }
 
-    func getTeamLineup(id: String) async throws -> TeamLineup {
-        try await request(.teamLineup(id: id))
+    func getTeamRoster(id: String) async throws -> [Player] {
+        try await request(.teamRoster(id: id))
+    }
+
+    func getTeamMatches(id: String) async throws -> [Match] {
+        try await request(.teamMatches(id: id))
     }
 
     // MARK: - Player Endpoints
@@ -71,8 +84,8 @@ class SHLAPIClient {
         try await request(.playerDetail(id: id))
     }
 
-    func getPlayerGameLog(id: String) async throws -> [PlayerGameLog] {
-        try await request(.playerGameLog(id: id))
+    func getPlayerStats(id: String) async throws -> [PlayerGameLog] {
+        try await request(.playerStats(id: id))
     }
 
     // MARK: - Season/League Endpoints
@@ -81,17 +94,16 @@ class SHLAPIClient {
         try await request(.currentSeason)
     }
 
-    func getCurrentSsgt() async throws -> String {
-        let response: SsgtResponse = try await request(.currentSsgt)
-        return response.ssgtUuid
+    func getAllSeasons() async throws -> [Season] {
+        try await request(.allSeasons)
     }
 
-    func getStandings(ssgtUuid: String) async throws -> Standings {
-        try await request(.standings(ssgtUuid: ssgtUuid))
+    func getStandings(seasonId: String) async throws -> [Standings] {
+        try await request(.standings(seasonId: seasonId))
     }
 
-    func getCurrentSeries() async throws -> Series {
-        try await request(.currentSeries)
+    func getCurrentStandings() async throws -> [Standings] {
+        try await request(.currentStandings)
     }
 
     // MARK: - Private Helper Methods
@@ -105,10 +117,10 @@ class SHLAPIClient {
                 }
 
                 switch result {
-                case .success(let response):
+                case let .success(response):
                     do {
                         // Check status code
-                        guard (200..<300).contains(response.statusCode) else {
+                        guard (200 ..< 300).contains(response.statusCode) else {
                             let error = SHLAPIError.map(statusCode: response.statusCode, data: response.data)
                             continuation.resume(throwing: error)
                             return
@@ -123,7 +135,7 @@ class SHLAPIClient {
                         continuation.resume(throwing: SHLAPIError.invalidResponse)
                     }
 
-                case .failure(let error):
+                case let .failure(error):
                     continuation.resume(throwing: SHLAPIError.networkError(underlying: error))
                 }
             }
@@ -133,6 +145,9 @@ class SHLAPIClient {
 
 // MARK: - Helper Response Types
 
-private struct SsgtResponse: Codable {
-    let ssgtUuid: String
+struct PaginatedResponse<T: Decodable>: Decodable {
+    let data: [T]
+    let page: Int
+    let limit: Int
+    let total: Int
 }

@@ -6,10 +6,9 @@
 //
 
 import SwiftUI
-import HockeyKit
 
 struct MatchCalendar: View {
-    var matches: [Game]
+    var matches: [Match]
     
     var body: some View {
         ForEach(matches.filter({!$0.played})) { match in
@@ -63,9 +62,9 @@ struct MatchCalendar: View {
 
 #Preview {
     MatchCalendar(matches: [
-        .fakeData(),
-        .fakeData(),
-        .fakeData(),
-        .fakeData(),
+        Match.fakeData(),
+        Match.fakeData(),
+        Match.fakeData(),
+        Match.fakeData(),
     ])
 }

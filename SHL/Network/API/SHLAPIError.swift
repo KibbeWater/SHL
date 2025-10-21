@@ -40,7 +40,9 @@ enum SHLAPIError: Error, LocalizedError {
 
     var isRetryable: Bool {
         switch self {
-        case .networkError, .serverError, .httpError(let code, _):
+        case .networkError, .serverError:
+            return true
+        case .httpError(let code, _):
             return code >= 500 && code < 600
         default:
             return false
