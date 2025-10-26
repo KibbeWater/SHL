@@ -13,7 +13,7 @@ import SwiftUI
 @MainActor
 class HomeViewModel: ObservableObject {
     private let api = SHLAPIClient.shared
-    private let liveListener = LiveMatchListener()
+    private let liveListener = LiveMatchListener.shared
 
     @Published var featuredGame: Match? = nil
     @Published var liveGame: GameData? = nil

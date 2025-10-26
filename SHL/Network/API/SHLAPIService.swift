@@ -12,6 +12,8 @@ enum SHLAPIService {
     // Match endpoints
     case latestMatches(page: Int, limit: Int)
     case liveMatches
+    case getLiveMatch(id: String)
+    case getLiveExternal(id: String)
     case matchDetail(id: String)
     case matchStats(id: String)
     case matchEvents(id: String)
@@ -49,6 +51,10 @@ extension SHLAPIService: TargetType {
             return "/api/v1/matches"
         case .liveMatches:
             return "/api/v1/matches/live"
+        case let .getLiveMatch(id):
+            return "/api/v1/live/\(id)"
+        case let .getLiveExternal(id):
+            return "/api/v1/live/\(id)/external"
         case let .matchDetail(id):
             return "/api/v1/matches/\(id)"
         case let .matchStats(id):
@@ -86,7 +92,10 @@ extension SHLAPIService: TargetType {
     }
 
     var method: Moya.Method {
-        return .get
+        switch self {
+        default:
+            return .get
+        }
     }
 
     var task: Task {

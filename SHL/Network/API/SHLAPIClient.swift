@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HockeyKit
 import Moya
 
 class SHLAPIClient {
@@ -38,6 +39,15 @@ class SHLAPIClient {
 
     func getLiveMatches() async throws -> [Match] {
         try await request(.liveMatches)
+    }
+    
+    func getLiveMatch(id: String) async throws -> LiveMatch {
+        try await request(.getLiveMatch(id: id))
+    }
+    
+    func getLiveExternal(id: String) async throws -> HockeyKit.GameData {
+        let data: GameDataResponse = try await request(.getLiveExternal(id: id))
+        return data.data
     }
 
     func getMatchDetail(id: String) async throws -> Match {

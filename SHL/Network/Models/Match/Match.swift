@@ -18,6 +18,7 @@ struct Match: Codable, Identifiable, Equatable {
     let state: MatchState
     let overtime: Bool?
     let shootout: Bool?
+    let externalUUID: String
 
     var played: Bool {
         state == .played

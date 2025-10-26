@@ -13,7 +13,7 @@ import SwiftUI
 @MainActor
 class MatchViewModel: ObservableObject {
     private let api = SHLAPIClient.shared
-    private let liveListener = LiveMatchListener()
+    private let liveListener = LiveMatchListener.shared
 
     @Published var match: Match? = nil
     @Published var matchStats: [MatchStats] = []
@@ -45,11 +45,14 @@ class MatchViewModel: ObservableObject {
         if hard {}
 
         match = try await api.getMatchDetail(id: game.id)
-        
+
         if let match {
             try await fetchTeam(match)
+            if match.isLive(), let live = try? await api.getLiveExternal(id: match.externalUUID) {
+                liveGame = live
+            }
         }
-        
+
         matchStats = (try? await api.getMatchStats(id: game.id)) ?? []
 
         try await refreshPBP()
@@ -64,11 +67,11 @@ class MatchViewModel: ObservableObject {
 
     func fetchTeam(_ matchDetail: Match) async throws {
         if let homeId = matchDetail.homeTeam.id {
-            self.home = try? await api.getTeamDetail(id: homeId)
+            home = try? await api.getTeamDetail(id: homeId)
         }
-        
+
         if let awayId = matchDetail.awayTeam.id {
-            self.away = try? await api.getTeamDetail(id: awayId)
+            away = try? await api.getTeamDetail(id: awayId)
         }
     }
 
@@ -77,10 +80,10 @@ class MatchViewModel: ObservableObject {
             cancellable.cancel()
         }
 
-        cancellable = liveListener.subscribe([game.id])
+        cancellable = liveListener.subscribe([game.externalUUID])
             .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
-                if self?.game.id == event.gameOverview.gameUuid {
+                if self?.game.externalUUID == event.gameOverview.gameUuid {
                     self?.liveGame = event
                 }
             }

@@ -110,9 +110,8 @@ public class ActivityUpdater {
     }
     
     func updatePushToken(_ matchUUID: String, token: String) {
-        var json: [String: Any] = ["deviceUUID": deviceUUID.uuidString,
-                                   "token": token,
-                                   "matchId": matchUUID]
+        var json: [String: Any] = ["token": token,
+                                   "deviceUUID": deviceUUID.uuidString]
         
         #if DEBUG
         json["environment"] = "development"
@@ -121,7 +120,7 @@ public class ActivityUpdater {
         let jsonData = try? JSONSerialization.data(withJSONObject: json)
 
         // create post request
-        let url = URL(string: "https://shl.lrlnet.se/api/register")!
+        let url = URL(string: "https://api.lrlnet.se/api/v1/live/\(matchUUID)")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 

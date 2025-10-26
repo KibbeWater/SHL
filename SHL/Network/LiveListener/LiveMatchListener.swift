@@ -13,9 +13,12 @@ import HockeyKit
 /// This is the ONLY class that should import and use HockeyKit in the app.
 class LiveMatchListener: ObservableObject {
     private let listener: ListenerServiceProtocol
+    static var shared: LiveMatchListener = .init()
+    private var cancellables: Set<AnyCancellable> = []
 
     init() {
         self.listener = HockeyAPI().listener
+        listener.connect()
     }
 
     /// Subscribe to live updates for specific match IDs

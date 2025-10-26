@@ -5,8 +5,8 @@
 //  Created by Linus Rönnbäck Larsson on 3/3/25.
 //
 
-import SwiftUI
 import HockeyKit
+import SwiftUI
 
 struct GameTime: View {
     let game: Match?
@@ -21,14 +21,19 @@ struct GameTime: View {
         self.liveGame = game
         self.game = nil
     }
-    
+
     var body: some View {
         if let _game = liveGame {
             switch _game.gameOverview.state {
             case .starting:
                 Text("0:00")
             case .ongoing:
-                Text(_game.gameOverview.time.periodTime)
+                Text(
+                    timerInterval: Date.now ... max(Date.now, _game.gameOverview.time.periodEnd ?? Date.now),
+                    pauseTime: Date.now,
+                    countsDown: true,
+                    showsHours: false
+                )
             case .onbreak:
                 Text("Break")
             case .overtime:

@@ -12,6 +12,7 @@
 		8020C25D2D7644D500F1FB5E /* ScrollPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */; };
 		8020C25F2D7644D500F1FB5E /* ScrollPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */; };
 		8020C2622D7651A500F1FB5E /* GameTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C2602D7651A500F1FB5E /* GameTime.swift */; };
+		802AD93B2EACFF1100916E9F /* LiveMatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AD93A2EACFF0D00916E9F /* LiveMatch.swift */; };
 		802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802B98E72BD06C6800278A00 /* MatchCalendar.swift */; };
 		803B84242DB3FE98002A15DC /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 803B84232DB3FE98002A15DC /* Kingfisher */; };
 		804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804316232BDCFFA5007D1D9A /* AppIntent.swift */; };
@@ -124,6 +125,7 @@
 		800F320D2C00D1300069E436 /* Sequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequence.swift; sourceTree = "<group>"; };
 		8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollPosition.swift; sourceTree = "<group>"; };
 		8020C2602D7651A500F1FB5E /* GameTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTime.swift; sourceTree = "<group>"; };
+		802AD93A2EACFF0D00916E9F /* LiveMatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveMatch.swift; sourceTree = "<group>"; };
 		802B98E72BD06C6800278A00 /* MatchCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCalendar.swift; sourceTree = "<group>"; };
 		804316232BDCFFA5007D1D9A /* AppIntent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
 		804316252BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetUpcoming.swift; sourceTree = "<group>"; };
@@ -289,6 +291,7 @@
 		806DBDFD2EA401FA00E07695 /* Match */ = {
 			isa = PBXGroup;
 			children = (
+				802AD93A2EACFF0D00916E9F /* LiveMatch.swift */,
 				806DBDF92EA401FA00E07695 /* Match.swift */,
 				806DBDFB2EA401FA00E07695 /* MatchStats.swift */,
 				806DBDFC2EA401FA00E07695 /* PBPEvents.swift */,
@@ -736,6 +739,7 @@
 				BCD7BC152BAF69D500E208B3 /* Root.swift in Sources */,
 				8075FBB42CA62706004C6438 /* GameExtensions.swift in Sources */,
 				BCAFE2CE2B4095170044225A /* SHLApp.swift in Sources */,
+				802AD93B2EACFF1100916E9F /* LiveMatch.swift in Sources */,
 				BCFA44AB2B44C06700B4358C /* StandingsTable.swift in Sources */,
 				804EC8282CFC0B070096CA0D /* HockeyAPIKey.swift in Sources */,
 				BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */,

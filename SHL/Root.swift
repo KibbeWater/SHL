@@ -178,21 +178,21 @@ struct Root: View {
             return
         }
         
-        guard (components.queryItems?.first(where: { $0.name == "id" })?.value) != nil else {
-            print("Hello")
+        guard let gameId = components.queryItems?.first(where: { $0.name == "id" })?.value else {
             return
         }
         
         // TODO: Find Games based on ID and display it
-        /* Task {
-            guard let game = try? await hockeyApi.match.getMatchExtra(matchId) else {
+        Task { // shltracker:open-game?id=0BC4115B-A6F8-49E4-A9A4-57C0120ECDA9
+            guard let game = try? await api.getMatchDetail(id: gameId) else {
                 print("Unable to find game")
                 return
             }
+            
             selectedTab = .home
-            openedGame = MatchView(match: Game(game))
+            openedGame = MatchView(game, referrer: "url-schema")
             isGameOpen = true
-        } */
+        }
     }
 }
 

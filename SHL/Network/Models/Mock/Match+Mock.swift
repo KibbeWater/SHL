@@ -27,7 +27,7 @@ extension Match {
             awayScore: 2,
             state: .played,
             overtime: true,
-            shootout: false
+            shootout: false, externalUUID: ""
         )
     }
 }

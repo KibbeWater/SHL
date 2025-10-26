@@ -60,27 +60,30 @@ struct SHLWidgetLiveActivity: Widget {
                                 countsDown: false,
                                 showsHours: false
                             ) */
-                            Text(_periodEnd, style: .timer)
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .multilineTextAlignment(.center)
-                                .font(.largeTitle)
-                                .fontWeight(.semibold)
-                        case .ongoing, .overtime:
-                            /* Text(
-                                timerInterval: Date.now..._periodEnd,
-                                pauseTime: _periodEnd,
+                            Text(
+                                timerInterval: Date.now ... max(Date.now, _periodEnd),
                                 countsDown: true,
                                 showsHours: false
                             )
                             .frame(maxWidth: .infinity, alignment: .center)
                             .multilineTextAlignment(.center)
                             .font(.largeTitle)
-                            .fontWeight(.semibold) */
-                            Text(_periodEnd, style: .timer)
+                            .fontWeight(.semibold)
+                        case .ongoing, .overtime:
+                            Text(
+                                timerInterval: Date.now ... max(Date.now, _periodEnd),
+                                countsDown: true,
+                                showsHours: false
+                            )
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .multilineTextAlignment(.center)
+                            .font(.largeTitle)
+                            .fontWeight(.semibold)
+                            /*Text(_periodEnd, style: .timer)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .multilineTextAlignment(.center)
                                 .font(.largeTitle)
-                                .fontWeight(.semibold)
+                                .fontWeight(.semibold) */
                         case .starting:
                             Text("0:00")
                                 .font(.largeTitle)
@@ -251,16 +254,16 @@ struct SHLWidgetLiveActivity: Widget {
                         .fontWeight(.bold)
                 }
             }
-            .widgetURL(URL(string: "http://www.apple.com"))
+            .widgetURL(URL(string: "shltracker://open-game?id=\(context.attributes.id)"))
             .keylineTint(Color.white)
         }
     }
     
     func ISODateToStr(dateString: String) -> Date {
         let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        // formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
 
-        return formatter.date(from: dateString) ?? Date()
+        return formatter.date(from: dateString) ?? .distantFuture
     }
 }
 

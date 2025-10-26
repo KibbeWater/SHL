@@ -172,7 +172,8 @@ struct MatchView: View {
 
             if let homeId = match.homeTeam.id, let awayId = match.awayTeam.id,
                let homeStats = viewModel.matchStats.first(where: { $0.teamID == homeId }),
-               let awayStats = viewModel.matchStats.first(where: { $0.teamID == awayId }) {
+               let awayStats = viewModel.matchStats.first(where: { $0.teamID == awayId })
+            {
                 let homeShotsGoal = homeStats.shotsOnGoal
                 let awayShotsGoal = awayStats.shotsOnGoal
                 VersusBar("Shots on goals", homeSide: homeShotsGoal, awaySide: awayShotsGoal, homeColor: homeColor, awayColor: awayColor)
@@ -190,8 +191,8 @@ struct MatchView: View {
                     }
                     return false
                 }
-                let homeSavesPercent = homeShotsGoal == 0 ? 0 : (Float(homeShotsGoal - awayGoals.count) / Float(homeShotsGoal)) * 100.0
-                let awaySavesPercent = awayShotsGoal == 0 ? 0 : (Float(awayShotsGoal - homeGoals.count) / Float(awayShotsGoal)) * 100.0
+                let homeSavesPercent = awayShotsGoal == 0 ? 0 : (Float(awayShotsGoal - awayGoals.count) / Float(awayShotsGoal)) * 100.0
+                let awaySavesPercent = homeShotsGoal == 0 ? 0 : (Float(homeShotsGoal - homeGoals.count) / Float(homeShotsGoal)) * 100.0
                 VersusBar("Save %", homeSide: Int(homeSavesPercent), awaySide: Int(awaySavesPercent), homeColor: homeColor, awayColor: awayColor)
 
                 let homeFaceoffs = homeStats.faceoffsWon
@@ -530,7 +531,7 @@ struct MatchView: View {
             awayScore: 2,
             state: .ongoing,
             overtime: false,
-            shootout: false
+            shootout: false, externalUUID: ""
         ),
         referrer: "PREVIEW"
     )
