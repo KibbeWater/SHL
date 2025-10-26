@@ -18,8 +18,8 @@ struct MatchListView: View {
 
     @StateObject private var viewModel = MatchListViewModel()
     
-    private func getLiveMatch(gameId: String) -> GameData.GameOverview? {
-        return viewModel.matchListeners[gameId]?.gameOverview
+    private func getLiveMatch(match: Match) -> LiveMatch? {
+        return viewModel.matchListeners[match.externalUUID]
     }
     
     var body: some View {
@@ -67,13 +67,13 @@ struct MatchListView: View {
                     MatchView(match, referrer: "match_list")
                 } label: {
                     if #available(iOS 17.2, *) {
-                        MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
+                        MatchOverview(game: match, liveGame: getLiveMatch(match: match))
                             .id("pm-\(match.id)")
                             .clipShape(RoundedRectangle(cornerRadius: 12.0))
                             .contextMenu {
                                 #if !APPCLIP
                                 Button("Start Activity", systemImage: "plus") {
-                                    if let live = getLiveMatch(gameId: match.id) {
+                                    if let live = getLiveMatch(match: match) {
                                         do {
                                             PostHogSDK.shared.capture(
                                                 "started_live_activity",
@@ -94,7 +94,7 @@ struct MatchListView: View {
                             }
                             .padding(.horizontal)
                     } else {
-                        MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
+                        MatchOverview(game: match, liveGame: getLiveMatch(match: match))
                             .id("pm-\(match.id)")
                             .clipShape(RoundedRectangle(cornerRadius: 12.0))
                             .padding(.horizontal)

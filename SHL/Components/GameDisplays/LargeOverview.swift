@@ -11,7 +11,7 @@ import HockeyKit
 
 struct LargeOverview: View {
     var game: Match
-    var liveGame: GameData.GameOverview?
+    var liveGame: LiveMatch?
     
     @State private var homeColor: Color = .black // Default color, updated on appear
     @State private var awayColor: Color = .black // Default color, updated on appear
@@ -33,15 +33,15 @@ struct LargeOverview: View {
         }
     }
     
-    init(game: Match, liveGame: GameData.GameOverview? = nil) {
+    init(game: Match, liveGame: LiveMatch? = nil) {
         self.game = game
-        if game.id == liveGame?.gameUuid {
+        if game.id == liveGame?.id {
             self.liveGame = liveGame
         }
     }
 
     func isHomeLeading() -> Bool {
-        liveGame?.homeGoals ?? game.homeScore > liveGame?.awayGoals ?? game.awayScore
+        liveGame?.homeScore ?? game.homeScore > liveGame?.awayScore ?? game.awayScore
     }
     
     func isToday() -> Bool {
@@ -50,16 +50,14 @@ struct LargeOverview: View {
     
     var gameStatusTag: some View {
         if let _liveGame = liveGame {
-            switch _liveGame.state {
-            case .starting:
+            switch _liveGame.gameState {
+            case .scheduled:
                 return Text("Starting")
             case .ongoing:
-                return Text("P\(_liveGame.time.period): \(_liveGame.time.periodTime)")
-            case .onbreak:
-                return Text("P\(_liveGame.time.period): Pause")
-            case .overtime:
-                return Text("OT: \(_liveGame.time.periodTime)")
-            case .ended:
+                return Text("P\(_liveGame.period): \(_liveGame.periodTime)")
+            case .paused:
+                return Text("P\(_liveGame.period): Pause")
+            case .played:
                 return Text("Ended")
             }
         } else {
@@ -76,7 +74,7 @@ struct LargeOverview: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 128, height: 128)
-                    Text(String(liveGame?.homeGoals ?? game.homeScore))
+                    Text(String(liveGame?.homeScore ?? game.homeScore))
                         .font(.system(size: 100))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
@@ -93,7 +91,7 @@ struct LargeOverview: View {
                 }
                 Spacer()
                 HStack(spacing: 34) {
-                    Text(String(liveGame?.awayGoals ?? game.awayScore))
+                    Text(String(liveGame?.awayScore ?? game.awayScore))
                         .font(.system(size: 100))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)

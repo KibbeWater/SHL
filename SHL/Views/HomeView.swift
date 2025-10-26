@@ -52,14 +52,14 @@ struct HomeView: View {
                 return AnyView(
                     LargeOverview(
                         game: featured,
-                        liveGame: viewModel.liveGame?.gameOverview
+                        liveGame: viewModel.liveGame
                     )
                 )
             } else {
                 return AnyView(
                     MatchOverview(
                         game: featured,
-                        liveGame: viewModel.liveGame?.gameOverview
+                        liveGame: viewModel.liveGame
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 12.0))
                 )

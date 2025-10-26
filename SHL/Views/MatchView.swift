@@ -76,15 +76,15 @@ struct MatchView: View {
                 } label: {
                     TeamLogo(
                         teamCode: viewModel.match?.homeTeam.code ?? match.homeTeam.code,
-                        score: viewModel.liveGame?.gameOverview.homeGoals ?? viewModel.match?.homeScore ?? match.homeScore,
-                        opponentScore: viewModel.liveGame?.gameOverview.awayGoals ?? viewModel.match?.awayScore ?? match.awayScore
+                        score: viewModel.liveGame?.homeScore ?? viewModel.match?.homeScore ?? match.homeScore,
+                        opponentScore: viewModel.liveGame?.awayScore ?? viewModel.match?.awayScore ?? match.awayScore
                     )
                 }
             } else {
                 TeamLogo(
                     teamCode: viewModel.match?.homeTeam.code ?? match.homeTeam.code,
-                    score: viewModel.liveGame?.gameOverview.homeGoals ?? viewModel.match?.homeScore ?? match.homeScore,
-                    opponentScore: viewModel.liveGame?.gameOverview.awayGoals ?? viewModel.match?.awayScore ?? match.awayScore
+                    score: viewModel.liveGame?.homeScore ?? viewModel.match?.homeScore ?? match.homeScore,
+                    opponentScore: viewModel.liveGame?.awayScore ?? viewModel.match?.awayScore ?? match.awayScore
                 )
             }
             
@@ -92,14 +92,14 @@ struct MatchView: View {
             
             VStack {
                 if let liveGame = viewModel.liveGame {
-                    if liveGame.gameOverview.state == .ongoing || liveGame.gameOverview.state == .onbreak {
-                        Label("P\(liveGame.gameOverview.time.period)", systemImage: "clock")
+                    if liveGame.gameState == .ongoing || liveGame.gameState == .paused {
+                        Label("P\(liveGame.period)", systemImage: "clock")
                             .foregroundStyle(.white.opacity(0.5))
                             .font(.body)
                     }
                     GameTime(liveGame)
                 } else {
-                    GameTime(match)
+                    GameTime(viewModel.match ?? match)
                 }
                 Spacer()
             }
@@ -117,15 +117,15 @@ struct MatchView: View {
                 } label: {
                     TeamLogo(
                         teamCode: viewModel.match?.awayTeam.code ?? match.awayTeam.code,
-                        score: viewModel.liveGame?.gameOverview.awayGoals ?? viewModel.match?.awayScore ?? match.awayScore,
-                        opponentScore: viewModel.liveGame?.gameOverview.homeGoals ?? viewModel.match?.homeScore ?? match.homeScore
+                        score: viewModel.liveGame?.awayScore ?? viewModel.match?.awayScore ?? match.awayScore,
+                        opponentScore: viewModel.liveGame?.homeScore ?? viewModel.match?.homeScore ?? match.homeScore
                     )
                 }
             } else {
                 TeamLogo(
                     teamCode: viewModel.match?.awayTeam.code ?? match.awayTeam.code,
-                    score: viewModel.liveGame?.gameOverview.awayGoals ?? viewModel.match?.awayScore ?? match.awayScore,
-                    opponentScore: viewModel.liveGame?.gameOverview.homeGoals ?? viewModel.match?.homeScore ?? match.homeScore
+                    score: viewModel.liveGame?.awayScore ?? viewModel.match?.awayScore ?? match.awayScore,
+                    opponentScore: viewModel.liveGame?.homeScore ?? viewModel.match?.homeScore ?? match.homeScore
                 )
             }
             
@@ -283,7 +283,7 @@ struct MatchView: View {
                                             "activity_id": ActivityUpdater.shared.deviceUUID.uuidString
                                         ]
                                     )
-                                    if let liveMatch = viewModel.liveGame?.gameOverview {
+                                    if let liveMatch = viewModel.liveGame {
                                         try ActivityUpdater.shared.start(match: liveMatch)
                                         activityRunning = true
                                     }
@@ -483,8 +483,8 @@ struct MatchView: View {
                 return
             }
             
-            if let _game = viewModel.liveGame?.gameOverview,
-               _game.state == .ended
+            if let _game = viewModel.liveGame,
+               _game.gameState == .played
             {
                 print("Disabling timer, game has ended")
                 timer.invalidate()

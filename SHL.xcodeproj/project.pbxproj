@@ -13,6 +13,8 @@
 		8020C25F2D7644D500F1FB5E /* ScrollPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */; };
 		8020C2622D7651A500F1FB5E /* GameTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C2602D7651A500F1FB5E /* GameTime.swift */; };
 		802AD93B2EACFF1100916E9F /* LiveMatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AD93A2EACFF0D00916E9F /* LiveMatch.swift */; };
+		802AD93C2EAE2C5300916E9F /* LiveMatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AD93A2EACFF0D00916E9F /* LiveMatch.swift */; };
+		802AD93D2EAE2C8500916E9F /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806DBDF92EA401FA00E07695 /* Match.swift */; };
 		802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802B98E72BD06C6800278A00 /* MatchCalendar.swift */; };
 		803B84242DB3FE98002A15DC /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 803B84232DB3FE98002A15DC /* Kingfisher */; };
 		804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804316232BDCFFA5007D1D9A /* AppIntent.swift */; };
@@ -684,6 +686,8 @@
 				BC425E4A2B4706CC00D82CFB /* SHLWidgetBundle.swift in Sources */,
 				BC425E4C2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift in Sources */,
 				804EC8242CFC02560096CA0D /* ActivityUpdater.swift in Sources */,
+				802AD93C2EAE2C5300916E9F /* LiveMatch.swift in Sources */,
+				802AD93D2EAE2C8500916E9F /* Match.swift in Sources */,
 				80E9ED8E2CB14DDC00D0E4E9 /* Settings.swift in Sources */,
 				804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */,
 				806DBE522EA4040D00E07695 /* WidgetGame.swift in Sources */,

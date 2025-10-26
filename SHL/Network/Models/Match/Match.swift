@@ -35,7 +35,7 @@ public struct TeamBasic: Codable, Equatable {
     let code: String
 }
 
-enum MatchState: String, Codable {
+public enum MatchState: String, Codable {
     case scheduled
     case ongoing
     case paused

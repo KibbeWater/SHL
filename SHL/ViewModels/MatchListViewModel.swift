@@ -20,7 +20,7 @@ class MatchListViewModel: ObservableObject {
     @Published var todayMatches: [Match] = []
     @Published var upcomingMatches: [Match] = []
 
-    @Published var matchListeners: [String: GameData] = [:]
+    @Published var matchListeners: [String: LiveMatch] = [:]
     private var cancellable: AnyCancellable?
 
     init() {
@@ -48,10 +48,10 @@ class MatchListViewModel: ObservableObject {
     }
 
     private func removeUnusedListeners() {
-        var newListeners: [String: GameData] = [:]
+        var newListeners: [String: LiveMatch] = [:]
         for game in todayMatches {
-            guard let listenerData = matchListeners[game.id] else { continue }
-            newListeners[game.id] = listenerData
+            guard let listenerData = matchListeners[game.externalUUID] else { continue }
+            newListeners[game.externalUUID] = listenerData
         }
         matchListeners = newListeners
     }
@@ -61,13 +61,27 @@ class MatchListViewModel: ObservableObject {
             cancellable.cancel()
         }
 
-        cancellable = liveListener.subscribe(todayMatches.map { $0.externalUUID })
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] event in
-                if self?.todayMatches.contains(where: { $0.externalUUID == event.gameOverview.gameUuid }) == true {
-                    self?.matchListeners[event.gameOverview.gameUuid] = event
-                }
-            }
+        cancellable = liveListener.subscribe(todayMatches.map { $0.externalUUID }) { [weak self] gameUuid in
+            guard let self = self else { return nil }
+            guard let match = self.todayMatches.first(where: { $0.externalUUID == gameUuid }) else { return nil }
+
+            // Fetch team data
+            return await self.fetchTeamData(for: match)
+        }
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] liveMatch in
+            self?.matchListeners[liveMatch.externalId] = liveMatch
+        }
+    }
+
+    private func fetchTeamData(for match: Match) async -> (match: Match, homeTeam: Team, awayTeam: Team)? {
+        guard let homeId = match.homeTeam.id, let awayId = match.awayTeam.id else { return nil }
+
+        async let homeTeam = try? await api.getTeamDetail(id: homeId)
+        async let awayTeam = try? await api.getTeamDetail(id: awayId)
+
+        guard let home = await homeTeam, let away = await awayTeam else { return nil }
+        return (match: match, homeTeam: home, awayTeam: away)
     }
 
     private func filterMatches() {

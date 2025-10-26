@@ -22,7 +22,7 @@ class MatchViewModel: ObservableObject {
     @Published var home: Team? = nil
     @Published var away: Team? = nil
 
-    @Published var liveGame: GameData? = nil
+    @Published var liveGame: LiveMatch? = nil
     private var cancellable: AnyCancellable?
 
     private var game: Match
@@ -48,9 +48,6 @@ class MatchViewModel: ObservableObject {
 
         if let match {
             try await fetchTeam(match)
-            if match.isLive(), let live = try? await api.getLiveExternal(id: match.externalUUID) {
-                liveGame = live
-            }
         }
 
         matchStats = (try? await api.getMatchStats(id: game.id)) ?? []
@@ -80,12 +77,16 @@ class MatchViewModel: ObservableObject {
             cancellable.cancel()
         }
 
-        cancellable = liveListener.subscribe([game.externalUUID])
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] event in
-                if self?.game.externalUUID == event.gameOverview.gameUuid {
-                    self?.liveGame = event
-                }
-            }
+        cancellable = liveListener.subscribe([game.externalUUID]) { [weak self] gameUuid in
+            guard let self = self else { return nil }
+            guard let match = self.match, match.externalUUID == gameUuid else { return nil }
+            guard let home = self.home, let away = self.away else { return nil }
+
+            return (match: match, homeTeam: home, awayTeam: away)
+        }
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] liveMatch in
+            self?.liveGame = liveMatch
+        }
     }
 }

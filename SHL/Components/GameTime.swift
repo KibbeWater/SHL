@@ -10,40 +10,38 @@ import SwiftUI
 
 struct GameTime: View {
     let game: Match?
-    let liveGame: GameData?
+    let liveGame: LiveMatch?
 
     init(_ game: Match) {
         self.game = game
         self.liveGame = nil
     }
 
-    init(_ game: GameData) {
+    init(_ game: LiveMatch) {
         self.liveGame = game
         self.game = nil
     }
 
     var body: some View {
         if let _game = liveGame {
-            switch _game.gameOverview.state {
-            case .starting:
+            switch _game.gameState {
+            case .scheduled:
                 Text("0:00")
             case .ongoing:
                 Text(
-                    timerInterval: Date.now ... max(Date.now, _game.gameOverview.time.periodEnd ?? Date.now),
+                    timerInterval: Date.now ... max(Date.now, _game.timeRemaining),
                     pauseTime: Date.now,
                     countsDown: true,
                     showsHours: false
                 )
-            case .onbreak:
+            case .paused:
                 Text("Break")
-            case .overtime:
-                Text("OT\n\(_game.gameOverview.time.periodTime)")
-            case .ended:
+            case .played:
                 Text("Ended")
             }
         } else if let match = game {
-            if match.date > Date.now && match.played {
-                Text((match.shootout ?? false) ? "OT" : (match.overtime ?? false) ? "OT" : "Full")
+            if match.date < Date.now && match.state == .played {
+                Text((match.shootout ?? false) ? "OT" : (match.overtime ?? false) ? "OT" : "Full-Time")
             } else {
                 let isToday = Calendar.current.isDate(match.date, inSameDayAs: Date())
                 VStack {

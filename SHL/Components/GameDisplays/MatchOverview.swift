@@ -10,7 +10,7 @@ import HockeyKit
 
 struct MatchOverview: View {
     var game: Match
-    var liveGame: GameData.GameOverview?
+    var liveGame: LiveMatch?
 
     @State private var homeColor: Color = .black // Default color, updated on appear
     @State private var awayColor: Color = .black // Default color, updated on appear
@@ -29,9 +29,9 @@ struct MatchOverview: View {
         }
     }
 
-    init(game: Match, liveGame: GameData.GameOverview? = nil) {
+    init(game: Match, liveGame: LiveMatch? = nil) {
         self.game = game
-        if game.id == liveGame?.gameUuid {
+        if game.id == liveGame?.id {
             self.liveGame = liveGame
         }
     }
@@ -49,11 +49,11 @@ struct MatchOverview: View {
                         Spacer()
                     }
                     Spacer()
-                    Text(String(liveGame?.homeGoals ?? game.homeScore))
+                    Text(String(liveGame?.homeScore ?? game.homeScore))
                         .font(.system(size: 48))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
-                        .foregroundStyle(liveGame?.homeGoals ?? game.homeScore > liveGame?.awayGoals ?? game.awayScore ? .primary : .secondary)
+                        .foregroundStyle(liveGame?.homeScore ?? game.homeScore > liveGame?.awayScore ?? game.awayScore ? .primary : .secondary)
                 }
                 .overlay(alignment: .bottomLeading) {
                     Text(game.homeTeam.name)
@@ -76,15 +76,14 @@ struct MatchOverview: View {
             VStack {
                 Spacer()
                 if let _liveGame = liveGame {
-                    if _liveGame.state == .starting {
+                    switch _liveGame.gameState {
+                    case .scheduled:
                         Text("Starting")
-                    } else if _liveGame.state == .ongoing {
-                        Text("P\(_liveGame.time.period): \(_liveGame.time.periodTime)")
-                    } else if _liveGame.state == .onbreak {
-                        Text("P\(_liveGame.time.period): Pause")
-                    } else if _liveGame.state == .overtime {
-                        Text("OT: \(_liveGame.time.periodTime)")
-                    } else if _liveGame.state == .ended {
+                    case .ongoing:
+                        Text("P\(_liveGame.period): \(_liveGame.periodTime)")
+                    case .paused:
+                        Text("P\(_liveGame.period): Pause")
+                    case .played:
                         Text("Ended")
                     }
                 } else {
@@ -103,11 +102,11 @@ struct MatchOverview: View {
             Spacer()
             VStack {
                 HStack {
-                    Text(String(liveGame?.awayGoals ?? game.awayScore))
+                    Text(String(liveGame?.awayScore ?? game.awayScore))
                         .font(.system(size: 48))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
-                        .foregroundStyle(liveGame?.awayGoals ?? game.awayScore > liveGame?.homeGoals ?? game.homeScore ? .primary : .secondary)
+                        .foregroundStyle(liveGame?.awayScore ?? game.awayScore > liveGame?.homeScore ?? game.homeScore ? .primary : .secondary)
                     Spacer()
                     VStack {
                         Spacer()

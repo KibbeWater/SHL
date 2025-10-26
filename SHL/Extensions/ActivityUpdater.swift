@@ -21,7 +21,15 @@ public class ActivityUpdater {
     func OverviewToAttrib(_ overview: GameData.GameOverview) -> SHLWidgetAttributes {
         return SHLWidgetAttributes(id: overview.gameUuid, homeTeam: .init(name: overview.homeTeam.teamName, teamCode: overview.homeTeam.teamCode), awayTeam: .init(name: overview.awayTeam.teamName, teamCode: overview.awayTeam.teamCode))
     }
-    
+
+    func OverviewToAttrib(_ liveMatch: LiveMatch) -> SHLWidgetAttributes {
+        return SHLWidgetAttributes(id: liveMatch.externalId, homeTeam: .init(name: liveMatch.homeTeam.name, teamCode: liveMatch.homeTeam.code), awayTeam: .init(name: liveMatch.awayTeam.name, teamCode: liveMatch.awayTeam.code))
+    }
+
+    func OverviewToState(_ liveMatch: LiveMatch) -> SHLWidgetAttributes.ContentState {
+        return SHLWidgetAttributes.ContentState(homeScore: liveMatch.homeScore, awayScore: liveMatch.awayScore, period: .init(period: liveMatch.period, periodEnd: liveMatch.timeRemaining.ISO8601Format(), state: .intermission))
+    }
+
     func OverviewToAttrib(_ match: Game) -> SHLWidgetAttributes {
         return SHLWidgetAttributes(id: match.id, homeTeam: .init(name: match.homeTeam.name, teamCode: match.homeTeam.code), awayTeam: .init(name: match.awayTeam.name, teamCode: match.awayTeam.code))
     }
@@ -76,35 +84,72 @@ public class ActivityUpdater {
     public func start(match: GameData.GameOverview) throws {
         let attrib = OverviewToAttrib(match)
         let initState = OverviewToState(match)
-        
+
         let activity = try Activity.request(
             attributes: attrib,
             content: .init(state: initState, staleDate: nil),
             pushType: .token
         )
-        
+
         Task {
             let center = UNUserNotificationCenter.current()
-            
+
             do {
                 try await center.requestAuthorization(options: [.alert])
             } catch {
                 // Handle errors that may occur during requestAuthorization.
             }
         }
-        
+
         Task {
             for await pushToken in activity.pushTokenUpdates {
                 let pushTokenString = pushToken.reduce("") {
                     $0 + String(format: "%02x", $1)
                 }
-                
+
 #if DEBUG
       print("Development Tokens: \(pushTokenString)")
 #endif
-                
+
                 // Send the push token
                 updatePushToken(match.gameUuid, token: pushTokenString)
+            }
+        }
+    }
+
+    @available(iOS 16.2, *)
+    public func start(match: LiveMatch) throws {
+        let attrib = OverviewToAttrib(match)
+        let initState = OverviewToState(match)
+
+        let activity = try Activity.request(
+            attributes: attrib,
+            content: .init(state: initState, staleDate: nil),
+            pushType: .token
+        )
+
+        Task {
+            let center = UNUserNotificationCenter.current()
+
+            do {
+                try await center.requestAuthorization(options: [.alert])
+            } catch {
+                // Handle errors that may occur during requestAuthorization.
+            }
+        }
+
+        Task {
+            for await pushToken in activity.pushTokenUpdates {
+                let pushTokenString = pushToken.reduce("") {
+                    $0 + String(format: "%02x", $1)
+                }
+
+#if DEBUG
+      print("Development Tokens: \(pushTokenString)")
+#endif
+
+                // Send the push token
+                updatePushToken(match.externalId, token: pushTokenString)
             }
         }
     }

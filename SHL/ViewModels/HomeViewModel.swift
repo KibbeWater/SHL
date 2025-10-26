@@ -16,12 +16,12 @@ class HomeViewModel: ObservableObject {
     private let liveListener = LiveMatchListener.shared
 
     @Published var featuredGame: Match? = nil
-    @Published var liveGame: GameData? = nil
+    @Published var liveGame: LiveMatch? = nil
     @Published var latestMatches: [Match] = []
     @Published var standings: [StandingObj]? = nil
     @Published var standingsDisabled: Bool = false
 
-    private var liveGameId: String?
+    private var liveGameExternalId: String?
     private var cancellable: AnyCancellable?
 
     init() {
@@ -37,7 +37,7 @@ class HomeViewModel: ObservableObject {
     }
 
     func selectListenedGame(_ game: Match) {
-        liveGameId = game.id
+        liveGameExternalId = game.externalUUID
         listenForLiveGame()
     }
 
@@ -46,17 +46,32 @@ class HomeViewModel: ObservableObject {
             cancellable.cancel()
         }
 
-        cancellable = liveListener.subscribe()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] event in
-                if event.gameOverview.gameUuid == self?.liveGameId {
-                    self?.liveGame = event
-                }
-            }
+        cancellable = liveListener.subscribe() { [weak self] gameUuid in
+            guard let self = self else { return nil }
+            guard let liveGameExternalId = self.liveGameExternalId, gameUuid == liveGameExternalId else { return nil }
+            guard let match = self.latestMatches.first(where: { $0.externalUUID == gameUuid }) else { return nil }
 
-        if let liveGameId {
-            liveListener.requestInitialData([liveGameId])
+            // Fetch team data
+            return await self.fetchTeamData(for: match)
         }
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] liveMatch in
+            self?.liveGame = liveMatch
+        }
+
+        if let liveGameExternalId {
+            liveListener.requestInitialData([liveGameExternalId])
+        }
+    }
+
+    private func fetchTeamData(for match: Match) async -> (match: Match, homeTeam: Team, awayTeam: Team)? {
+        guard let homeId = match.homeTeam.id, let awayId = match.awayTeam.id else { return nil }
+
+        async let homeTeam = try? await api.getTeamDetail(id: homeId)
+        async let awayTeam = try? await api.getTeamDetail(id: awayId)
+
+        guard let home = await homeTeam, let away = await awayTeam else { return nil }
+        return (match: match, homeTeam: home, awayTeam: away)
     }
 
     func refresh(hard: Bool = false) async throws {
