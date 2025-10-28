@@ -28,6 +28,6 @@ class TeamViewModel: ObservableObject {
     func refresh() async throws  {
         self.lineup = (try? await api.getTeamRoster(id: team.id)) ?? []
         self.standings = (try? await api.getCurrentStandings()) ?? []
-        self.history = (try? await api.getTeamMatches(id: team.id)) ?? []
+        self.history = (try? await api.getTeamMatches(id: team.id))?.sorted(by: {$0.date > $1.date}) ?? []
     }
 }

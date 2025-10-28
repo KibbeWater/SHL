@@ -9,17 +9,17 @@ import HockeyKit
 
 public struct LiveMatch: Codable {
     // Basic game information
-    public let id: String              // Internal database UUID
-    public let externalId: String      // HockeyKit match UUID
+    public let id: String // Internal database UUID
+    public let externalId: String // HockeyKit match UUID
     let homeTeam: Team
     let awayTeam: Team
 
     // Live game overview
-    public let homeScore: Int
-    public let awayScore: Int
-    public let period: Int
-    public let periodTime: String      // Formatted time "mm:ss"
-    public let timeRemaining: Date
+    let homeScore: Int
+    let awayScore: Int
+    let period: Int
+    let periodTime: String
+    let periodEnd: Date // Timestamp when current period ends
     public let gameState: MatchState
 }
 
@@ -55,7 +55,7 @@ extension LiveMatch {
             awayScore: gameOverview.awayGoals,
             period: gameOverview.time.period,
             periodTime: gameOverview.time.periodTime,
-            timeRemaining: gameOverview.time.periodEnd ?? Date.now,
+            periodEnd: gameOverview.time.periodEnd ?? Date.now,
             gameState: gameState
         )
     }

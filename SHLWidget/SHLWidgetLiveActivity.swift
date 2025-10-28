@@ -48,42 +48,24 @@ struct SHLWidgetLiveActivity: Widget {
                 VStack {
                     HStack {
                         let _periodEnd = ISODateToStr(dateString: context.state.period.periodEnd)
+                        let cappedEnd = min(_periodEnd, Date.now.addingTimeInterval(1200)) // Cap at 20:00 (1200 seconds)
                         switch context.state.period.state {
                         case .ended:
                             Text("Ended")
                                 .font(.largeTitle)
                                 .fontWeight(.semibold)
                         case .onbreak:
-                            /* Text(
-                                timerInterval: _periodEnd...Date.now,
-                                pauseTime: _periodEnd,
-                                countsDown: false,
-                                showsHours: false
-                            ) */
-                            Text(
-                                timerInterval: Date.now ... max(Date.now, _periodEnd),
-                                countsDown: true,
-                                showsHours: false
-                            )
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .multilineTextAlignment(.center)
-                            .font(.largeTitle)
-                            .fontWeight(.semibold)
-                        case .ongoing, .overtime:
-                            Text(
-                                timerInterval: Date.now ... max(Date.now, _periodEnd),
-                                countsDown: true,
-                                showsHours: false
-                            )
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .multilineTextAlignment(.center)
-                            .font(.largeTitle)
-                            .fontWeight(.semibold)
-                            /*Text(_periodEnd, style: .timer)
+                            Text(cappedEnd, style: .timer)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .multilineTextAlignment(.center)
                                 .font(.largeTitle)
-                                .fontWeight(.semibold) */
+                                .fontWeight(.semibold)
+                        case .ongoing, .overtime:
+                            Text(cappedEnd, style: .timer)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .multilineTextAlignment(.center)
+                                .font(.largeTitle)
+                                .fontWeight(.semibold)
                         case .starting:
                             Text("0:00")
                                 .font(.largeTitle)

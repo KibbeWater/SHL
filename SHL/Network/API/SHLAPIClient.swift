@@ -58,8 +58,27 @@ class SHLAPIClient {
         try await request(.matchStats(id: id))
     }
 
-    func getMatchEvents(id: String) async throws -> [PBPEvent] {
+    /// Get match events as rich DTOs
+    func getMatchEvents(id: String) async throws -> [PBPEventDTO] {
         try await request(.matchEvents(id: id))
+    }
+
+    /// Get match events wrapped in a PBPController for easy manipulation
+    func getMatchPBPController(id: String) async throws -> PBPController {
+        let events: [PBPEventDTO] = try await request(.matchEvents(id: id))
+
+        // Deduplicate events by ID (API may return duplicates)
+        var seenIDs = Set<String>()
+        let uniqueEvents = events.filter { event in
+            if seenIDs.contains(event.id) {
+                return false
+            } else {
+                seenIDs.insert(event.id)
+                return true
+            }
+        }
+
+        return await PBPController(events: uniqueEvents)
     }
 
     func getSeasonMatches(seasonCode: String) async throws -> [Match] {

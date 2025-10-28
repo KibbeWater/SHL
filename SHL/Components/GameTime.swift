@@ -29,7 +29,7 @@ struct GameTime: View {
                 Text("0:00")
             case .ongoing:
                 Text(
-                    timerInterval: Date.now ... max(Date.now, _game.timeRemaining),
+                    timerInterval: Date.now ... max(Date.now, _game.periodEnd),
                     pauseTime: Date.now,
                     countsDown: true,
                     showsHours: false

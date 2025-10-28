@@ -152,52 +152,32 @@ struct MatchView: View {
     
     func StatsComponent() -> some View {
         VStack {
-            let goals = viewModel.pbp?.events.filter { $0.type == .goal } ?? []
-            let penalties = viewModel.pbp?.events.filter { $0.type == .penalty } ?? []
+            if let pbpController = viewModel.pbpController,
+               let homeTeamId = match.homeTeam.id,
+               let awayTeamId = match.awayTeam.id {
+                let homePenaltyCount = pbpController.penaltyCount(forTeamID: homeTeamId)
+                let awayPenaltyCount = pbpController.penaltyCount(forTeamID: awayTeamId)
 
-            // Count penalties for each team
-            let homePenalties = penalties.filter { event in
-                if let penaltyEvent = event as? AdaptedPenaltyEvent {
-                    return penaltyEvent.eventTeam.teamCode == match.homeTeam.code
-                }
-                return false
-            }
-            let awayPenalties = penalties.filter { event in
-                if let penaltyEvent = event as? AdaptedPenaltyEvent {
-                    return penaltyEvent.eventTeam.teamCode == match.awayTeam.code
-                }
-                return false
-            }
-            VersusBar("Penalties", homeSide: homePenalties.count, awaySide: awayPenalties.count, homeColor: homeColor, awayColor: awayColor)
+                VersusBar("Penalties", homeSide: homePenaltyCount, awaySide: awayPenaltyCount, homeColor: homeColor, awayColor: awayColor)
 
-            if let homeId = match.homeTeam.id, let awayId = match.awayTeam.id,
-               let homeStats = viewModel.matchStats.first(where: { $0.teamID == homeId }),
-               let awayStats = viewModel.matchStats.first(where: { $0.teamID == awayId })
-            {
-                let homeShotsGoal = homeStats.shotsOnGoal
-                let awayShotsGoal = awayStats.shotsOnGoal
-                VersusBar("Shots on goals", homeSide: homeShotsGoal, awaySide: awayShotsGoal, homeColor: homeColor, awayColor: awayColor)
-                
-                // Count goals for each team
-                let homeGoals = goals.filter { event in
-                    if let goalEvent = event as? AdaptedGoalEvent {
-                        return goalEvent.eventTeam.teamCode == match.homeTeam.code
-                    }
-                    return false
-                }
-                let awayGoals = goals.filter { event in
-                    if let goalEvent = event as? AdaptedGoalEvent {
-                        return goalEvent.eventTeam.teamCode == match.awayTeam.code
-                    }
-                    return false
-                }
-                let homeSavesPercent = awayShotsGoal == 0 ? 0 : (Float(awayShotsGoal - awayGoals.count) / Float(awayShotsGoal)) * 100.0
-                let awaySavesPercent = homeShotsGoal == 0 ? 0 : (Float(homeShotsGoal - homeGoals.count) / Float(homeShotsGoal)) * 100.0
-                VersusBar("Save %", homeSide: Int(homeSavesPercent), awaySide: Int(awaySavesPercent), homeColor: homeColor, awayColor: awayColor)
+                if let homeStats = viewModel.matchStats.first(where: { $0.teamID == homeTeamId }),
+                   let awayStats = viewModel.matchStats.first(where: { $0.teamID == awayTeamId }) {
+                    let homeShotsGoal = homeStats.shotsOnGoal
+                    let awayShotsGoal = awayStats.shotsOnGoal
+                    VersusBar("Shots on goals", homeSide: homeShotsGoal, awaySide: awayShotsGoal, homeColor: homeColor, awayColor: awayColor)
 
-                let homeFaceoffs = homeStats.faceoffsWon
-                let awayFaceoffs = awayStats.faceoffsWon
-                VersusBar("Won Faceoffs", homeSide: homeFaceoffs, awaySide: awayFaceoffs, homeColor: homeColor, awayColor: awayColor)
+                    // Count goals for each team
+                    let homeGoalCount = pbpController.goalCount(forTeamID: homeTeamId)
+                    let awayGoalCount = pbpController.goalCount(forTeamID: awayTeamId)
+
+                    let homeSavesPercent = awayShotsGoal == 0 ? 0 : (Float(awayShotsGoal - awayGoalCount) / Float(awayShotsGoal)) * 100.0
+                    let awaySavesPercent = homeShotsGoal == 0 ? 0 : (Float(homeShotsGoal - homeGoalCount) / Float(homeShotsGoal)) * 100.0
+                    VersusBar("Save %", homeSide: Int(homeSavesPercent), awaySide: Int(awaySavesPercent), homeColor: homeColor, awayColor: awayColor)
+
+                    let homeFaceoffs = homeStats.faceoffsWon
+                    let awayFaceoffs = awayStats.faceoffsWon
+                    VersusBar("Won Faceoffs", homeSide: homeFaceoffs, awaySide: awayFaceoffs, homeColor: homeColor, awayColor: awayColor)
+                }
             }
         }
         .padding()
@@ -355,10 +335,10 @@ struct MatchView: View {
                         .fontWeight(.semibold)
                         .padding(.top)
                 }
-            } else if viewModel.pbp?.events.isEmpty == false {
+            } else if let pbpController = viewModel.pbpController, pbpController.hasEvents {
                 VStack {
-                    if let pbp = viewModel.pbp {
-                        PBPView(events: pbp, shouldReverse: viewModel.liveGame == nil)
+                    ForEach(viewModel.sortedPBPEvents) { event in
+                        PBPEventRowView(event: event, match: match)
                     }
                 }
                 .padding(.horizontal)

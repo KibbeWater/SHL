@@ -27,7 +27,7 @@ public class ActivityUpdater {
     }
 
     func OverviewToState(_ liveMatch: LiveMatch) -> SHLWidgetAttributes.ContentState {
-        return SHLWidgetAttributes.ContentState(homeScore: liveMatch.homeScore, awayScore: liveMatch.awayScore, period: .init(period: liveMatch.period, periodEnd: liveMatch.timeRemaining.ISO8601Format(), state: .intermission))
+        return SHLWidgetAttributes.ContentState(homeScore: liveMatch.homeScore, awayScore: liveMatch.awayScore, period: .init(period: liveMatch.period, periodEnd: liveMatch.periodEnd.ISO8601Format(), state: .intermission))
     }
 
     func OverviewToAttrib(_ match: Game) -> SHLWidgetAttributes {

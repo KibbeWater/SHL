@@ -5,9 +5,9 @@
 //  Created by Linus Rönnbäck Larsson on 28/9/24.
 //
 
-import SwiftUI
 import HockeyKit
 import Kingfisher
+import SwiftUI
 
 private enum TeamTabs: String, CaseIterable {
     case history = "History"
@@ -35,8 +35,8 @@ struct TeamView: View {
     
     var matchHistoryTab: some View {
         LazyVStack {
-            let upcomingGames = viewModel.history.filter({ !$0.played })
-            let playedGames = viewModel.history.filter({ $0.played })
+            let upcomingGames = viewModel.history.filter { !$0.played }.reversed()
+            let playedGames = viewModel.history.filter { $0.played }
             
             if viewModel.history.isEmpty {
                 VStack {
@@ -83,7 +83,6 @@ struct TeamView: View {
                                         .background(Color(uiColor: .systemBackground))
                                         .clipShape(RoundedRectangle(cornerRadius: 12))
                                         .padding(.horizontal)
-                                    
                                 }
                             }
                         }
@@ -93,11 +92,53 @@ struct TeamView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .padding()
                 } else {
-                    ForEach(viewModel.history, id: \.id) { match in
-                        MatchOverview(game: match)
-                            .background(Color(uiColor: .systemBackground))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                            .padding(.horizontal)
+                    VStack {
+                        HStack {
+                            Text("Upcoming Games")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        
+                        LazyVStack {
+                            ForEach(upcomingGames.prefix(3), id: \.id) { match in
+                                NavigationLink {
+                                    MatchView(match, referrer: "team_view")
+                                } label: {
+                                    MatchOverview(game: match)
+                                        .background(Color(uiColor: .systemBackground))
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        .padding(.horizontal)
+                                }
+                                .foregroundStyle(.primary)
+                            }
+                        }
+                    }
+                    .padding(.top)
+                    VStack {
+                        HStack {
+                            Text("Played Games")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                                .padding(.top)
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        
+                        LazyVStack {
+                            ForEach(playedGames, id: \.id) { match in
+                                NavigationLink {
+                                    MatchView(match, referrer: "team_view")
+                                } label: {
+                                    MatchOverview(game: match)
+                                        .background(Color(uiColor: .systemBackground))
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        .padding(.horizontal)
+                                }
+                                .foregroundStyle(.primary)
+                            }
+                        }
                     }
                 }
             }
@@ -127,7 +168,7 @@ struct TeamView: View {
             return LinearGradient(colors: [.red, .blue], startPoint: .top, endPoint: .bottom)
         case .norway:
             return LinearGradient(colors: [.red, .white, .blue], startPoint: .top, endPoint: .bottom)
-        case .none, .unknown(_):
+        case .none, .unknown:
             return LinearGradient(colors: [.gray, .gray], startPoint: .top, endPoint: .bottom)
         }
     }
@@ -206,35 +247,41 @@ struct TeamView: View {
     
     func renderPlayerCard(_ player: Player) -> some View {
         return LazyVStack {
-            NavigationLink {
-                PlayerView(player, teamColor: $teamColor)
-            } label: {
-                VStack {
-                    Text(player.fullName)
-                        .padding(.horizontal, 4)
-                        .padding(.top, 8)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(Color(uiColor: .label))
-
-                    // TODO: Add player portrait when API provides it
-                    ZStack {
-                        Rectangle()
-                            .fill(playerCountryColor(player))
-                        VStack {
-                            Text("#\(player.jerseyNumber ?? -1)")
-                                .font(.system(size: 48))
-                                .fontWeight(.bold)
-                                .foregroundStyle(Color(uiColor: .label))
-                            Text(player.position?.rawValue ?? "")
-                                .font(.caption)
-                                .foregroundStyle(Color(uiColor: .secondaryLabel))
-                        }
+            if let url = player.portraitURL {
+                NavigationLink {
+                    PlayerView(player, teamColor: $teamColor)
+                } label: {
+                    VStack {
+                        Text(player.fullName)
+                            .padding(.horizontal, 4)
+                            .padding(.top, 8)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Color(uiColor: .label))
+                        
+                        KFImage(.init(string: url)!)
+                            .placeholder {
+                                ProgressView()
+                                    .frame(width: 200)
+                            }
+                            .setProcessor(DownsamplingImageProcessor(size: CGSize(
+                                width: 186,
+                                height: 224
+                            )))
+                            .resizable()
+                            .background(playerCountryColor(player))
+                            .aspectRatio(contentMode: .fit)
+                            .overlay(alignment: .topLeading) {
+                                if let _number = player.jerseyNumber {
+                                    Text("#\(_number)")
+                                        .padding(.all, 8)
+                                        .foregroundStyle(Color(uiColor: .label))
+                                }
+                            }
                     }
-                    .frame(width: 186, height: 224)
+                    .frame(height: 256)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .frame(height: 256)
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }
     }
@@ -246,7 +293,7 @@ struct TeamView: View {
                 .clear,
                 .clear,
             ], startPoint: .top, endPoint: .bottom)
-            .ignoresSafeArea()
+                .ignoresSafeArea()
             
             ScrollView {
                 HStack {
@@ -320,4 +367,3 @@ struct TeamView: View {
     TeamView(team: .fakeData())
         .environment(\.hockeyAPI, HockeyAPI())
 }
-

@@ -17,7 +17,7 @@ class MatchViewModel: ObservableObject {
 
     @Published var match: Match? = nil
     @Published var matchStats: [MatchStats] = []
-    @Published var pbp: PBPEventsAdapter? = nil
+    @Published var pbpController: PBPController? = nil
 
     @Published var home: Team? = nil
     @Published var away: Team? = nil
@@ -26,6 +26,14 @@ class MatchViewModel: ObservableObject {
     private var cancellable: AnyCancellable?
 
     private var game: Match
+
+    /// Get PBP events sorted with period markers based on game state
+    /// - Completed games: chronological order (Period 1 → 2 → 3)
+    /// - Live games: reverse chronological order (Period 3 → 2 → 1)
+    var sortedPBPEvents: [PBPEventDTO] {
+        guard let controller = pbpController else { return [] }
+        return controller.sortedWithPeriodMarkers(reverse: liveGame != nil)
+    }
 
     init(_ game: Match) {
         self.game = game
@@ -45,8 +53,11 @@ class MatchViewModel: ObservableObject {
         if hard {}
 
         match = try await api.getMatchDetail(id: game.id)
-
+        
         if let match {
+            if let live = try? await api.getLiveMatch(id: match.externalUUID) {
+                self.liveGame = live
+            }
             try await fetchTeam(match)
         }
 
@@ -56,10 +67,7 @@ class MatchViewModel: ObservableObject {
     }
 
     func refreshPBP() async throws {
-        let backendEvents = try await api.getMatchEvents(id: game.id)
-        // Use the current match if available, otherwise use the initial game
-        let matchForMapping = match ?? game
-        pbp = PBPEventsAdapter.from(backendEvents: backendEvents, match: matchForMapping)
+        pbpController = try await api.getMatchPBPController(id: game.id)
     }
 
     func fetchTeam(_ matchDetail: Match) async throws {
