@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FoundationModels
 
 struct Season: Codable, Identifiable {
     let id: String

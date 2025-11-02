@@ -11,6 +11,7 @@ import Moya
 enum SHLAPIService {
     // Match endpoints
     case latestMatches(page: Int, limit: Int)
+    case searchMatches(date: String?, team: String?, season: String?, state: String?, descending: Bool?, page: Int, limit: Int)
     case liveMatches
     case getLiveMatch(id: String)
     case getLiveExternal(id: String)
@@ -32,6 +33,7 @@ enum SHLAPIService {
 
     // Season/League endpoints
     case currentSeason
+    case currentSeasonInfo
     case allSeasons
     case standings(seasonId: String)
     case currentStandings
@@ -47,7 +49,7 @@ extension SHLAPIService: TargetType {
     var path: String {
         switch self {
         // Match paths
-        case .latestMatches:
+        case .latestMatches, .searchMatches:
             return "/api/v1/matches"
         case .liveMatches:
             return "/api/v1/matches/live"
@@ -63,7 +65,7 @@ extension SHLAPIService: TargetType {
             return "/api/v1/matches/\(id)/events"
         case let .seasonMatches(seasonCode):
             return "/api/v1/matches/season/\(seasonCode)"
-        case .recentMatches(_):
+        case .recentMatches:
             return "/api/v1/matches/recent"
         // Team paths
         case .teams:
@@ -82,6 +84,8 @@ extension SHLAPIService: TargetType {
         // Season/League paths
         case .currentSeason:
             return "/api/v1/seasons/current"
+        case .currentSeasonInfo:
+            return "/api/v1/seasons/current/info"
         case .allSeasons:
             return "/api/v1/seasons"
         case let .standings(seasonId):
@@ -103,6 +107,24 @@ extension SHLAPIService: TargetType {
         case let .latestMatches(page, limit):
             return .requestParameters(
                 parameters: ["page": page, "limit": limit],
+                encoding: URLEncoding.queryString
+            )
+        case let .searchMatches(date, team, season, state, descending, page, limit):
+            var parameters: [String: Any] = ["page": page, "limit": limit, "sort": descending == true ? "desc" : "asc"]
+            if let date = date {
+                parameters["date"] = date
+            }
+            if let team = team {
+                parameters["team"] = team
+            }
+            if let season = season {
+                parameters["season"] = season
+            }
+            if let state = state {
+                parameters["state"] = state
+            }
+            return .requestParameters(
+                parameters: parameters,
                 encoding: URLEncoding.queryString
             )
         case let .recentMatches(limit):

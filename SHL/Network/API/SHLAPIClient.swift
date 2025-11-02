@@ -37,14 +37,43 @@ class SHLAPIClient {
         return response.data
     }
 
+    /// Search matches with optional filters and pagination
+    /// - Parameters:
+    ///   - date: Optional ISO8601 date string to filter by specific date
+    ///   - team: Optional team code to filter by team (home or away)
+    ///   - season: Optional season code to filter by season
+    ///   - state: Optional match state (scheduled, ongoing, paused, played)
+    ///   - page: Page number for pagination (default: 1)
+    ///   - limit: Number of results per page (default: 20)
+    /// - Returns: Paginated response containing matches and pagination metadata
+    func searchMatches(
+        date: String? = nil,
+        team: String? = nil,
+        season: String? = nil,
+        state: String? = nil,
+        descending: Bool = false,
+        page: Int = 1,
+        limit: Int = 20
+    ) async throws -> PaginatedResponse<Match> {
+        try await request(.searchMatches(
+            date: date,
+            team: team,
+            season: season,
+            state: state,
+            descending: descending,
+            page: page,
+            limit: limit
+        ))
+    }
+
     func getLiveMatches() async throws -> [Match] {
         try await request(.liveMatches)
     }
-    
+
     func getLiveMatch(id: String) async throws -> LiveMatch {
         try await request(.getLiveMatch(id: id))
     }
-    
+
     func getLiveExternal(id: String) async throws -> HockeyKit.GameData {
         let data: GameDataResponse = try await request(.getLiveExternal(id: id))
         return data.data
@@ -121,6 +150,10 @@ class SHLAPIClient {
 
     func getCurrentSeason() async throws -> Season {
         try await request(.currentSeason)
+    }
+
+    func getCurrentSeasonInfo() async throws -> SeasonInfoResponse {
+        try await request(.currentSeasonInfo)
     }
 
     func getAllSeasons() async throws -> [Season] {

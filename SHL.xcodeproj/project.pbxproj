@@ -20,6 +20,12 @@
 		802AD9452EAE654500916E9F /* PBPEventData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AD93F2EAE654500916E9F /* PBPEventData.swift */; };
 		802AD9462EAE654500916E9F /* PBPController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AD93E2EAE654500916E9F /* PBPController.swift */; };
 		802AD9482EAE656C00916E9F /* PBPEventRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AD9472EAE656C00916E9F /* PBPEventRowView.swift */; };
+		802AD9662EB176B600916E9F /* CurrentSeason.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AD9652EB176B600916E9F /* CurrentSeason.swift */; };
+		802AD9682EB176E200916E9F /* SeasonInfoResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AD9672EB176E200916E9F /* SeasonInfoResponse.swift */; };
+		802AD96A2EB17BB100916E9F /* PromptTeam.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AD9692EB17BB100916E9F /* PromptTeam.swift */; };
+		802AD96C2EB17BB300916E9F /* PromptSeason.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AD96B2EB17BB300916E9F /* PromptSeason.swift */; };
+		802AD96E2EB17EF100916E9F /* MatchSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AD96D2EB17EF100916E9F /* MatchSearch.swift */; };
+		802AD9712EB1834900916E9F /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802AD9702EB1834900916E9F /* SearchView.swift */; };
 		802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802B98E72BD06C6800278A00 /* MatchCalendar.swift */; };
 		803B84242DB3FE98002A15DC /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 803B84232DB3FE98002A15DC /* Kingfisher */; };
 		804316242BDCFFA5007D1D9A /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804316232BDCFFA5007D1D9A /* AppIntent.swift */; };
@@ -136,6 +142,12 @@
 		802AD9402EAE654500916E9F /* PBPEventDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PBPEventDTO.swift; sourceTree = "<group>"; };
 		802AD9412EAE654500916E9F /* PBPSupporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PBPSupporting.swift; sourceTree = "<group>"; };
 		802AD9472EAE656C00916E9F /* PBPEventRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PBPEventRowView.swift; sourceTree = "<group>"; };
+		802AD9652EB176B600916E9F /* CurrentSeason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentSeason.swift; sourceTree = "<group>"; };
+		802AD9672EB176E200916E9F /* SeasonInfoResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeasonInfoResponse.swift; sourceTree = "<group>"; };
+		802AD9692EB17BB100916E9F /* PromptTeam.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptTeam.swift; sourceTree = "<group>"; };
+		802AD96B2EB17BB300916E9F /* PromptSeason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptSeason.swift; sourceTree = "<group>"; };
+		802AD96D2EB17EF100916E9F /* MatchSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSearch.swift; sourceTree = "<group>"; };
+		802AD9702EB1834900916E9F /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		802B98E72BD06C6800278A00 /* MatchCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCalendar.swift; sourceTree = "<group>"; };
 		804316232BDCFFA5007D1D9A /* AppIntent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
 		804316252BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetUpcoming.swift; sourceTree = "<group>"; };
@@ -289,6 +301,25 @@
 			path = PBP;
 			sourceTree = "<group>";
 		};
+		802AD9632EB1766F00916E9F /* Intelligence */ = {
+			isa = PBXGroup;
+			children = (
+				802AD9642EB1767600916E9F /* Tools */,
+				802AD9692EB17BB100916E9F /* PromptTeam.swift */,
+				802AD96B2EB17BB300916E9F /* PromptSeason.swift */,
+			);
+			path = Intelligence;
+			sourceTree = "<group>";
+		};
+		802AD9642EB1767600916E9F /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				802AD9652EB176B600916E9F /* CurrentSeason.swift */,
+				802AD96D2EB17EF100916E9F /* MatchSearch.swift */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
 		806DBDF62EA401FA00E07695 /* API */ = {
 			isa = PBXGroup;
 			children = (
@@ -337,6 +368,7 @@
 		806DBE062EA401FA00E07695 /* Season */ = {
 			isa = PBXGroup;
 			children = (
+				802AD9672EB176E200916E9F /* SeasonInfoResponse.swift */,
 				806DBE032EA401FA00E07695 /* Season.swift */,
 				806DBE042EA401FA00E07695 /* Series.swift */,
 				806DBE052EA401FA00E07695 /* Standings.swift */,
@@ -518,6 +550,7 @@
 		BCAFE2CC2B4095170044225A /* SHL */ = {
 			isa = PBXGroup;
 			children = (
+				802AD9632EB1766F00916E9F /* Intelligence */,
 				806DBE0E2EA401FA00E07695 /* Network */,
 				BC8848252BB1714800844DBB /* SHL.entitlements */,
 				804EC7F42CFBA9A00096CA0D /* ViewModels */,
@@ -551,6 +584,7 @@
 				806796CE2CA864C100E9D95D /* TeamView.swift */,
 				804375A92CAA09FC0041F46D /* PlayerView.swift */,
 				806BEB142CB0500700CC4565 /* SettingsView.swift */,
+				802AD9702EB1834900916E9F /* SearchView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -732,21 +766,26 @@
 				80E9ED8F2CB14DDC00D0E4E9 /* Settings.swift in Sources */,
 				BC369E1C2BBAF5CC00940F42 /* VersusBar.swift in Sources */,
 				804375AA2CAA09FC0041F46D /* PlayerView.swift in Sources */,
+				802AD96E2EB17EF100916E9F /* MatchSearch.swift in Sources */,
+				802AD9682EB176E200916E9F /* SeasonInfoResponse.swift in Sources */,
 				8020C2622D7651A500F1FB5E /* GameTime.swift in Sources */,
 				802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */,
 				8075FBB82CA6A1AE004C6438 /* LargeOverview.swift in Sources */,
 				808F89BD2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */,
 				8020C25F2D7644D500F1FB5E /* ScrollPosition.swift in Sources */,
+				802AD9662EB176B600916E9F /* CurrentSeason.swift in Sources */,
 				806BEB162CB0500700CC4565 /* SettingsView.swift in Sources */,
 				806BEB192CB052BB00CC4565 /* CloudStorage.swift in Sources */,
 				805C8AA32CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */,
 				806796CF2CA864C100E9D95D /* TeamView.swift in Sources */,
 				806DBE0F2EA401FA00E07695 /* Season.swift in Sources */,
 				806DBE102EA401FA00E07695 /* Team.swift in Sources */,
+				802AD96C2EB17BB300916E9F /* PromptSeason.swift in Sources */,
 				806DBE112EA401FA00E07695 /* LiveMatchListener.swift in Sources */,
 				806DBE122EA401FA00E07695 /* MatchStats.swift in Sources */,
 				806DBE132EA401FA00E07695 /* SHLAPIService.swift in Sources */,
 				806DBE152EA401FA00E07695 /* Match+Mock.swift in Sources */,
+				802AD96A2EB17BB100916E9F /* PromptTeam.swift in Sources */,
 				806DBE162EA401FA00E07695 /* PlayerGameLog.swift in Sources */,
 				806DBE172EA401FA00E07695 /* Player.swift in Sources */,
 				806DBE182EA401FA00E07695 /* Series.swift in Sources */,
@@ -754,6 +793,7 @@
 				806DBE1B2EA401FA00E07695 /* SHLAPIClient.swift in Sources */,
 				806DBE1C2EA401FA00E07695 /* Match.swift in Sources */,
 				806DBE1D2EA401FA00E07695 /* SHLAPIError.swift in Sources */,
+				802AD9712EB1834900916E9F /* SearchView.swift in Sources */,
 				806DBE1E2EA401FA00E07695 /* NetworkLoggerPlugin.swift in Sources */,
 				806DBE202EA401FA00E07695 /* Standings.swift in Sources */,
 				BC8C15112BAC787B0010AB59 /* MatchOverview.swift in Sources */,

@@ -5,13 +5,14 @@
 //  Created by user242911 on 3/23/24.
 //
 
-import SwiftUI
 import HockeyKit
+import SwiftUI
 
 enum RootTabs: Equatable, Hashable, Identifiable {
     case home
     case calendar
     case settings
+    case search
     case team(Team)
 
     var id: String {
@@ -19,6 +20,7 @@ enum RootTabs: Equatable, Hashable, Identifiable {
         case .home: return "home"
         case .calendar: return "calendar"
         case .settings: return "settings"
+        case .search: return "search"
         case .team(let team): return "team_\(team.id)"
         }
     }
@@ -57,6 +59,12 @@ struct Root: View {
                     
                     Tab("Settings", systemImage: "gearshape", value: RootTabs.settings) {
                         SettingsView()
+                    }
+                    
+                    if #available(iOS 26.0, *) {
+                        Tab(value: RootTabs.search, role: .search) {
+                            SearchView()
+                        }
                     }
                     
                     if UIDevice.current.userInterfaceIdiom == .pad {
@@ -122,7 +130,7 @@ struct Root: View {
                 .zIndex(10)
                 .transition(
                     .move(edge: .bottom)
-                    .animation(.easeInOut(duration: 300))
+                        .animation(.easeInOut(duration: 300))
                 )
                 .task {
                     do {
@@ -141,7 +149,6 @@ struct Root: View {
                         loggedIn = true
                     }
                 }
-
             }
         }
         .task {
