@@ -35,7 +35,7 @@ struct LargeOverview: View {
     
     init(game: Match, liveGame: LiveMatch? = nil) {
         self.game = game
-        if game.id == liveGame?.id {
+        if game.externalUUID == liveGame?.externalId {
             self.liveGame = liveGame
         }
     }
