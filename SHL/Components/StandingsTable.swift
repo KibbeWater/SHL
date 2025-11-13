@@ -30,10 +30,7 @@ struct StandingView: View {
             Text("\(standing.points)p")
                 .padding(.trailing, 24)
             
-            Image("Team/\(standing.teamCode)")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 32, height: 32)
+            TeamLogoView(teamCode: standing.teamCode, size: .small)
         }
     }
 }

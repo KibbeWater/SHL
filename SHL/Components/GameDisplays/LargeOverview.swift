@@ -70,10 +70,7 @@ struct LargeOverview: View {
         VStack {
             HStack {
                 HStack(spacing: 34) {
-                    Image("Team/\(game.homeTeam.code.uppercased())")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 128, height: 128)
+                    TeamLogoView(teamCode: game.homeTeam.code, size: .custom(128))
                     Text(String(liveGame?.homeScore ?? game.homeScore))
                         .font(.system(size: 100))
                         .fontWidth(.compressed)
@@ -99,10 +96,7 @@ struct LargeOverview: View {
                             !isHomeLeading() ? .white : .white.opacity(0.5)
                         )
                         .padding(.bottom, -2)
-                    Image("Team/\(game.awayTeam.code.uppercased())")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 128, height: 128)
+                    TeamLogoView(teamCode: game.awayTeam.code, size: .custom(128))
                 }
             }
             HStack {

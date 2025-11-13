@@ -58,10 +58,7 @@ struct MatchView: View {
                     .padding(.bottom, -2)
                 Spacer()
             }
-            Image("Team/\(teamCode.uppercased())")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 84, height: 84)
+            TeamLogoView(teamCode: teamCode, size: .extraLarge)
                 .padding(0)
         }
         .frame(height: !match.isLive() ? 172 : 84)

@@ -19,11 +19,12 @@ struct Team: Codable, Identifiable, Equatable, Hashable {
     let finals: Int?
     let finalYears: [Int]?
     // let retiredNumbers: [String]?
+    let iconURL: String?
     let isActive: Bool
 }
 
 extension Team {
     static func fromDetail(_ team: TeamDetail) -> Team {
-        Team(id: team.id, name: team.name, code: team.code, city: team.city, founded: team.founded, venue: nil, golds: nil, goldYears: nil, finals: nil, finalYears: nil, isActive: team.isActive)
+        Team(id: team.id, name: team.name, code: team.code, city: team.city, founded: team.founded, venue: nil, golds: nil, goldYears: nil, finals: nil, finalYears: nil, iconURL: team.logoUrl, isActive: team.isActive)
     }
 }

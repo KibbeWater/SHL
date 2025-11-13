@@ -45,6 +45,7 @@ extension Team {
             goldYears: [2024],
             finals: 2,
             finalYears: [2020, 2024],
+            iconURL: nil,
             isActive: true
         )
     }

@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		8008FC7E2C9DCC4E00B23669 /* ReminderContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8008FC7D2C9DCC4E00B23669 /* ReminderContext.swift */; };
 		800F320E2C00D1300069E436 /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F320D2C00D1300069E436 /* Sequence.swift */; };
+		801A95EE2EBF7F5300530970 /* TeamLogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 801A95ED2EBF7F5300530970 /* TeamLogoView.swift */; };
+		801A95F12EBF80F500530970 /* SVGKit in Frameworks */ = {isa = PBXBuildFile; productRef = 801A95F02EBF80F500530970 /* SVGKit */; };
 		8020C25D2D7644D500F1FB5E /* ScrollPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */; };
 		8020C25F2D7644D500F1FB5E /* ScrollPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */; };
 		8020C2622D7651A500F1FB5E /* GameTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C2602D7651A500F1FB5E /* GameTime.swift */; };
@@ -134,6 +136,7 @@
 /* Begin PBXFileReference section */
 		8008FC7D2C9DCC4E00B23669 /* ReminderContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderContext.swift; sourceTree = "<group>"; };
 		800F320D2C00D1300069E436 /* Sequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequence.swift; sourceTree = "<group>"; };
+		801A95ED2EBF7F5300530970 /* TeamLogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamLogoView.swift; sourceTree = "<group>"; };
 		8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollPosition.swift; sourceTree = "<group>"; };
 		8020C2602D7651A500F1FB5E /* GameTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTime.swift; sourceTree = "<group>"; };
 		802AD93A2EACFF0D00916E9F /* LiveMatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveMatch.swift; sourceTree = "<group>"; };
@@ -257,6 +260,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				801A95F12EBF80F500530970 /* SVGKit in Frameworks */,
 				8055E5182BD173A30096DCBF /* WidgetKit.framework in Frameworks */,
 				8055E5172BD1739D0096DCBF /* ActivityKit.framework in Frameworks */,
 				80DBB7A92EA3FD530051C807 /* CombineMoya in Frameworks */,
@@ -592,6 +596,7 @@
 		BCF54B572B40E44200960F47 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				801A95ED2EBF7F5300530970 /* TeamLogoView.swift */,
 				802AD9472EAE656C00916E9F /* PBPEventRowView.swift */,
 				8008FC7C2C9DCC3A00B23669 /* Context */,
 				80CF89F52C7791F3000CE2CE /* Pulse Shader */,
@@ -657,6 +662,7 @@
 				80DBB7AA2EA3FD530051C807 /* Moya */,
 				80DBB7AC2EA3FD530051C807 /* ReactiveMoya */,
 				80DBB7AE2EA3FD530051C807 /* RxMoya */,
+				801A95F02EBF80F500530970 /* SVGKit */,
 			);
 			productName = LHF;
 			productReference = BCAFE2CA2B4095170044225A /* SHL.app */;
@@ -694,6 +700,7 @@
 				8095D07B2D8DA059006469A4 /* XCRemoteSwiftPackageReference "posthog-ios" */,
 				803B84222DB3FE98002A15DC /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				80DBB7A72EA3FD530051C807 /* XCRemoteSwiftPackageReference "Moya" */,
+				801A95EF2EBF80F500530970 /* XCRemoteSwiftPackageReference "SVGKit" */,
 			);
 			productRefGroup = BCAFE2CB2B4095170044225A /* Products */;
 			projectDirPath = "";
@@ -801,6 +808,7 @@
 				800F320E2C00D1300069E436 /* Sequence.swift in Sources */,
 				80DCA05E2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */,
 				BCD7BC152BAF69D500E208B3 /* Root.swift in Sources */,
+				801A95EE2EBF7F5300530970 /* TeamLogoView.swift in Sources */,
 				8075FBB42CA62706004C6438 /* GameExtensions.swift in Sources */,
 				BCAFE2CE2B4095170044225A /* SHLApp.swift in Sources */,
 				802AD93B2EACFF1100916E9F /* LiveMatch.swift in Sources */,
@@ -843,7 +851,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.9;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.SHLWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -878,7 +886,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.9;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl.SHLWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1040,7 +1048,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.9;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1082,7 +1090,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.9;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kibbewater.shl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1129,6 +1137,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		801A95EF2EBF80F500530970 /* XCRemoteSwiftPackageReference "SVGKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SVGKit/SVGKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
 		803B84222DB3FE98002A15DC /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -1164,6 +1180,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		801A95F02EBF80F500530970 /* SVGKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 801A95EF2EBF80F500530970 /* XCRemoteSwiftPackageReference "SVGKit" */;
+			productName = SVGKit;
+		};
 		803B84232DB3FE98002A15DC /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 803B84222DB3FE98002A15DC /* XCRemoteSwiftPackageReference "Kingfisher" */;

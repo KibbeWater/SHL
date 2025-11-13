@@ -1,5 +1,5 @@
 {
-  "originHash" : "ad4d0d6aaba37fcba75aaa1338b662e63f4b525978e139facc21f455ca48f93c",
+  "originHash" : "cdc5ecd581f226be5c2c0b140ada5b92fe977baa0b4541adb0524f16f5181fdd",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -17,6 +17,15 @@
       "state" : {
         "revision" : "8430dd49d4e2b417f472141805c9691ec2923cb8",
         "version" : "1.29.0"
+      }
+    },
+    {
+      "identity" : "cocoalumberjack",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/CocoaLumberjack/CocoaLumberjack.git",
+      "state" : {
+        "revision" : "a9ed4b6f9bdedce7d77046f43adfb8ce1fd54114",
+        "version" : "3.9.0"
       }
     },
     {
@@ -71,6 +80,15 @@
       "state" : {
         "revision" : "5dd1907d64f0d36f158f61a466bab75067224893",
         "version" : "6.9.0"
+      }
+    },
+    {
+      "identity" : "svgkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SVGKit/SVGKit.git",
+      "state" : {
+        "revision" : "58152b9f7c85eab239160b36ffdfd364aa43d666",
+        "version" : "3.0.0"
       }
     },
     {

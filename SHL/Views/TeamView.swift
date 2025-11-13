@@ -310,10 +310,7 @@ struct TeamView: View {
                         }
                     }
                     Spacer()
-                    Image("Team/\(team.code.uppercased())")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 72, height: 72)
+                    TeamLogoView(team: team, size: .large)
                 }
                 .padding(.horizontal)
                 .padding(.bottom)

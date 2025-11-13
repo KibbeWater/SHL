@@ -121,10 +121,7 @@ struct GoalEventRow: View {
                     .fontWeight(.bold)
                     .foregroundStyle(.primary)
                 Spacer()
-                Image("Team/\(isHome ? match.homeTeam.code : match.awayTeam.code)")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 48, height: 48)
+                TeamLogoView(teamCode: isHome ? match.homeTeam.code : match.awayTeam.code, size: .medium)
             }
             .frame(width: 96)
         }
@@ -300,10 +297,7 @@ struct TimeoutEventRow: View {
             Spacer()
 
             let isHome = event.teamID == match.homeTeam.id
-            Image("Team/\(isHome ? match.homeTeam.code : match.awayTeam.code)")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 48, height: 48)
+            TeamLogoView(teamCode: isHome ? match.homeTeam.code : match.awayTeam.code, size: .medium)
         }
         .padding([.trailing, .vertical], 8)
         .padding(.leading)

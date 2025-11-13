@@ -42,10 +42,7 @@ struct MatchOverview: View {
                 HStack {
                     VStack {
                         Spacer()
-                        Image("Team/\(game.homeTeam.code.uppercased())")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 48, height: 48)
+                        TeamLogoView(teamCode: game.homeTeam.code, size: .medium)
                         Spacer()
                     }
                     Spacer()
@@ -110,10 +107,7 @@ struct MatchOverview: View {
                     Spacer()
                     VStack {
                         Spacer()
-                        Image("Team/\(game.awayTeam.code.uppercased())")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 48, height: 48)
+                        TeamLogoView(teamCode: game.awayTeam.code, size: .medium)
                         Spacer()
                     }
                 }
