@@ -27,6 +27,12 @@ class Settings: ObservableObject {
     }
     
     public func binding_preferredTeam() -> Binding<String> {
-        return $_preferredTeam
+        return Binding(
+            get: { self._preferredTeam },
+            set: { newValue in
+                self.objectWillChange.send()
+                self._preferredTeam = newValue
+            }
+        )
     }
 }

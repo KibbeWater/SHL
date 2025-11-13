@@ -54,7 +54,12 @@ class CloudStorage<Value: Codable>: DynamicProperty {
         self.defaultValue = `default`
         self.userDefaults = UserDefaults(suiteName: SharedPreferenceKeys.groupIdentifier) ?? UserDefaults.standard
         self.currentValue = CloudStorage.getValue(forKey: key, defaultValue: `default`)
-        
+
+        #if DEBUG
+        let iCloudAvailable = FileManager.default.ubiquityIdentityToken != nil
+        print("🔧 [CloudStorage] Init key='\(key)' iCloudAvailable=\(iCloudAvailable)")
+        #endif
+
         // Observe iCloud changes
         cancellable = NotificationCenter.default.publisher(for: NSUbiquitousKeyValueStore.didChangeExternallyNotification)
             .sink { [weak self] notification in
@@ -68,6 +73,9 @@ class CloudStorage<Value: Codable>: DynamicProperty {
            changedKeys.contains(key),
            let data = ubiquitousStore.data(forKey: key),
            let decodedValue = CloudStorage.decode(data) as Value? {
+            #if DEBUG
+            print("☁️ [CloudStorage] Synced from iCloud: key='\(key)' value='\(decodedValue)'")
+            #endif
             currentValue = decodedValue
         }
     }
@@ -78,20 +86,29 @@ class CloudStorage<Value: Codable>: DynamicProperty {
     static func getValue(forKey key: String, defaultValue: Value) -> Value {
         let userDefaults = UserDefaults(suiteName: SharedPreferenceKeys.groupIdentifier) ?? UserDefaults.standard
         let ubiquitousStore = NSUbiquitousKeyValueStore.default
-        
+
         // Try to retrieve value from UserDefaults first
         if let data = userDefaults.data(forKey: key),
            let value = decode(data) as Value? {
+            #if DEBUG
+            print("📦 [CloudStorage] Read from UserDefaults: key='\(key)' value='\(value)'")
+            #endif
             return value
         }
-        
+
         // If not found, try from iCloud
         if let data = ubiquitousStore.data(forKey: key),
            let value = decode(data) as Value? {
+            #if DEBUG
+            print("☁️ [CloudStorage] Read from iCloud: key='\(key)' value='\(value)'")
+            #endif
             return value
         }
-        
+
         // Return the default value if no data is found
+        #if DEBUG
+        print("⚠️ [CloudStorage] Using default: key='\(key)' value='\(defaultValue)'")
+        #endif
         return defaultValue
     }
 
@@ -99,15 +116,22 @@ class CloudStorage<Value: Codable>: DynamicProperty {
     static func setValue(_ value: Value, forKey key: String) {
         let userDefaults = UserDefaults(suiteName: SharedPreferenceKeys.groupIdentifier) ?? UserDefaults.standard
         let ubiquitousStore = NSUbiquitousKeyValueStore.default
-        
+
         // Encode the value to Data
         if let data = try? JSONEncoder().encode(value) {
             // Save to UserDefaults
             userDefaults.set(data, forKey: key)
-            
+            #if DEBUG
+            print("💾 [CloudStorage] Saved to UserDefaults: key='\(key)' value='\(value)'")
+            #endif
+
             // Save to iCloud
             ubiquitousStore.set(data, forKey: key)
-            ubiquitousStore.synchronize() // Explicitly sync iCloud
+            let syncResult = ubiquitousStore.synchronize()
+            #if DEBUG
+            let iCloudAvailable = FileManager.default.ubiquityIdentityToken != nil
+            print("☁️ [CloudStorage] Attempted iCloud sync: key='\(key)' syncResult=\(syncResult) iCloudAvailable=\(iCloudAvailable)")
+            #endif
         }
     }
 

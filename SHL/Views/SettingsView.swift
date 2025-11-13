@@ -16,10 +16,7 @@ struct SettingsView: View {
     @State private var selectedTeam: String? = nil
     @State private var teams: [Team] = []
     @State private var teamsLoaded: Bool = false
-    
-    @CloudStorage(key: "preferredTeam", default: "")
-    private var _preferredTeam: String
-    
+
     private let api = SHLAPIClient.shared
     
     func loadTeams() {
@@ -35,7 +32,7 @@ struct SettingsView: View {
         List {
             Section("General") {
                 if teamsLoaded {
-                    Picker("Preferred Team", selection: $_preferredTeam) {
+                    Picker("Preferred Team", selection: settings.binding_preferredTeam()) {
                         Text("None")
                             .tag("")
                         ForEach(teams.filter({ !$0.id.isEmpty })) { team in
