@@ -7,7 +7,6 @@
 
 import Combine
 import Foundation
-import HockeyKit
 import SwiftUI
 
 @MainActor

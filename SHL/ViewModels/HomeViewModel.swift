@@ -7,7 +7,6 @@
 
 import Combine
 import Foundation
-import HockeyKit
 import SwiftUI
 
 @MainActor
@@ -110,81 +109,13 @@ class HomeViewModel: ObservableObject {
 
     // MARK: - Calculate featured game by relevance
 
-    // TODO: Use FeaturedGameAlgo functions instead
-
     func SelectFeaturedMatch() async throws {
         guard let recent = try? await api.getRecentMatches() else { return }
         let matches = recent.upcoming + recent.recent
 
-        let scoredMatches = await scoreAndSortHockeyMatches(
+        featuredGame = await FeaturedGameAlgo.getFeaturedGame(
             matches,
             preferredTeam: Settings.shared.getPreferredTeam()
         )
-
-        featuredGame = scoredMatches.first?.0
-    }
-
-    func getTeamByCode(_ code: String) async -> Team? {
-        guard let teams = try? await api.getTeams() else { return nil }
-        return teams.first(where: { $0.code == code })
-    }
-
-    func scoreAndSortHockeyMatches(_ matches: [Match], preferredTeam: String?) async -> [(Match, Double)] {
-        // First, asynchronously get all team UUIDs
-        let teamUUIDs = await withTaskGroup(of: (String, String).self) { group in
-            for match in matches {
-                group.addTask {
-                    let homeTeam = await self.getTeamByCode(match.homeTeam.code)
-                    return (match.homeTeam.code, homeTeam?.id ?? "")
-                }
-                group.addTask {
-                    let awayTeam = await self.getTeamByCode(match.awayTeam.code)
-                    return (match.awayTeam.code, awayTeam?.id ?? "")
-                }
-            }
-
-            var uuidDict = [String: String]()
-            for await (code, uuid) in group {
-                uuidDict[code] = uuid
-            }
-            return uuidDict
-        }
-
-        // Now score the matches
-        let scoredMatches = matches.map { game -> (Match, Double) in
-            var score: Double = 0
-
-            // Live games get the highest base score
-            if game.isLive() {
-                score += 1000
-            }
-
-            // Preferred team bonus
-            if let preferredTeam = preferredTeam,
-               let homeTeamUUID = teamUUIDs[game.homeTeam.code],
-               let awayTeamUUID = teamUUIDs[game.awayTeam.code]
-            {
-                if homeTeamUUID == preferredTeam || awayTeamUUID == preferredTeam {
-                    score += 500
-                }
-            }
-
-            // Upcoming games score
-            if !game.played {
-                let timeUntilGame = game.date.timeIntervalSinceNow
-                if timeUntilGame > 0 {
-                    score += max(100 - log10(timeUntilGame / 3600) * 20, 0)
-                }
-            } else {
-                // Played games score
-                let timeSinceGame = -game.date.timeIntervalSinceNow
-                score += max(50 - log10(timeSinceGame / 3600) * 10, 0)
-            }
-
-            return (game, score)
-        }
-
-        // Sort the matches based on their scores, highest to lowest
-        return scoredMatches.sorted { $0.1 > $1.1 }
     }
 }

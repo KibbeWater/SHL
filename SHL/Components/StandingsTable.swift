@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import HockeyKit
 
 struct StandingObj: Identifiable, Equatable {
     public var id: String

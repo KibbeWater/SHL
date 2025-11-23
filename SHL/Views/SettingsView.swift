@@ -6,16 +6,19 @@
 //
 
 import SwiftUI
-import HockeyKit
 
 struct SettingsView: View {
     @Environment(\.openURL) var openURL
-    
+
     @ObservedObject private var settings = Settings.shared
-    
+    @ObservedObject private var authManager = AuthenticationManager.shared
+
     @State private var selectedTeam: String? = nil
     @State private var teams: [Team] = []
     @State private var teamsLoaded: Bool = false
+    @State private var showDeleteAccountAlert = false
+    @State private var devices: [Device] = []
+    @State private var isLoadingDevices = false
 
     private let api = SHLAPIClient.shared
     
@@ -24,6 +27,35 @@ struct SettingsView: View {
             if let newTeams = try? await api.getTeams() {
                 teams = newTeams.sorted(by: { ($0.name) < ($1.name) })
                 teamsLoaded = true
+            }
+        }
+    }
+
+    func loadDevices() {
+        isLoadingDevices = true
+        Task {
+            do {
+                let response = try await api.getDevices()
+                await MainActor.run {
+                    devices = response.devices
+                    isLoadingDevices = false
+                }
+            } catch {
+                print("Failed to load devices: \(error)")
+                await MainActor.run {
+                    isLoadingDevices = false
+                }
+            }
+        }
+    }
+
+    func deleteAccount() {
+        Task {
+            do {
+                try await authManager.deleteAccount()
+                // Account deleted successfully
+            } catch {
+                print("Failed to delete account: \(error)")
             }
         }
     }
@@ -53,13 +85,138 @@ struct SettingsView: View {
                         ProgressView()
                     }
                 }
-                
+
 #if DEBUG
                 Button("Reset Cache", role: .destructive) {
                 }
 #endif
             }
-            
+
+            // MARK: - User Management Section
+
+            Section {
+                Toggle("Enable Account Features", isOn: settings.binding_userManagementEnabled())
+                    .tint(.accentColor)
+
+                if settings.userManagementEnabled {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Account Features Enabled")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text("Push notifications, cross-device sync, and personalized features are now available.")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                } else {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Account Features Disabled")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text("Enable to unlock push notifications, settings sync across devices, and personalized features.")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+            } header: {
+                Text("Account")
+            } footer: {
+                Text("Account features are optional. The app works fully without them. When enabled, your settings sync across devices via iCloud.")
+            }
+
+            // MARK: - Notification Settings (only if user management enabled)
+
+            if settings.userManagementEnabled {
+                Section("Notification Preferences") {
+                    Toggle("Match Reminders", isOn: Binding(
+                        get: { settings.notificationSettings.matchReminders },
+                        set: { newValue in
+                            var updated = settings.notificationSettings
+                            updated.matchReminders = newValue
+                            settings.notificationSettings = updated
+                        }
+                    ))
+
+                    Toggle("Match Results", isOn: Binding(
+                        get: { settings.notificationSettings.matchResults },
+                        set: { newValue in
+                            var updated = settings.notificationSettings
+                            updated.matchResults = newValue
+                            settings.notificationSettings = updated
+                        }
+                    ))
+
+                    Toggle("Live Goals", isOn: Binding(
+                        get: { settings.notificationSettings.liveGoals },
+                        set: { newValue in
+                            var updated = settings.notificationSettings
+                            updated.liveGoals = newValue
+                            settings.notificationSettings = updated
+                        }
+                    ))
+
+                    Toggle("Period Updates", isOn: Binding(
+                        get: { settings.notificationSettings.periodUpdates },
+                        set: { newValue in
+                            var updated = settings.notificationSettings
+                            updated.periodUpdates = newValue
+                            settings.notificationSettings = updated
+                        }
+                    ))
+
+                    Toggle("Favorite Team Only", isOn: Binding(
+                        get: { settings.notificationSettings.favoriteTeamOnly },
+                        set: { newValue in
+                            var updated = settings.notificationSettings
+                            updated.favoriteTeamOnly = newValue
+                            settings.notificationSettings = updated
+                        }
+                    ))
+                }
+
+                // MARK: - Account Management
+
+                Section("Account Management") {
+                    if authManager.isAuthenticated {
+                        if let userId = authManager.currentUserId {
+                            VStack(alignment: .leading) {
+                                Text("User ID")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Text(userId)
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                                    .textSelection(.enabled)
+                            }
+                        }
+
+                        Button("View Devices") {
+                            loadDevices()
+                        }
+
+                        Button("Logout", role: .destructive) {
+                            Task {
+                                try? await authManager.logout()
+                            }
+                        }
+
+                        Button("Delete Account", role: .destructive) {
+                            showDeleteAccountAlert = true
+                        }
+                    } else {
+                        Text("Not authenticated")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .alert("Delete Account", isPresented: $showDeleteAccountAlert) {
+                    Button("Cancel", role: .cancel) {}
+                    Button("Delete", role: .destructive) {
+                        deleteAccount()
+                    }
+                } message: {
+                    Text("Are you sure you want to delete your account? This action cannot be undone and will remove all your data from our servers.")
+                }
+            }
+
             Section("Support Me") {
                 /*Button("Leave a Tip") {
                     
@@ -89,5 +246,4 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView()
-        .environment(\.hockeyAPI, HockeyAPI())
 }

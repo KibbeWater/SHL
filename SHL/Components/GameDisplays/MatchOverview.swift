@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import HockeyKit
 
 struct MatchOverview: View {
     var game: Match

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import HockeyKit
 import Moya
 
 class SHLAPIClient {
@@ -14,6 +13,7 @@ class SHLAPIClient {
 
     private let provider: MoyaProvider<SHLAPIService>
     private let decoder: JSONDecoder
+    private let keychain = KeychainManager.shared
 
     private init() {
         // Configure decoder
@@ -72,11 +72,6 @@ class SHLAPIClient {
 
     func getLiveMatch(id: String) async throws -> LiveMatch {
         try await request(.getLiveMatch(id: id))
-    }
-
-    func getLiveExternal(id: String) async throws -> HockeyKit.GameData {
-        let data: GameDataResponse = try await request(.getLiveExternal(id: id))
-        return data.data
     }
 
     func getMatchDetail(id: String) async throws -> Match {
@@ -168,6 +163,184 @@ class SHLAPIClient {
         try await request(.currentStandings)
     }
 
+    // MARK: - User Management Endpoints
+
+    /// Generic authenticated request with automatic token refresh
+    func request<T: Decodable>(
+        endpoint: String,
+        method: HTTPMethod,
+        body: (any Encodable)? = nil,
+        requiresAuth: Bool = false
+    ) async throws -> T {
+        var headers: [String: String] = [
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        ]
+
+        // Add JWT token if required
+        if requiresAuth {
+            guard let token = keychain.getToken() else {
+                throw SHLAPIError.unauthorized
+            }
+            headers["Authorization"] = "Bearer \(token)"
+        }
+
+        // Build URL
+        guard let url = URL(string: "https://api.lrlnet.se/api/v1\(endpoint)") else {
+            throw SHLAPIError.invalidURL
+        }
+
+        // Build request
+        var request = URLRequest(url: url)
+        request.httpMethod = method.rawValue
+        headers.forEach { request.setValue($0.value, forHTTPHeaderField: $0.key) }
+
+        // Add body if present
+        if let body = body {
+            request.httpBody = try JSONEncoder().encode(body)
+        }
+
+        // Execute request
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw SHLAPIError.invalidResponse
+        }
+
+        // Handle 401 Unauthorized - token expired
+        if httpResponse.statusCode == 401 && requiresAuth {
+            // Try to refresh token
+            do {
+                try await AuthenticationManager.shared.refreshToken()
+                // Retry request with new token
+                return try await self.request(endpoint: endpoint, method: method, body: body, requiresAuth: requiresAuth)
+            } catch {
+                throw SHLAPIError.unauthorized
+            }
+        }
+
+        // Check status code
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            let error = SHLAPIError.map(statusCode: httpResponse.statusCode, data: data)
+            throw error
+        }
+
+        // Handle empty response for 204 No Content
+        if httpResponse.statusCode == 204 {
+            // Return empty response for Void type
+            if T.self == EmptyResponse.self {
+                return EmptyResponse() as! T
+            }
+        }
+
+        // Decode response
+        do {
+            return try decoder.decode(T.self, from: data)
+        } catch let decodingError as DecodingError {
+            throw SHLAPIError.decodingError(underlying: decodingError)
+        }
+    }
+
+    /// Update notification settings
+    func updateNotificationSettings(_ settings: NotificationSettings) async throws -> NotificationSettingsResponse {
+        try await request(
+            endpoint: "/user/notifications",
+            method: .patch,
+            body: settings,
+            requiresAuth: true
+        )
+    }
+
+    /// Set favorite team
+    func setFavoriteTeam(teamId: String) async throws -> FavoriteTeamResponse {
+        try await request(
+            endpoint: "/user/favorite-team",
+            method: .put,
+            body: FavoriteTeamRequest(teamId: teamId),
+            requiresAuth: true
+        )
+    }
+
+    /// Remove favorite team
+    func removeFavoriteTeam() async throws {
+        let _: EmptyResponse = try await request(
+            endpoint: "/user/favorite-team",
+            method: .delete,
+            requiresAuth: true
+        )
+    }
+
+    /// Get all devices
+    func getDevices() async throws -> DevicesResponse {
+        try await request(
+            endpoint: "/devices",
+            method: .get,
+            requiresAuth: true
+        )
+    }
+
+    /// Update device name or notification settings
+    func updateDevice(deviceId: String, name: String? = nil, notificationsEnabled: Bool? = nil) async throws {
+        let request = UpdateDeviceRequest(deviceName: name, notificationsEnabled: notificationsEnabled)
+        let _: EmptyResponse = try await self.request(
+            endpoint: "/devices/\(deviceId)",
+            method: .put,
+            body: request,
+            requiresAuth: true
+        )
+    }
+
+    /// Remove device
+    func removeDevice(deviceId: String) async throws {
+        let _: EmptyResponse = try await request(
+            endpoint: "/devices/\(deviceId)",
+            method: .delete,
+            requiresAuth: true
+        )
+    }
+
+    /// Get all push tokens
+    func getPushTokens() async throws -> PushTokensResponse {
+        try await request(
+            endpoint: "/push-tokens",
+            method: .get,
+            requiresAuth: true
+        )
+    }
+
+    /// Delete push token
+    func deletePushToken(tokenId: String) async throws {
+        let _: EmptyResponse = try await request(
+            endpoint: "/push-tokens/\(tokenId)",
+            method: .delete,
+            requiresAuth: true
+        )
+    }
+
+    /// Register push token for live match
+    func registerLiveActivityToken(matchUUID: String, token: String) async throws -> RegisterPushTokenResponse {
+        let deviceId = keychain.getDeviceId()
+        let environment: String
+        #if DEBUG
+            environment = "development"
+        #else
+            environment = "production"
+        #endif
+
+        let request = RegisterPushTokenRequest(
+            deviceUUID: deviceId,
+            token: token,
+            environment: environment
+        )
+
+        return try await self.request(
+            endpoint: "/live/\(matchUUID)",
+            method: .post,
+            body: request,
+            requiresAuth: true
+        )
+    }
+
     // MARK: - Private Helper Methods
 
     private func request<T: Decodable>(_ target: SHLAPIService) async throws -> T {
@@ -203,6 +376,22 @@ class SHLAPIClient {
             }
         }
     }
+}
+
+// MARK: - HTTP Method Enum
+
+enum HTTPMethod: String {
+    case get = "GET"
+    case post = "POST"
+    case put = "PUT"
+    case patch = "PATCH"
+    case delete = "DELETE"
+}
+
+// MARK: - Empty Response for 204 No Content
+
+struct EmptyResponse: Codable {
+    init() {}
 }
 
 // MARK: - Helper Response Types

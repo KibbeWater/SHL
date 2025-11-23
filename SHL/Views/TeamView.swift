@@ -5,7 +5,6 @@
 //  Created by Linus Rönnbäck Larsson on 28/9/24.
 //
 
-import HockeyKit
 import Kingfisher
 import SwiftUI
 
@@ -362,5 +361,4 @@ struct TeamView: View {
 
 #Preview {
     TeamView(team: .fakeData())
-        .environment(\.hockeyAPI, HockeyAPI())
 }

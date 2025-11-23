@@ -1,7 +1,6 @@
 import SwiftUI
 import PostHog
 import ActivityKit
-import HockeyKit
 
 private enum Tabs: String, CaseIterable {
     case previous = "Previous"

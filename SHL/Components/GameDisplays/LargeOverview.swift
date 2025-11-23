@@ -7,7 +7,6 @@
 
 import MapKit
 import SwiftUI
-import HockeyKit
 
 struct LargeOverview: View {
     var game: Match

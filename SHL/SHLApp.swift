@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
-import HockeyKit
 import PostHog
 
 @main
 struct LHFApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     init() {
         let config = PostHogConfig(
             apiKey: SharedPreferenceKeys.POSTHOG_API_KEY,

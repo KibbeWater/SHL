@@ -5,7 +5,6 @@
 //  Created by KibbeWater on 3/27/24.
 //
 
-import HockeyKit
 import Foundation
 import ActivityKit
 import UserNotifications
@@ -13,14 +12,9 @@ import UserNotifications
 public class ActivityUpdater {
     @MainActor public static let shared: ActivityUpdater = ActivityUpdater()
     public var deviceUUID = UUID()
-    
-    func OverviewToState(_ overview: GameData.GameOverview) -> SHLWidgetAttributes.ContentState {
-        return SHLWidgetAttributes.ContentState(homeScore: overview.homeGoals, awayScore: overview.awayGoals, period: .init(period: overview.time.period, periodEnd: (overview.time.periodEnd ?? Date()).ISO8601Format(), state: .intermission))
-    }
-    
-    func OverviewToAttrib(_ overview: GameData.GameOverview) -> SHLWidgetAttributes {
-        return SHLWidgetAttributes(id: overview.gameUuid, homeTeam: .init(name: overview.homeTeam.teamName, teamCode: overview.homeTeam.teamCode), awayTeam: .init(name: overview.awayTeam.teamName, teamCode: overview.awayTeam.teamCode))
-    }
+
+    private let settings = Settings.shared
+    private let keychain = KeychainManager.shared
 
     func OverviewToAttrib(_ liveMatch: LiveMatch) -> SHLWidgetAttributes {
         return SHLWidgetAttributes(id: liveMatch.externalId, homeTeam: .init(name: liveMatch.homeTeam.name, teamCode: liveMatch.homeTeam.code), awayTeam: .init(name: liveMatch.awayTeam.name, teamCode: liveMatch.awayTeam.code))
@@ -28,93 +22,6 @@ public class ActivityUpdater {
 
     func OverviewToState(_ liveMatch: LiveMatch) -> SHLWidgetAttributes.ContentState {
         return SHLWidgetAttributes.ContentState(homeScore: liveMatch.homeScore, awayScore: liveMatch.awayScore, period: .init(period: liveMatch.period, periodEnd: liveMatch.periodEnd.ISO8601Format(), state: .intermission))
-    }
-
-    func OverviewToAttrib(_ match: Game) -> SHLWidgetAttributes {
-        return SHLWidgetAttributes(id: match.id, homeTeam: .init(name: match.homeTeam.name, teamCode: match.homeTeam.code), awayTeam: .init(name: match.awayTeam.name, teamCode: match.awayTeam.code))
-    }
-    
-    @available(iOS 16.2, *)
-    public func start(match: Game) throws {
-        let attrib = OverviewToAttrib(match)
-        let initState = SHLWidgetAttributes.ContentState(
-            homeScore: 0,
-            awayScore: 0,
-            period: .init(
-                period: 1,
-                periodEnd: "",
-                state: .intermission
-            )
-        )
-        
-        let activity = try Activity.request(
-            attributes: attrib,
-            content: .init(state: initState, staleDate: nil),
-            pushType: .token
-        )
-        
-        Task {
-            let center = UNUserNotificationCenter.current()
-            
-            do {
-                try await center.requestAuthorization(options: [.alert])
-            } catch {
-                
-            }
-        }
-        
-        Task {
-            for await pushToken in activity.pushTokenUpdates {
-                let pushTokenString = pushToken.reduce("") {
-                    $0 + String(format: "%02x", $1)
-                }
-                
-                
-#if DEBUG
-      print("Development Tokens: \(pushTokenString)")
-#endif
-                
-                // Send the push token
-                updatePushToken(match.id, token: pushTokenString)
-            }
-        }
-    }
-    
-    @available(iOS 16.2, *)
-    public func start(match: GameData.GameOverview) throws {
-        let attrib = OverviewToAttrib(match)
-        let initState = OverviewToState(match)
-
-        let activity = try Activity.request(
-            attributes: attrib,
-            content: .init(state: initState, staleDate: nil),
-            pushType: .token
-        )
-
-        Task {
-            let center = UNUserNotificationCenter.current()
-
-            do {
-                try await center.requestAuthorization(options: [.alert])
-            } catch {
-                // Handle errors that may occur during requestAuthorization.
-            }
-        }
-
-        Task {
-            for await pushToken in activity.pushTokenUpdates {
-                let pushTokenString = pushToken.reduce("") {
-                    $0 + String(format: "%02x", $1)
-                }
-
-#if DEBUG
-      print("Development Tokens: \(pushTokenString)")
-#endif
-
-                // Send the push token
-                updatePushToken(match.gameUuid, token: pushTokenString)
-            }
-        }
     }
 
     @available(iOS 16.2, *)
@@ -155,9 +62,31 @@ public class ActivityUpdater {
     }
     
     func updatePushToken(_ matchUUID: String, token: String) {
+        // Use authenticated API if user management is enabled
+        if settings.userManagementEnabled {
+            Task {
+                do {
+                    let response = try await SHLAPIClient.shared.registerLiveActivityToken(
+                        matchUUID: matchUUID,
+                        token: token
+                    )
+                    print("✅ Successfully registered live activity token (authenticated): \(response.id)")
+                } catch {
+                    print("❌ Failed to register live activity token (authenticated): \(error)")
+                    // Fallback to unauthenticated if registration fails
+                    fallbackUpdatePushToken(matchUUID, token: token)
+                }
+            }
+        } else {
+            // Use legacy unauthenticated endpoint
+            fallbackUpdatePushToken(matchUUID, token: token)
+        }
+    }
+
+    private func fallbackUpdatePushToken(_ matchUUID: String, token: String) {
         var json: [String: Any] = ["token": token,
                                    "deviceUUID": deviceUUID.uuidString]
-        
+
         #if DEBUG
         json["environment"] = "development"
         #endif
@@ -180,7 +109,7 @@ public class ActivityUpdater {
             }
             let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
             if let responseJSON = responseJSON as? [String: Any] {
-                print(responseJSON)
+                print("✅ Successfully registered live activity token (legacy): \(responseJSON)")
             }
         }
 

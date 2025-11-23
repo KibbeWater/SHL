@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import HockeyKit
 import SwiftUI
 
 @MainActor

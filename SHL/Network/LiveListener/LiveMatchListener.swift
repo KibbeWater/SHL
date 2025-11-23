@@ -3,22 +3,26 @@
 //  SHL
 //
 //  Created by Migration Script
+//  Migrated to native SSE implementation
 //
 
 import Combine
 import Foundation
-import HockeyKit
 
-/// Wrapper class for HockeyKit's live match listener functionality.
-/// This is the ONLY class that should import and use HockeyKit in the app.
+/// Native live match listener using SSE connection
+/// Provides live game updates with connection quality monitoring
 class LiveMatchListener: ObservableObject {
-    private let listener: ListenerServiceProtocol
     static var shared: LiveMatchListener = .init()
+
+    @Published private(set) var metrics: ConnectionMetrics
+    private let connectionManager: SSEConnectionManager
     private var cancellables: Set<AnyCancellable> = []
+    private var activeSubscriptions: Set<AnyCancellable> = []
 
     init() {
-        self.listener = HockeyAPI().listener
-        listener.connect()
+        let metricsInstance = ConnectionMetrics()
+        self.metrics = metricsInstance
+        self.connectionManager = SSEConnectionManager(metrics: metricsInstance)
     }
 
     /// Subscribe to live updates for specific match IDs
@@ -30,40 +34,85 @@ class LiveMatchListener: ObservableObject {
         _ matchIds: [String] = [],
         matchProvider: @escaping (String) async -> (match: Match, homeTeam: Team, awayTeam: Team)?
     ) -> AnyPublisher<LiveMatch, Never> {
-        return listener.subscribe(matchIds)
-            .flatMap { gameData -> AnyPublisher<LiveMatch?, Never> in
-                let gameUuid = gameData.gameOverview.gameUuid
+        let subject = PassthroughSubject<LiveMatch, Never>()
 
-                return Future<LiveMatch?, Never> { promise in
-                    Task {
+        Task {
+            // First, send any cached data
+            if matchIds.isEmpty {
+                let cachedUpdates = await connectionManager.getAllCachedUpdates()
+                for update in cachedUpdates {
+                    if let data = await matchProvider(update.gameUuid) {
+                        let liveMatch = LiveMatch.fromLiveGameUpdate(
+                            update,
+                            match: data.match,
+                            homeTeam: data.homeTeam,
+                            awayTeam: data.awayTeam
+                        )
+                        subject.send(liveMatch)
+                    }
+                }
+            } else {
+                for gameUuid in matchIds {
+                    if let update = await connectionManager.getCachedUpdate(for: gameUuid) {
                         if let data = await matchProvider(gameUuid) {
-                            let liveMatch = LiveMatch.fromGameData(
-                                gameData,
+                            let liveMatch = LiveMatch.fromLiveGameUpdate(
+                                update,
                                 match: data.match,
                                 homeTeam: data.homeTeam,
                                 awayTeam: data.awayTeam
                             )
-                            promise(.success(liveMatch))
-                        } else {
-                            promise(.success(nil))
+                            subject.send(liveMatch)
                         }
                     }
-                }.eraseToAnyPublisher()
+                }
             }
-            .compactMap { $0 }
-            .eraseToAnyPublisher()
-    }
 
-    /// Subscribe to live updates for specific match IDs (returns raw GameData)
-    /// - Parameter matchIds: Array of match IDs to listen to. If empty, subscribes to all matches.
-    /// - Returns: Publisher that emits GameData events
-    func subscribeRaw(_ matchIds: [String] = []) -> AnyPublisher<GameData, Never> {
-        return listener.subscribe(matchIds)
+            // Then subscribe to live stream
+            let stream = await connectionManager.subscribe()
+            for await update in stream {
+                // Filter by matchIds if specified
+                if !matchIds.isEmpty && !matchIds.contains(update.gameUuid) {
+                    continue
+                }
+
+                // Get match data and transform
+                if let data = await matchProvider(update.gameUuid) {
+                    let liveMatch = LiveMatch.fromLiveGameUpdate(
+                        update,
+                        match: data.match,
+                        homeTeam: data.homeTeam,
+                        awayTeam: data.awayTeam
+                    )
+                    subject.send(liveMatch)
+                }
+            }
+
+            subject.send(completion: .finished)
+        }
+
+        return subject.eraseToAnyPublisher()
     }
 
     /// Request initial data for specific match IDs
+    /// Returns cached data immediately if available
     /// - Parameter matchIds: Array of match IDs to fetch
     func requestInitialData(_ matchIds: [String]) {
-        listener.requestInitialData(matchIds)
+        Task {
+            // With our implementation, cached data is automatically sent on subscribe
+            // This method is kept for backward compatibility but doesn't need to do anything
+            // since subscribe() already sends cached data immediately
+        }
+    }
+
+    /// Disconnect from SSE stream
+    func disconnect() {
+        Task {
+            await connectionManager.disconnect()
+        }
+    }
+
+    deinit {
+        cancellables.forEach { $0.cancel() }
+        activeSubscriptions.forEach { $0.cancel() }
     }
 }

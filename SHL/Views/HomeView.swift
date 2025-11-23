@@ -6,7 +6,6 @@
 //
 
 import ActivityKit
-import HockeyKit
 import PostHog
 import SwiftUI
 

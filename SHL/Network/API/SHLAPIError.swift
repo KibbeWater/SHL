@@ -11,6 +11,7 @@ enum SHLAPIError: Error, LocalizedError {
     case networkError(underlying: Error)
     case decodingError(underlying: Error)
     case invalidResponse
+    case invalidURL
     case httpError(statusCode: Int, data: Data?)
     case notFound
     case serverError
@@ -25,6 +26,8 @@ enum SHLAPIError: Error, LocalizedError {
             return "Failed to decode response: \(error.localizedDescription)"
         case .invalidResponse:
             return "Invalid response from server"
+        case .invalidURL:
+            return "Invalid URL"
         case .httpError(let statusCode, _):
             return "HTTP error: \(statusCode)"
         case .notFound:

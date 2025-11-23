@@ -5,7 +5,6 @@
 //  Created by Linus Rönnbäck Larsson on 3/3/25.
 //
 
-import HockeyKit
 import SwiftUI
 
 struct GameTime: View {

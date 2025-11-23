@@ -5,7 +5,6 @@
 //  Created by Linus Rönnbäck Larsson on 30/9/24.
 //
 
-import HockeyKit
 import Kingfisher
 import SwiftUI
 
@@ -139,8 +138,6 @@ private struct GoalieStatsGridView: View {
 // MARK: - Player View
 
 struct PlayerView: View {
-    @Environment(\.hockeyAPI) private var api: HockeyAPI
-    
     @StateObject private var viewModel: PlayerViewModel
 
     let player: Player

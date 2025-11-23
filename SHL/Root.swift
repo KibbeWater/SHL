@@ -5,7 +5,6 @@
 //  Created by user242911 on 3/23/24.
 //
 
-import HockeyKit
 import SwiftUI
 
 enum RootTabs: Equatable, Hashable, Identifiable {

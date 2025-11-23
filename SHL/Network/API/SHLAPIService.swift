@@ -14,7 +14,6 @@ enum SHLAPIService {
     case searchMatches(date: String?, team: String?, season: String?, state: String?, descending: Bool?, page: Int, limit: Int)
     case liveMatches
     case getLiveMatch(id: String)
-    case getLiveExternal(id: String)
     case matchDetail(id: String)
     case matchStats(id: String)
     case matchEvents(id: String)
@@ -55,8 +54,6 @@ extension SHLAPIService: TargetType {
             return "/api/v1/matches/live"
         case let .getLiveMatch(id):
             return "/api/v1/live/\(id)"
-        case let .getLiveExternal(id):
-            return "/api/v1/live/\(id)/external"
         case let .matchDetail(id):
             return "/api/v1/matches/\(id)"
         case let .matchStats(id):
