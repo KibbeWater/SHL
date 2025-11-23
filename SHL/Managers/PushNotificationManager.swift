@@ -15,11 +15,16 @@ final class PushNotificationManager: NSObject, ObservableObject {
 
     @Published private(set) var isRegistered = false
     @Published private(set) var pushToken: String?
+    @Published var permissionStatus: UNAuthorizationStatus = .notDetermined
+    @Published var isTokenRegisteredWithBackend = false
 
     private let settings = Settings.shared
 
     private override init() {
         super.init()
+        Task {
+            await checkAndUpdatePermissionStatus()
+        }
     }
 
     // MARK: - Permission Requests
@@ -46,6 +51,28 @@ final class PushNotificationManager: NSObject, ObservableObject {
         return settings.authorizationStatus
     }
 
+    /// Check and update permission status
+    func checkAndUpdatePermissionStatus() async {
+        let status = await checkNotificationPermission()
+        await MainActor.run {
+            self.permissionStatus = status
+        }
+    }
+
+    /// Request permissions and register token with backend
+    /// Convenience method callable from anywhere in the app
+    func requestPermissionsAndRegister() async -> Bool {
+        let granted = await requestNotificationPermission()
+
+        if granted {
+            await checkAndUpdatePermissionStatus()
+            // Token registration will happen after token is received
+            // See didRegisterForRemoteNotifications
+        }
+
+        return granted
+    }
+
     // MARK: - APNs Registration
 
     /// Register for remote notifications (call from main thread)
@@ -65,8 +92,9 @@ final class PushNotificationManager: NSObject, ObservableObject {
 
         // Auto-register with backend if user management is enabled
         if settings.userManagementEnabled {
-            // The token will be used when registering for live activities
-            // Each live activity will register its own listener with this token
+            Task {
+                try? await registerTokenWithBackend()
+            }
         }
     }
 
@@ -74,6 +102,41 @@ final class PushNotificationManager: NSObject, ObservableObject {
     func didFailToRegisterForRemoteNotifications(error: Error) {
         print("Failed to register for remote notifications: \(error)")
         self.isRegistered = false
+    }
+
+    /// Register token with backend for push notifications
+    func registerTokenWithBackend() async throws {
+        guard let token = pushToken else {
+            throw PushNotificationError.noToken
+        }
+
+        guard settings.userManagementEnabled else {
+            throw PushNotificationError.userManagementDisabled
+        }
+
+        #if DEBUG
+        let environment = "development"
+        #else
+        let environment = "production"
+        #endif
+
+        let request = RegisterPushTokenRequest(
+            token: token,
+            deviceId: KeychainManager.shared.getDeviceId(),
+            type: "regular",
+            environment: environment
+        )
+
+        do {
+            let _ = try await SHLAPIClient.shared.registerPushToken(request)
+            await MainActor.run {
+                self.isTokenRegisteredWithBackend = true
+            }
+            print("✅ Push token registered with backend successfully")
+        } catch {
+            print("❌ Failed to register push token with backend: \(error)")
+            throw error
+        }
     }
 
     // MARK: - Live Activity Token Registration
@@ -94,7 +157,7 @@ final class PushNotificationManager: NSObject, ObservableObject {
                 token: token
             )
 
-            print("Successfully registered live activity token for match: \(matchUUID), listener ID: \(response.id)")
+            print("Successfully registered live activity token for match: \(matchUUID)")
         } catch {
             print("Failed to register live activity token: \(error)")
             throw error
@@ -166,3 +229,60 @@ enum PushNotificationError: LocalizedError {
         }
     }
 }
+
+// MARK: - Debug Extensions
+
+#if DEBUG
+extension PushNotificationManager {
+    /// Send a test notification (Debug Only)
+    func testNotification(type: NotificationType, title: String? = nil, body: String? = nil) async throws -> TestNotificationResponse {
+        guard AuthenticationManager.shared.isAuthenticated else {
+            throw PushNotificationError.userManagementDisabled
+        }
+
+        let request: TestNotificationRequest
+        if type == .custom {
+            request = TestNotificationRequest(
+                type: type,
+                title: title ?? "Test",
+                body: body ?? "Test notification",
+                bypassPreferences: true,
+                bypassCache: true
+            )
+        } else {
+            request = TestNotificationRequest(
+                type: type,
+                bypassPreferences: true,
+                bypassCache: true
+            )
+        }
+
+        // Backend uses JWT to identify user automatically
+        return try await SHLAPIClient.shared.testNotification(request: request)
+    }
+
+    /// Get detailed push token information for debugging
+    var debugInfo: String {
+        var info = "Push Notification Debug Info\n"
+        info += "============================\n\n"
+
+        if let token = pushToken {
+            info += "Token: \(token.prefix(20))...\n"
+        } else {
+            info += "Token: None\n"
+        }
+
+        info += "Registered: \(isRegistered)\n"
+
+        if let userId = AuthenticationManager.shared.currentUserId {
+            info += "User ID: \(userId)\n"
+        } else {
+            info += "User ID: Not authenticated\n"
+        }
+
+        info += "User Management: \(Settings.shared.userManagementEnabled ? "Enabled" : "Disabled")\n"
+
+        return info
+    }
+}
+#endif

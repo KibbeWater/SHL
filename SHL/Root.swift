@@ -57,7 +57,9 @@ struct Root: View {
                     }
                     
                     Tab("Settings", systemImage: "gearshape", value: RootTabs.settings) {
-                        SettingsView()
+                        NavigationStack {
+                            SettingsView()
+                        }
                     }
                     
                     if #available(iOS 26.0, *) {

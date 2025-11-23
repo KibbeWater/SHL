@@ -12,6 +12,7 @@ struct SettingsView: View {
 
     @ObservedObject private var settings = Settings.shared
     @ObservedObject private var authManager = AuthenticationManager.shared
+    @ObservedObject private var pushManager = PushNotificationManager.shared
 
     @State private var selectedTeam: String? = nil
     @State private var teams: [Team] = []
@@ -173,6 +174,62 @@ struct SettingsView: View {
                     ))
                 }
 
+                // MARK: - Push Notification Status
+
+                Section("Push Notifications") {
+                    HStack {
+                        Text("Permission Status")
+                        Spacer()
+                        switch pushManager.permissionStatus {
+                        case .authorized:
+                            Label("Authorized", systemImage: "checkmark.circle.fill")
+                                .foregroundStyle(.green)
+                        case .denied:
+                            Label("Denied", systemImage: "xmark.circle.fill")
+                                .foregroundStyle(.red)
+                        case .notDetermined:
+                            Label("Not Set", systemImage: "questionmark.circle.fill")
+                                .foregroundStyle(.orange)
+                        case .provisional, .ephemeral:
+                            Label("Provisional", systemImage: "clock.circle.fill")
+                                .foregroundStyle(.orange)
+                        @unknown default:
+                            Label("Unknown", systemImage: "exclamationmark.circle.fill")
+                                .foregroundStyle(.gray)
+                        }
+                    }
+                    .font(.caption)
+
+                    if pushManager.permissionStatus != .authorized {
+                        Button {
+                            Task {
+                                _ = await pushManager.requestPermissionsAndRegister()
+                            }
+                        } label: {
+                            Label("Enable Push Notifications", systemImage: "bell.badge.fill")
+                        }
+                    } else {
+                        HStack {
+                            Text("Backend Registration")
+                            Spacer()
+                            if pushManager.isTokenRegisteredWithBackend {
+                                Label("Registered", systemImage: "checkmark.circle.fill")
+                                    .foregroundStyle(.green)
+                            } else if pushManager.pushToken != nil {
+                                Button("Register Token") {
+                                    Task {
+                                        try? await pushManager.registerTokenWithBackend()
+                                    }
+                                }
+                            } else {
+                                Label("No Token", systemImage: "xmark.circle.fill")
+                                    .foregroundStyle(.red)
+                            }
+                        }
+                        .font(.caption)
+                    }
+                }
+
                 // MARK: - Account Management
 
                 Section("Account Management") {
@@ -216,6 +273,20 @@ struct SettingsView: View {
                     Text("Are you sure you want to delete your account? This action cannot be undone and will remove all your data from our servers.")
                 }
             }
+
+            // MARK: - Debug Tools Section
+
+#if DEBUG
+            Section("Debug Tools") {
+                if settings.userManagementEnabled && authManager.isAuthenticated {
+                    NavigationLink {
+                        NotificationTestView()
+                    } label: {
+                        Label("Test Push Notifications", systemImage: "bell.badge.fill")
+                    }
+                }
+            }
+#endif
 
             Section("Support Me") {
                 /*Button("Leave a Tip") {

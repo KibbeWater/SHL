@@ -8,7 +8,6 @@
 import ActivityKit
 import WidgetKit
 import SwiftUI
-import HockeyKit
 
 extension AnyTransition {
     static var moveDown: AnyTransition {

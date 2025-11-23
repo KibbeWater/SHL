@@ -70,7 +70,7 @@ public class ActivityUpdater {
                         matchUUID: matchUUID,
                         token: token
                     )
-                    print("✅ Successfully registered live activity token (authenticated): \(response.id)")
+                    print("✅ Successfully registered live activity token (authenticated): \(response)")
                 } catch {
                     print("❌ Failed to register live activity token (authenticated): \(error)")
                     // Fallback to unauthenticated if registration fails

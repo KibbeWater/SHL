@@ -220,9 +220,32 @@ class SHLAPIClient {
         }
 
         // Check status code
+        #if DEBUG
+        print("\n========== API RESPONSE ==========")
+        print("Status Code: \(httpResponse.statusCode)")
+        print("URL: \(httpResponse.url?.absoluteString ?? "unknown")")
+
+        if !(200..<300).contains(httpResponse.statusCode) {
+            if let errorString = String(data: data, encoding: .utf8) {
+                print("Error Response Body: \(errorString)")
+            }
+        }
+        print("==================================\n")
+        #endif
+
         guard (200..<300).contains(httpResponse.statusCode) else {
             let error = SHLAPIError.map(statusCode: httpResponse.statusCode, data: data)
             throw error
+        }
+
+        // Handle empty response for 201 Created (common for resource creation)
+        if httpResponse.statusCode == 201 && data.isEmpty {
+            if T.self == RegisterPushTokenResponse.self {
+                // Return a success response with default values
+                return RegisterPushTokenResponse(success: true, message: nil) as! T
+            } else if T.self == EmptyResponse.self {
+                return EmptyResponse() as! T
+            }
         }
 
         // Handle empty response for 204 No Content
@@ -266,6 +289,16 @@ class SHLAPIClient {
         let _: EmptyResponse = try await request(
             endpoint: "/user/favorite-team",
             method: .delete,
+            requiresAuth: true
+        )
+    }
+
+    /// Register push notification token
+    func registerPushToken(_ request: RegisterPushTokenRequest) async throws -> RegisterPushTokenResponse {
+        try await self.request(
+            endpoint: "/push-tokens/register",
+            method: .post,
+            body: request,
             requiresAuth: true
         )
     }
@@ -328,8 +361,8 @@ class SHLAPIClient {
         #endif
 
         let request = RegisterPushTokenRequest(
-            deviceUUID: deviceId,
             token: token,
+            deviceId: deviceId,
             environment: environment
         )
 

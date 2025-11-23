@@ -160,16 +160,24 @@ struct PushTokensResponse: Codable {
 }
 
 struct RegisterPushTokenRequest: Codable {
-    let deviceUUID: String
     let token: String
-    let environment: String
+    let deviceId: String
+    let type: String
+    let teamCode: String?
+    let environment: String?
+
+    init(token: String, deviceId: String, type: String = "regular", teamCode: String? = nil, environment: String? = "production") {
+        self.token = token
+        self.deviceId = deviceId
+        self.type = type
+        self.teamCode = teamCode
+        self.environment = environment
+    }
 }
 
 struct RegisterPushTokenResponse: Codable {
-    let id: String
-    let deviceUUID: String
-    let matchId: String
-    let environment: String
+    let success: Bool?
+    let message: String?
 }
 
 // MARK: - User Data Export (GDPR)

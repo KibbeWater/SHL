@@ -50,6 +50,9 @@
 		801A96242ED1EF2E00530970 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 801A96232ED1EF2E00530970 /* Kingfisher */; };
 		801A96262ED1EF2E00530970 /* SVGKit in Frameworks */ = {isa = PBXBuildFile; productRef = 801A96252ED1EF2E00530970 /* SVGKit */; };
 		801A96282ED1EF2E00530970 /* SVGKitSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 801A96272ED1EF2E00530970 /* SVGKitSwift */; };
+		801A962A2ED30D1300530970 /* TestNotificationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 801A96292ED30D1300530970 /* TestNotificationModels.swift */; };
+		801A962F2ED30D4400530970 /* NotificationTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 801A962D2ED30D4400530970 /* NotificationTestView.swift */; };
+		801A96312ED30D8900530970 /* SHLAPIDebug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 801A96302ED30D8400530970 /* SHLAPIDebug.swift */; };
 		8020C25D2D7644D500F1FB5E /* ScrollPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */; };
 		8020C25F2D7644D500F1FB5E /* ScrollPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */; };
 		8020C2622D7651A500F1FB5E /* GameTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8020C2602D7651A500F1FB5E /* GameTime.swift */; };
@@ -180,6 +183,9 @@
 		801A96022ED1ED0A00530970 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
 		801A96052ED1ED2800530970 /* UserModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModels.swift; sourceTree = "<group>"; };
 		801A96082ED1ED3300530970 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		801A96292ED30D1300530970 /* TestNotificationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNotificationModels.swift; sourceTree = "<group>"; };
+		801A962D2ED30D4400530970 /* NotificationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationTestView.swift; sourceTree = "<group>"; };
+		801A96302ED30D8400530970 /* SHLAPIDebug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLAPIDebug.swift; sourceTree = "<group>"; };
 		8020C25C2D7644D500F1FB5E /* ScrollPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollPosition.swift; sourceTree = "<group>"; };
 		8020C2602D7651A500F1FB5E /* GameTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTime.swift; sourceTree = "<group>"; };
 		802AD93A2EACFF0D00916E9F /* LiveMatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveMatch.swift; sourceTree = "<group>"; };
@@ -360,9 +366,18 @@
 		801A96062ED1ED2800530970 /* User */ = {
 			isa = PBXGroup;
 			children = (
+				801A96292ED30D1300530970 /* TestNotificationModels.swift */,
 				801A96052ED1ED2800530970 /* UserModels.swift */,
 			);
 			path = User;
+			sourceTree = "<group>";
+		};
+		801A962E2ED30D4400530970 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				801A962D2ED30D4400530970 /* NotificationTestView.swift */,
+			);
+			path = Debug;
 			sourceTree = "<group>";
 		};
 		802AD9422EAE654500916E9F /* PBP */ = {
@@ -398,6 +413,7 @@
 		806DBDF62EA401FA00E07695 /* API */ = {
 			isa = PBXGroup;
 			children = (
+				801A96302ED30D8400530970 /* SHLAPIDebug.swift */,
 				806DBDF32EA401FA00E07695 /* SHLAPIClient.swift */,
 				806DBDF42EA401FA00E07695 /* SHLAPIError.swift */,
 				806DBDF52EA401FA00E07695 /* SHLAPIService.swift */,
@@ -660,6 +676,7 @@
 		BCD7BC162BAF69E000E208B3 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				801A962E2ED30D4400530970 /* Debug */,
 				BCAFE2CF2B4095170044225A /* HomeView.swift */,
 				BCD7BC172BAF6B9800E208B3 /* MatchListView.swift */,
 				BC6212E42BB05B81003CCB45 /* MatchView.swift */,
@@ -905,8 +922,10 @@
 				801A95F52EC8A5EA00530970 /* SSEConnectionManager.swift in Sources */,
 				806DBE1A2EA401FA00E07695 /* TeamDetail.swift in Sources */,
 				801A96042ED1ED0A00530970 /* KeychainManager.swift in Sources */,
+				801A962F2ED30D4400530970 /* NotificationTestView.swift in Sources */,
 				801A96092ED1ED3300530970 /* AppDelegate.swift in Sources */,
 				806DBE1B2EA401FA00E07695 /* SHLAPIClient.swift in Sources */,
+				801A96312ED30D8900530970 /* SHLAPIDebug.swift in Sources */,
 				806DBE1C2EA401FA00E07695 /* Match.swift in Sources */,
 				806DBE1D2EA401FA00E07695 /* SHLAPIError.swift in Sources */,
 				802AD9712EB1834900916E9F /* SearchView.swift in Sources */,
@@ -923,6 +942,7 @@
 				801A96012ED1ECFA00530970 /* iCloudSyncManager.swift in Sources */,
 				8075FBB42CA62706004C6438 /* GameExtensions.swift in Sources */,
 				BCAFE2CE2B4095170044225A /* SHLApp.swift in Sources */,
+				801A962A2ED30D1300530970 /* TestNotificationModels.swift in Sources */,
 				802AD93B2EACFF1100916E9F /* LiveMatch.swift in Sources */,
 				BCFA44AB2B44C06700B4358C /* StandingsTable.swift in Sources */,
 				BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */,
