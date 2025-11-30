@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+// MARK: - Notification Names
+
+extension Notification.Name {
+    static let interestedTeamsDidChange = Notification.Name("interestedTeamsDidChange")
+}
+
 public enum SharedPreferenceKeys {
     static let appId = "6479990812"
     static let groupIdentifier: String = "group.kibbewater.shl"
@@ -18,31 +24,112 @@ public enum SharedPreferenceKeys {
 class Settings: ObservableObject {
     public static let shared = Settings()
 
-    // MARK: - Team Preferences
+    // MARK: - Interested Teams
 
-    @CloudStorage(key: "preferredTeam", default: "")
-    private var _preferredTeam: String
+    @CloudStorage(key: "interestedTeamIds", default: [])
+    private var _interestedTeamIds: [String]
 
-    public func getPreferredTeam() -> String? {
-        let team = _preferredTeam.isEmpty ? nil : _preferredTeam
-        return team
+    // Cache for team details (not synced to cloud - fetched dynamically)
+    private var _cachedInterestedTeams: [InterestedTeam] = []
+
+    /// Returns the interested team IDs (UUIDs)
+    public func getInterestedTeamIds() -> [String] {
+        return _interestedTeamIds
     }
 
-    public func binding_preferredTeam() -> Binding<String> {
-        return Binding(
-            get: { self._preferredTeam },
-            set: { newValue in
-                self.objectWillChange.send()
-                self._preferredTeam = newValue
+    /// Returns the cached interested teams with full details
+    public func getInterestedTeams() -> [InterestedTeam] {
+        return _cachedInterestedTeams
+    }
 
-                // Sync with backend if user management is enabled
-                if self.userManagementEnabled && !newValue.isEmpty {
-                    Task {
-                        try? await SHLAPIClient.shared.setFavoriteTeam(teamId: newValue)
-                    }
-                }
+    /// Sets all interested teams at once
+    public func setInterestedTeams(_ teams: [InterestedTeam]) {
+        objectWillChange.send()
+        _interestedTeamIds = teams.map { $0.id }
+        _cachedInterestedTeams = teams
+
+        // Sync with backend if user management is enabled
+        if userManagementEnabled {
+            Task {
+                try? await SHLAPIClient.shared.setInterestedTeams(teamIds: _interestedTeamIds)
             }
-        )
+        }
+
+        // Notify observers that teams changed (for token re-registration)
+        NotificationCenter.default.post(name: .interestedTeamsDidChange, object: nil)
+    }
+
+    /// Add a team to interested teams
+    public func addInterestedTeam(_ team: InterestedTeam) {
+        guard !_interestedTeamIds.contains(team.id) else { return }
+
+        objectWillChange.send()
+        _interestedTeamIds.append(team.id)
+        _cachedInterestedTeams.append(team)
+
+        // Sync with backend if user management is enabled
+        if userManagementEnabled {
+            Task {
+                try? await SHLAPIClient.shared.addInterestedTeam(teamId: team.id)
+            }
+        }
+
+        // Notify observers that teams changed
+        NotificationCenter.default.post(name: .interestedTeamsDidChange, object: nil)
+    }
+
+    /// Remove a team from interested teams
+    public func removeInterestedTeam(id: String) {
+        objectWillChange.send()
+        _interestedTeamIds.removeAll { $0 == id }
+        _cachedInterestedTeams.removeAll { $0.id == id }
+
+        // Sync with backend if user management is enabled
+        if userManagementEnabled {
+            Task {
+                try? await SHLAPIClient.shared.removeInterestedTeam(teamId: id)
+            }
+        }
+
+        // Notify observers that teams changed
+        NotificationCenter.default.post(name: .interestedTeamsDidChange, object: nil)
+    }
+
+    /// Cache interested teams from API response (without triggering sync)
+    public func cacheInterestedTeams(_ teams: [InterestedTeam]) {
+        objectWillChange.send()
+        _cachedInterestedTeams = teams
+        _interestedTeamIds = teams.map { $0.id }
+    }
+
+    /// Returns the primary team code (first team) for push token registration
+    public func getPrimaryTeamCode() -> String? {
+        return _cachedInterestedTeams.first?.code
+    }
+
+    /// Check if a specific team is in interested teams
+    public func isTeamInterested(teamId: String) -> Bool {
+        return _interestedTeamIds.contains(teamId)
+    }
+
+    // MARK: - Migration from old preferredTeam
+
+    /// Migrate old single preferredTeam to new interestedTeams array (call once on app launch)
+    public func migratePreferredTeamIfNeeded() {
+        let oldKey = "preferredTeam"
+        let defaults = UserDefaults(suiteName: SharedPreferenceKeys.groupIdentifier)
+
+        if let oldTeamId = defaults?.string(forKey: oldKey), !oldTeamId.isEmpty {
+            // Only migrate if we don't already have interested teams
+            if _interestedTeamIds.isEmpty {
+                _interestedTeamIds = [oldTeamId]
+                #if DEBUG
+                print("✅ Migrated preferredTeam to interestedTeams: \(oldTeamId)")
+                #endif
+            }
+            // Clear old key
+            defaults?.removeObject(forKey: oldKey)
+        }
     }
 
     // MARK: - User Management Settings
@@ -90,9 +177,10 @@ class Settings: ObservableObject {
             let userId = try await AuthenticationManager.shared.register()
             print("User registered successfully: \(userId)")
 
-            // Sync current preferred team to backend
-            if let teamId = getPreferredTeam(), !teamId.isEmpty {
-                try? await SHLAPIClient.shared.setFavoriteTeam(teamId: teamId)
+            // Sync current interested teams to backend
+            let teamIds = getInterestedTeamIds()
+            if !teamIds.isEmpty {
+                try? await SHLAPIClient.shared.setInterestedTeams(teamIds: teamIds)
             }
 
             // Sync notification settings

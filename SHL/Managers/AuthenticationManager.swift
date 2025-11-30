@@ -172,6 +172,22 @@ final class AuthenticationManager: ObservableObject {
             keychain.saveToken(session.token, expiresAt: session.expiresAt)
             keychain.saveUserId(session.userId)
 
+            // Validate session with backend by trying to refresh
+            do {
+                try await refreshToken()
+                #if DEBUG
+                print("✅ Successfully validated iCloud session with backend")
+                #endif
+            } catch {
+                #if DEBUG
+                print("⚠️ iCloud session invalid on backend, clearing and re-registering")
+                #endif
+                // Session is invalid (user doesn't exist), clear and return false
+                clearAuthenticationData()
+                try? await iCloudSync.deleteUserSession()
+                return false
+            }
+
             await MainActor.run {
                 self.isAuthenticated = true
                 self.currentUserId = session.userId

@@ -12,10 +12,10 @@ class FeaturedGameAlgo {
     /// Get the most relevant featured game from a list of matches
     /// - Parameters:
     ///   - matches: Array of matches to score
-    ///   - preferredTeam: Optional preferred team UUID for bonus scoring
+    ///   - interestedTeams: Array of team UUIDs for bonus scoring
     /// - Returns: The highest-scored match, or nil if no matches provided
-    static func getFeaturedGame(_ matches: [Match], preferredTeam: String?) async -> Match? {
-        let scoredMatches = await scoreAndSortMatches(matches, preferredTeam: preferredTeam)
+    static func getFeaturedGame(_ matches: [Match], interestedTeams: [String]) async -> Match? {
+        let scoredMatches = await scoreAndSortMatches(matches, interestedTeams: interestedTeams)
         return scoredMatches.first?.0
     }
 
@@ -30,9 +30,9 @@ class FeaturedGameAlgo {
     /// Score and sort matches by relevance
     /// - Parameters:
     ///   - matches: Array of matches to score
-    ///   - preferredTeam: Optional preferred team UUID for bonus scoring
+    ///   - interestedTeams: Array of team UUIDs for bonus scoring
     /// - Returns: Array of tuples containing match and score, sorted by score (highest first)
-    private static func scoreAndSortMatches(_ matches: [Match], preferredTeam: String?) async -> [(Match, Double)] {
+    private static func scoreAndSortMatches(_ matches: [Match], interestedTeams: [String]) async -> [(Match, Double)] {
         // First, asynchronously get all team UUIDs
         let teamUUIDs = await withTaskGroup(of: (String, String).self) { group in
             for match in matches {
@@ -62,12 +62,12 @@ class FeaturedGameAlgo {
                 score += 1000
             }
 
-            // Preferred team bonus
-            if let preferredTeam = preferredTeam,
+            // Interested teams bonus
+            if !interestedTeams.isEmpty,
                let homeTeamUUID = teamUUIDs[game.homeTeam.code],
                let awayTeamUUID = teamUUIDs[game.awayTeam.code]
             {
-                if homeTeamUUID == preferredTeam || awayTeamUUID == preferredTeam {
+                if interestedTeams.contains(homeTeamUUID) || interestedTeams.contains(awayTeamUUID) {
                     score += 500
                 }
             }

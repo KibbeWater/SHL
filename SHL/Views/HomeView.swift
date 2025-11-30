@@ -83,18 +83,19 @@ struct HomeView: View {
                     "featured_interaction",
                     properties: [
                         "game_id": featured.id,
-                        "is_preferred_team": await FeaturedGameContainsPreferredTeam(),
+                        "is_interested_team": await FeaturedGameContainsInterestedTeam(),
                     ],
                     userProperties: [
-                        "preferred_team": Settings.shared.getPreferredTeam() ?? "N/A",
+                        "interested_teams_count": Settings.shared.getInterestedTeamIds().count,
                     ]
                 )
             }
         })
     }
     
-    func FeaturedGameContainsPreferredTeam() async -> Bool {
-        guard let preferredId = Settings.shared.getPreferredTeam() else {
+    func FeaturedGameContainsInterestedTeam() async -> Bool {
+        let interestedTeams = Settings.shared.getInterestedTeams()
+        guard !interestedTeams.isEmpty else {
             return false
         }
 
@@ -102,11 +103,9 @@ struct HomeView: View {
             return false
         }
 
-        guard let preferredTeam = try? await SHLAPIClient.shared.getTeamDetail(id: preferredId) else {
-            return false
-        }
-
-        return featuredGame.homeTeam.code.lowercased() == preferredTeam.code.lowercased() || featuredGame.awayTeam.code.lowercased() == preferredTeam.code.lowercased()
+        let interestedCodes = interestedTeams.map { $0.code.lowercased() }
+        return interestedCodes.contains(featuredGame.homeTeam.code.lowercased()) ||
+               interestedCodes.contains(featuredGame.awayTeam.code.lowercased())
     }
     
     func getTimeLoop() -> Double {

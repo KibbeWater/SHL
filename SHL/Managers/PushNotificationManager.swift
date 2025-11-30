@@ -25,6 +25,42 @@ final class PushNotificationManager: NSObject, ObservableObject {
         Task {
             await checkAndUpdatePermissionStatus()
         }
+
+        // Observe team changes to re-register tokens with new team code
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleInterestedTeamsChange),
+            name: .interestedTeamsDidChange,
+            object: nil
+        )
+    }
+
+    @objc private func handleInterestedTeamsChange() {
+        #if DEBUG
+        print("""
+
+        ========== TEAMS CHANGED - RE-REGISTERING TOKENS ==========
+        Primary Team Code: \(Settings.shared.getPrimaryTeamCode() ?? "nil")
+        Interested Teams: \(Settings.shared.getInterestedTeamIds().count) teams
+        Has Push Token: \(pushToken != nil)
+        ===========================================================
+
+        """)
+        #endif
+
+        Task {
+            // Re-register push token with new team code
+            if pushToken != nil {
+                try? await registerTokenWithBackend()
+            }
+
+            // Re-register push-to-start token with new team code
+            if #available(iOS 17.2, *) {
+                await MainActor.run {
+                    ActivityUpdater.shared.startObservingPushToStartToken()
+                }
+            }
+        }
     }
 
     // MARK: - Permission Requests
@@ -78,6 +114,9 @@ final class PushNotificationManager: NSObject, ObservableObject {
     /// Register for remote notifications (call from main thread)
     @MainActor
     func registerForRemoteNotifications() async {
+        #if DEBUG
+        print("📱 Requesting remote notification registration...")
+        #endif
         UIApplication.shared.registerForRemoteNotifications()
     }
 
@@ -88,19 +127,37 @@ final class PushNotificationManager: NSObject, ObservableObject {
         self.pushToken = tokenString
         self.isRegistered = true
 
-        print("Successfully registered for remote notifications. Token: \(tokenString)")
+        #if DEBUG
+        print("✅ APNs token received: \(tokenString.prefix(20))...")
+        #endif
 
         // Auto-register with backend if user management is enabled
-        if settings.userManagementEnabled {
+        // Use Settings.shared directly to get current value
+        if Settings.shared.userManagementEnabled {
+            #if DEBUG
+            print("📤 Attempting to register token with backend...")
+            #endif
             Task {
-                try? await registerTokenWithBackend()
+                do {
+                    try await registerTokenWithBackend()
+                } catch {
+                    #if DEBUG
+                    print("❌ Failed to register token with backend: \(error)")
+                    #endif
+                }
             }
+        } else {
+            #if DEBUG
+            print("⚠️ User management disabled, skipping backend registration")
+            #endif
         }
     }
 
     /// Handle failed APNs token registration
     func didFailToRegisterForRemoteNotifications(error: Error) {
-        print("Failed to register for remote notifications: \(error)")
+        #if DEBUG
+        print("❌ Failed to register for remote notifications: \(error.localizedDescription)")
+        #endif
         self.isRegistered = false
     }
 
@@ -124,42 +181,40 @@ final class PushNotificationManager: NSObject, ObservableObject {
             token: token,
             deviceId: KeychainManager.shared.getDeviceId(),
             type: "regular",
+            teamCode: Settings.shared.getPrimaryTeamCode(),
             environment: environment
         )
 
+        #if DEBUG
+        print("""
+
+        ========== PUSH TOKEN REGISTRATION ==========
+        Token Type: regular
+        Token: \(token.prefix(20))...
+        Device ID: \(KeychainManager.shared.getDeviceId())
+        Primary Team Code: \(Settings.shared.getPrimaryTeamCode() ?? "nil")
+        Environment: \(environment)
+        =============================================
+
+        """)
+        #endif
+
+        #if DEBUG
+        print("🌐 Calling API: POST /push-tokens/register")
+        #endif
+
         do {
-            let _ = try await SHLAPIClient.shared.registerPushToken(request)
+            let response = try await SHLAPIClient.shared.registerPushToken(request)
             await MainActor.run {
                 self.isTokenRegisteredWithBackend = true
             }
-            print("✅ Push token registered with backend successfully")
+            #if DEBUG
+            print("✅ Push token registered with backend successfully: \(response)")
+            #endif
         } catch {
+            #if DEBUG
             print("❌ Failed to register push token with backend: \(error)")
-            throw error
-        }
-    }
-
-    // MARK: - Live Activity Token Registration
-
-    /// Register push token for live match updates
-    func registerLiveActivityToken(matchUUID: String) async throws {
-        guard let token = pushToken else {
-            throw PushNotificationError.noToken
-        }
-
-        guard settings.userManagementEnabled else {
-            throw PushNotificationError.userManagementDisabled
-        }
-
-        do {
-            let response = try await SHLAPIClient.shared.registerLiveActivityToken(
-                matchUUID: matchUUID,
-                token: token
-            )
-
-            print("Successfully registered live activity token for match: \(matchUUID)")
-        } catch {
-            print("Failed to register live activity token: \(error)")
+            #endif
             throw error
         }
     }

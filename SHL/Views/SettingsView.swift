@@ -14,10 +14,10 @@ struct SettingsView: View {
     @ObservedObject private var authManager = AuthenticationManager.shared
     @ObservedObject private var pushManager = PushNotificationManager.shared
 
-    @State private var selectedTeam: String? = nil
     @State private var teams: [Team] = []
     @State private var teamsLoaded: Bool = false
     @State private var showDeleteAccountAlert = false
+    @State private var showTeamSelectionSheet = false
     @State private var devices: [Device] = []
     @State private var isLoadingDevices = false
 
@@ -26,8 +26,21 @@ struct SettingsView: View {
     func loadTeams() {
         Task {
             if let newTeams = try? await api.getTeams() {
-                teams = newTeams.sorted(by: { ($0.name) < ($1.name) })
-                teamsLoaded = true
+                await MainActor.run {
+                    teams = newTeams.sorted(by: { ($0.name) < ($1.name) })
+                    teamsLoaded = true
+                }
+
+                // Populate cached interested teams from stored IDs
+                let interestedIds = settings.getInterestedTeamIds()
+                if !interestedIds.isEmpty {
+                    let cachedTeams = interestedIds.compactMap { id in
+                        newTeams.first(where: { $0.id == id }).map { team in
+                            InterestedTeam(id: team.id, name: team.name, code: team.code, city: nil)
+                        }
+                    }
+                    settings.cacheInterestedTeams(cachedTeams)
+                }
             }
         }
     }
@@ -63,35 +76,48 @@ struct SettingsView: View {
     
     var body: some View {
         List {
-            Section("General") {
+            Section {
                 if teamsLoaded {
-                    Picker("Preferred Team", selection: settings.binding_preferredTeam()) {
-                        Text("None")
-                            .tag("")
-                        ForEach(teams.filter({ !$0.id.isEmpty })) { team in
+                    let interestedTeams = settings.getInterestedTeams()
+                    if interestedTeams.isEmpty {
+                        Text("No teams selected")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(interestedTeams) { team in
                             HStack {
                                 Text(team.name)
-                                /*Image("Team/\(team.names.code.uppercased())")
-                                    .resizable()
-                                    .frame(width: 16, height: 16)*/
+                                Spacer()
+                                Text(team.code)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                             }
-                            .tag(team.id)
                         }
                     }
-                    .pickerStyle(.menu)
+
+                    Button {
+                        showTeamSelectionSheet = true
+                    } label: {
+                        Label("Select Teams", systemImage: "person.2.fill")
+                    }
                 } else {
                     HStack {
-                        Text("Preferred Team")
+                        Text("Loading teams...")
                         Spacer()
                         ProgressView()
                     }
                 }
+            } header: {
+                Text("Interested Teams")
+            } footer: {
+                Text("You'll receive notifications for matches involving your selected teams.")
+            }
 
 #if DEBUG
+            Section("Debug") {
                 Button("Reset Cache", role: .destructive) {
                 }
-#endif
             }
+#endif
 
             // MARK: - User Management Section
 
@@ -127,7 +153,7 @@ struct SettingsView: View {
             // MARK: - Notification Settings (only if user management enabled)
 
             if settings.userManagementEnabled {
-                Section("Notification Preferences") {
+                Section {
                     Toggle("Match Reminders", isOn: Binding(
                         get: { settings.notificationSettings.matchReminders },
                         set: { newValue in
@@ -164,14 +190,22 @@ struct SettingsView: View {
                         }
                     ))
 
-                    Toggle("Favorite Team Only", isOn: Binding(
-                        get: { settings.notificationSettings.favoriteTeamOnly },
-                        set: { newValue in
-                            var updated = settings.notificationSettings
-                            updated.favoriteTeamOnly = newValue
-                            settings.notificationSettings = updated
-                        }
-                    ))
+                    if #available(iOS 17.2, *) {
+                        Toggle("Auto-start Live Activity", isOn: Binding(
+                            get: { settings.notificationSettings.autoStartLiveActivity },
+                            set: { newValue in
+                                var updated = settings.notificationSettings
+                                updated.autoStartLiveActivity = newValue
+                                settings.notificationSettings = updated
+                            }
+                        ))
+                    }
+                } header: {
+                    Text("Notification Preferences")
+                } footer: {
+                    if #available(iOS 17.2, *) {
+                        Text("Auto-start Live Activity will automatically show a Live Activity on your Lock Screen 15 minutes before your interested teams play.")
+                    }
                 }
 
                 // MARK: - Push Notification Status
@@ -311,6 +345,20 @@ struct SettingsView: View {
         }
         .onAppear {
             loadTeams()
+        }
+        .sheet(isPresented: $showTeamSelectionSheet) {
+            TeamSelectionSheet(
+                allTeams: teams,
+                selectedTeamIds: settings.getInterestedTeamIds()
+            ) { selectedIds in
+                // Convert selected IDs to InterestedTeam objects
+                let selectedTeams = selectedIds.compactMap { id in
+                    teams.first(where: { $0.id == id }).map { team in
+                        InterestedTeam(id: team.id, name: team.name, code: team.code, city: nil)
+                    }
+                }
+                settings.setInterestedTeams(selectedTeams)
+            }
         }
     }
 }

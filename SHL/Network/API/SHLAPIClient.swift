@@ -15,18 +15,16 @@ class SHLAPIClient {
     private let decoder: JSONDecoder
     private let keychain = KeychainManager.shared
 
+    /// Flag to prevent recursive token refresh attempts
+    private var isRefreshingToken = false
+
     private init() {
         // Configure decoder
         decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
 
-        // Configure provider with plugins
-        #if DEBUG
-            let plugins: [PluginType] = [NetworkLoggerPlugin(verbose: true)]
-        #else
-            let plugins: [PluginType] = []
-        #endif
-
+        // Configure provider without verbose logging
+        let plugins: [PluginType] = []
         provider = MoyaProvider<SHLAPIService>(plugins: plugins)
     }
 
@@ -190,14 +188,24 @@ class SHLAPIClient {
             throw SHLAPIError.invalidURL
         }
 
+        #if DEBUG
+        print("🌐 API Request: \(method.rawValue) \(url.absoluteString)")
+        #endif
+
         // Build request
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
+        request.timeoutInterval = 30 // 30 second timeout
         headers.forEach { request.setValue($0.value, forHTTPHeaderField: $0.key) }
 
         // Add body if present
         if let body = body {
             request.httpBody = try JSONEncoder().encode(body)
+            #if DEBUG
+            if let bodyData = request.httpBody, let bodyString = String(data: bodyData, encoding: .utf8) {
+                print("📦 Request body: \(bodyString)")
+            }
+            #endif
         }
 
         // Execute request
@@ -207,33 +215,67 @@ class SHLAPIClient {
             throw SHLAPIError.invalidResponse
         }
 
+        #if DEBUG
+        print("📥 API Response: \(httpResponse.statusCode) (\(data.count) bytes)")
+        #endif
+
         // Handle 401 Unauthorized - token expired
         if httpResponse.statusCode == 401 && requiresAuth {
+            #if DEBUG
+            print("⚠️ Received 401 Unauthorized for: \(endpoint)")
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("📄 401 Response body: \(responseString)")
+            }
+            #endif
+
+            // Prevent recursive refresh attempts
+            guard !isRefreshingToken else {
+                #if DEBUG
+                print("❌ Already refreshing token, not retrying to prevent infinite loop")
+                #endif
+                throw SHLAPIError.unauthorized
+            }
+
+            // Check if this is the refresh endpoint itself - don't try to refresh again
+            if endpoint == "/auth/refresh" {
+                #if DEBUG
+                print("❌ Token refresh itself returned 401, token is invalid")
+                #endif
+                throw SHLAPIError.unauthorized
+            }
+
             // Try to refresh token
             do {
+                isRefreshingToken = true
+                defer { isRefreshingToken = false }
+
+                #if DEBUG
+                print("🔄 Attempting to refresh token...")
+                #endif
+
                 try await AuthenticationManager.shared.refreshToken()
+
+                #if DEBUG
+                print("✅ Token refreshed, retrying original request...")
+                #endif
+
                 // Retry request with new token
                 return try await self.request(endpoint: endpoint, method: method, body: body, requiresAuth: requiresAuth)
             } catch {
+                #if DEBUG
+                print("❌ Token refresh failed: \(error)")
+                #endif
                 throw SHLAPIError.unauthorized
             }
         }
 
-        // Check status code
-        #if DEBUG
-        print("\n========== API RESPONSE ==========")
-        print("Status Code: \(httpResponse.statusCode)")
-        print("URL: \(httpResponse.url?.absoluteString ?? "unknown")")
-
-        if !(200..<300).contains(httpResponse.statusCode) {
-            if let errorString = String(data: data, encoding: .utf8) {
-                print("Error Response Body: \(errorString)")
-            }
-        }
-        print("==================================\n")
-        #endif
-
         guard (200..<300).contains(httpResponse.statusCode) else {
+            #if DEBUG
+            print("❌ API Error: \(httpResponse.statusCode) for \(endpoint)")
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("📄 Error response body: \(responseString)")
+            }
+            #endif
             let error = SHLAPIError.map(statusCode: httpResponse.statusCode, data: data)
             throw error
         }
@@ -274,21 +316,41 @@ class SHLAPIClient {
         )
     }
 
-    /// Set favorite team
-    func setFavoriteTeam(teamId: String) async throws -> FavoriteTeamResponse {
+    // MARK: - Interested Teams
+
+    /// Get user's interested teams
+    func getInterestedTeams() async throws -> InterestedTeamsResponse {
         try await request(
-            endpoint: "/user/favorite-team",
-            method: .put,
-            body: FavoriteTeamRequest(teamId: teamId),
+            endpoint: "/user/interested-teams",
+            method: .get,
             requiresAuth: true
         )
     }
 
-    /// Remove favorite team
-    func removeFavoriteTeam() async throws {
+    /// Add a team to interested teams
+    func addInterestedTeam(teamId: String) async throws {
         let _: EmptyResponse = try await request(
-            endpoint: "/user/favorite-team",
+            endpoint: "/user/interested-teams/\(teamId)",
+            method: .post,
+            requiresAuth: true
+        )
+    }
+
+    /// Remove a team from interested teams
+    func removeInterestedTeam(teamId: String) async throws {
+        let _: EmptyResponse = try await request(
+            endpoint: "/user/interested-teams/\(teamId)",
             method: .delete,
+            requiresAuth: true
+        )
+    }
+
+    /// Set all interested teams at once (replaces existing)
+    func setInterestedTeams(teamIds: [String]) async throws -> InterestedTeamsResponse {
+        try await request(
+            endpoint: "/user/interested-teams",
+            method: .put,
+            body: SetInterestedTeamsRequest(teamIds: teamIds),
             requiresAuth: true
         )
     }
@@ -301,6 +363,26 @@ class SHLAPIClient {
             body: request,
             requiresAuth: true
         )
+    }
+
+    /// Register push token with type and optional team code (convenience method for push-to-start)
+    func registerPushToken(token: String, type: String, deviceId: String, teamCode: String? = nil) async throws -> RegisterPushTokenResponse {
+        let environment: String
+        #if DEBUG
+        environment = "development"
+        #else
+        environment = "production"
+        #endif
+
+        let request = RegisterPushTokenRequest(
+            token: token,
+            deviceId: deviceId,
+            type: type,
+            teamCode: teamCode,
+            environment: environment
+        )
+
+        return try await registerPushToken(request)
     }
 
     /// Get all devices
@@ -363,6 +445,7 @@ class SHLAPIClient {
         let request = RegisterPushTokenRequest(
             token: token,
             deviceId: deviceId,
+            type: "live_activity",
             environment: environment
         )
 

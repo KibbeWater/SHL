@@ -39,7 +39,7 @@ struct UserProfile: Codable {
     let iosVersion: String?
     let appVersion: String?
     let notificationSettings: NotificationSettings
-    let favoriteTeam: FavoriteTeam?
+    let interestedTeams: [InterestedTeam]
     let createdAt: String
     let lastSeenAt: String
 
@@ -64,18 +64,18 @@ struct NotificationSettings: Codable, Equatable {
     /// Receive real-time goal notifications during live matches
     var liveGoals: Bool
 
-    /// Only send notifications for user's favorite team
-    var favoriteTeamOnly: Bool
-
     /// Receive notifications at period end (1st, 2nd, 3rd)
     var periodUpdates: Bool
+
+    /// Automatically start Live Activity before interested team's matches
+    var autoStartLiveActivity: Bool
 
     static let `default` = NotificationSettings(
         matchReminders: true,
         matchResults: true,
         liveGoals: true,
-        favoriteTeamOnly: false,
-        periodUpdates: false
+        periodUpdates: false,
+        autoStartLiveActivity: true
     )
 }
 
@@ -84,22 +84,21 @@ struct NotificationSettingsResponse: Codable {
     let settings: NotificationSettings
 }
 
-// MARK: - Favorite Team
+// MARK: - Interested Teams
 
-struct FavoriteTeam: Codable {
+struct InterestedTeam: Codable, Identifiable, Equatable {
     let id: String
     let name: String
     let code: String
     let city: String?
 }
 
-struct FavoriteTeamRequest: Codable {
-    let teamId: String
+struct InterestedTeamsResponse: Codable {
+    let teams: [InterestedTeam]
 }
 
-struct FavoriteTeamResponse: Codable {
-    let success: Bool
-    let favoriteTeam: FavoriteTeam
+struct SetInterestedTeamsRequest: Codable {
+    let teamIds: [String]
 }
 
 // MARK: - Device Management
@@ -186,9 +185,9 @@ struct UserDataExport: Codable {
     let userId: String
     let deviceId: String
     let notificationSettings: NotificationSettings
-    let favoriteTeam: FavoriteTeam?
+    let interestedTeams: [InterestedTeam]?
     let devices: [ExportedDevice]
-    let favoriteTeamMatchHistory: [ExportedMatch]?
+    let interestedTeamsMatchHistory: [ExportedMatch]?
 }
 
 struct ExportedDevice: Codable {

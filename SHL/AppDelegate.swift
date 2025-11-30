@@ -13,6 +13,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Set notification delegate
         UNUserNotificationCenter.current().delegate = self
 
+        // Migrate from old single preferredTeam to new interestedTeams array (one-time migration)
+        Settings.shared.migratePreferredTeamIfNeeded()
+
         // Check if user has opted in to user management
         if Settings.shared.userManagementEnabled {
             // Try to sync with iCloud session
@@ -29,15 +32,60 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
                     // Check if token needs refresh
                     if KeychainManager.shared.isTokenExpiringSoon() {
-                        try await AuthenticationManager.shared.refreshToken()
+                        do {
+                            try await AuthenticationManager.shared.refreshToken()
+                        } catch {
+                            #if DEBUG
+                            print("⚠️ Token refresh failed, attempting re-registration: \(error)")
+                            #endif
+                            // Token refresh failed (likely user doesn't exist), re-register
+                            _ = try await AuthenticationManager.shared.register()
+                        }
                     }
+
+                    // Fetch team code before registering push tokens
+                    await Self.fetchAndCacheInterestedTeams()
+
+                    // Register for push notifications on launch
+                    await PushNotificationManager.shared.registerForRemoteNotifications()
                 } catch {
                     print("Failed to initialize user session: \(error)")
+                }
+            }
+
+            // Start observing push-to-start token on first launch (iOS 17.2+)
+            if #available(iOS 17.2, *) {
+                Task { @MainActor in
+                    // Fetch team code first, then start observing
+                    await Self.fetchAndCacheInterestedTeams()
+                    ActivityUpdater.shared.startObservingPushToStartToken()
                 }
             }
         }
 
         return true
+    }
+
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        // Re-register tokens when app becomes active
+        Task {
+            // Re-register regular push token
+            if Settings.shared.userManagementEnabled {
+                await PushNotificationManager.shared.registerForRemoteNotifications()
+
+                // Also register with backend if we already have a token
+                if PushNotificationManager.shared.pushToken != nil {
+                    try? await PushNotificationManager.shared.registerTokenWithBackend()
+                }
+            }
+
+            // Re-register push-to-start token (iOS 17.2+)
+            if #available(iOS 17.2, *) {
+                await MainActor.run {
+                    ActivityUpdater.shared.startObservingPushToStartToken()
+                }
+            }
+        }
     }
 
     // MARK: - Push Notifications
@@ -70,5 +118,37 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // For example, navigate to match detail if it's a match notification
 
         completionHandler()
+    }
+
+    // MARK: - Helper Methods
+
+    /// Fetch teams and cache interested team details for push token registration
+    private static func fetchAndCacheInterestedTeams() async {
+        let interestedIds = Settings.shared.getInterestedTeamIds()
+        guard !interestedIds.isEmpty else {
+            return
+        }
+
+        // Skip if already cached
+        if !Settings.shared.getInterestedTeams().isEmpty {
+            return
+        }
+
+        do {
+            let teams = try await SHLAPIClient.shared.getTeams()
+            let cachedTeams = interestedIds.compactMap { id in
+                teams.first(where: { $0.id == id }).map { team in
+                    InterestedTeam(id: team.id, name: team.name, code: team.code, city: nil)
+                }
+            }
+            Settings.shared.cacheInterestedTeams(cachedTeams)
+            #if DEBUG
+            print("✅ Cached \(cachedTeams.count) interested teams")
+            #endif
+        } catch {
+            #if DEBUG
+            print("❌ Failed to fetch teams for caching: \(error.localizedDescription)")
+            #endif
+        }
     }
 }

@@ -58,7 +58,7 @@ struct ReminderContext: View {
                     match.awayTeam.code
                 ]
             ],
-            userProperties: ["preferred_team": Settings.shared.getPreferredTeam() ?? "N/A"]
+            userProperties: ["interested_teams_count": Settings.shared.getInterestedTeamIds().count]
         )
         
         let notificationCenter = UNUserNotificationCenter.current()

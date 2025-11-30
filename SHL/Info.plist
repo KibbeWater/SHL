@@ -23,5 +23,7 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<key>NSSupportsLiveActivitiesFrequentUpdates</key>
+	<true/>
 </dict>
 </plist>
