@@ -77,3 +77,4 @@ DerivedData/
 # Note: Package.resolved is intentionally tracked for reproducible builds
 # If you want to ignore it, uncomment the following line:
 # *.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+.DS_Store
