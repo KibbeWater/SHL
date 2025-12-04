@@ -36,11 +36,27 @@ class LiveMatchListener: ObservableObject {
     ) -> AnyPublisher<LiveMatch, Never> {
         let subject = PassthroughSubject<LiveMatch, Never>()
 
-        Task {
-            // First, send any cached data
-            if matchIds.isEmpty {
-                let cachedUpdates = await connectionManager.getAllCachedUpdates()
-                for update in cachedUpdates {
+        // Create a publisher for initial cached data using Future
+        // Future waits for the async work to complete before emitting,
+        // ensuring subscribers receive cached data regardless of timing
+        let initialDataPublisher = Future<[LiveMatch], Never> { promise in
+            Task {
+                var initialMatches: [LiveMatch] = []
+
+                let updates: [LiveGameUpdate]
+                if matchIds.isEmpty {
+                    updates = await self.connectionManager.getAllCachedUpdates()
+                } else {
+                    var fetchedUpdates: [LiveGameUpdate] = []
+                    for gameUuid in matchIds {
+                        if let update = await self.connectionManager.getCachedUpdate(for: gameUuid) {
+                            fetchedUpdates.append(update)
+                        }
+                    }
+                    updates = fetchedUpdates
+                }
+
+                for update in updates {
                     if let data = await matchProvider(update.gameUuid) {
                         let liveMatch = LiveMatch.fromLiveGameUpdate(
                             update,
@@ -48,26 +64,20 @@ class LiveMatchListener: ObservableObject {
                             homeTeam: data.homeTeam,
                             awayTeam: data.awayTeam
                         )
-                        subject.send(liveMatch)
+                        initialMatches.append(liveMatch)
                     }
                 }
-            } else {
-                for gameUuid in matchIds {
-                    if let update = await connectionManager.getCachedUpdate(for: gameUuid) {
-                        if let data = await matchProvider(gameUuid) {
-                            let liveMatch = LiveMatch.fromLiveGameUpdate(
-                                update,
-                                match: data.match,
-                                homeTeam: data.homeTeam,
-                                awayTeam: data.awayTeam
-                            )
-                            subject.send(liveMatch)
-                        }
-                    }
-                }
-            }
 
-            // Then subscribe to live stream
+                promise(.success(initialMatches))
+            }
+        }
+        .flatMap { matches in
+            Publishers.Sequence(sequence: matches)
+        }
+        .eraseToAnyPublisher()
+
+        // Start live stream subscription in background
+        Task {
             let stream = await connectionManager.subscribe()
             for await update in stream {
                 // Filter by matchIds if specified
@@ -90,18 +100,20 @@ class LiveMatchListener: ObservableObject {
             subject.send(completion: .finished)
         }
 
-        return subject.eraseToAnyPublisher()
+        // Merge: initial cached data first, then live stream updates
+        return Publishers.Merge(initialDataPublisher, subject)
+            .eraseToAnyPublisher()
     }
 
     /// Request initial data for specific match IDs
-    /// Returns cached data immediately if available
-    /// - Parameter matchIds: Array of match IDs to fetch
+    /// - Note: Deprecated. subscribe() now reliably delivers cached data via
+    ///         Publishers.Merge with Future. This method is kept for backward
+    ///         compatibility but is a no-op.
+    /// - Parameter matchIds: Array of match IDs to fetch (ignored)
+    @available(*, deprecated, message: "No longer needed - subscribe() delivers cached data reliably")
     func requestInitialData(_ matchIds: [String]) {
-        Task {
-            // With our implementation, cached data is automatically sent on subscribe
-            // This method is kept for backward compatibility but doesn't need to do anything
-            // since subscribe() already sends cached data immediately
-        }
+        // No-op: subscribe() now uses Future + Merge to ensure cached data
+        // reaches subscribers regardless of connection timing
     }
 
     /// Disconnect from SSE stream

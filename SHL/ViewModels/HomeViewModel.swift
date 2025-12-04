@@ -26,9 +26,16 @@ class HomeViewModel: ObservableObject {
     init() {
         Task {
             try? await refresh()
+            // Subscribe to live updates AFTER refresh completes
+            // This ensures latestMatches and featuredGame are populated
+            if let featured = featuredGame {
+                liveGameExternalId = featured.externalUUID
+                // Fetch initial live data from API immediately
+                // This is more reliable than waiting for SSE cache
+                await fetchInitialLiveData(for: featured)
+            }
+            listenForLiveGame()
         }
-
-        listenForLiveGame()
     }
 
     deinit {
@@ -37,7 +44,18 @@ class HomeViewModel: ObservableObject {
 
     func selectListenedGame(_ game: Match) {
         liveGameExternalId = game.externalUUID
+        Task {
+            await fetchInitialLiveData(for: game)
+        }
         listenForLiveGame()
+    }
+
+    /// Fetch initial live data from API for immediate display
+    /// This provides instant data without waiting for SSE cache
+    private func fetchInitialLiveData(for game: Match) async {
+        if let live = try? await api.getLiveMatch(id: game.externalUUID) {
+            self.liveGame = live
+        }
     }
 
     private func listenForLiveGame() {
@@ -57,10 +75,8 @@ class HomeViewModel: ObservableObject {
         .sink { [weak self] liveMatch in
             self?.liveGame = liveMatch
         }
-
-        if let liveGameExternalId {
-            liveListener.requestInitialData([liveGameExternalId])
-        }
+        // Note: requestInitialData is no longer needed as subscribe() now reliably
+        // delivers cached data via Publishers.Merge with Future
     }
 
     private func fetchTeamData(for match: Match) async -> (match: Match, homeTeam: Team, awayTeam: Team)? {

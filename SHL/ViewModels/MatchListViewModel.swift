@@ -25,9 +25,9 @@ class MatchListViewModel: ObservableObject {
     init() {
         Task {
             try? await refresh()
+            // Note: listenForLiveGame() is called at the end of refresh()
+            // so todayMatches is populated before subscribing
         }
-
-        listenForLiveGame()
     }
 
     deinit {
@@ -42,7 +42,20 @@ class MatchListViewModel: ObservableObject {
 
             filterMatches()
             removeUnusedListeners()
-            liveListener.requestInitialData(todayMatches.filter { $0.isLive() || $0.played }.map { $0.id })
+            // Fetch initial live data from API for immediate display
+            await fetchInitialLiveData()
+            // Subscribe with updated todayMatches for live updates
+            listenForLiveGame()
+        }
+    }
+
+    /// Fetch initial live data from API for all today's matches
+    /// This provides instant data without waiting for SSE cache
+    private func fetchInitialLiveData() async {
+        for match in todayMatches {
+            if let live = try? await api.getLiveMatch(id: match.externalUUID) {
+                matchListeners[live.externalId] = live
+            }
         }
     }
 

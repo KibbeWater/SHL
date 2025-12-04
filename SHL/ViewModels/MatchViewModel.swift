@@ -39,9 +39,10 @@ class MatchViewModel: ObservableObject {
 
         Task {
             try? await refresh()
+            // Subscribe to live updates AFTER refresh completes
+            // This ensures match, home, and away are populated
+            listenForLiveGame()
         }
-
-        listenForLiveGame()
     }
 
     deinit {
