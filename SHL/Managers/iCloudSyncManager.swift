@@ -52,6 +52,20 @@ final class iCloudSyncManager {
         do {
             _ = try await privateDatabase.save(record)
             print("User session saved to iCloud")
+        } catch let error as CKError {
+            switch error.code {
+            case .quotaExceeded:
+                print("iCloud quota exceeded, cannot sync user session")
+                // Post notification to inform user
+                NotificationCenter.default.post(name: .iCloudQuotaExceeded, object: nil)
+            case .notAuthenticated:
+                print("iCloud not signed in, cannot sync user session")
+                // Post notification to prompt user
+                NotificationCenter.default.post(name: .iCloudNotAuthenticated, object: nil)
+            default:
+                print("CloudKit error saving user session: \(error.localizedDescription)")
+            }
+            throw error
         } catch {
             print("Failed to save user session to iCloud: \(error)")
             throw error
@@ -73,9 +87,19 @@ final class iCloudSyncManager {
             }
 
             return (userId: userId, token: token, expiresAt: expiresAt)
-        } catch let error as CKError where error.code == .unknownItem {
-            // No session exists in iCloud
-            return nil
+        } catch let error as CKError {
+            switch error.code {
+            case .unknownItem:
+                // No session exists in iCloud
+                return nil
+            case .notAuthenticated:
+                print("iCloud not signed in, cannot fetch user session")
+                NotificationCenter.default.post(name: .iCloudNotAuthenticated, object: nil)
+                throw error
+            default:
+                print("CloudKit error fetching user session: \(error.localizedDescription)")
+                throw error
+            }
         } catch {
             print("Failed to fetch user session from iCloud: \(error)")
             throw error
@@ -89,9 +113,19 @@ final class iCloudSyncManager {
         do {
             _ = try await privateDatabase.deleteRecord(withID: recordID)
             print("User session deleted from iCloud")
-        } catch let error as CKError where error.code == .unknownItem {
-            // Already deleted, no action needed
-            print("User session was already deleted from iCloud")
+        } catch let error as CKError {
+            switch error.code {
+            case .unknownItem:
+                // Already deleted, no action needed
+                print("User session was already deleted from iCloud")
+            case .notAuthenticated:
+                print("iCloud not signed in, cannot delete user session")
+                NotificationCenter.default.post(name: .iCloudNotAuthenticated, object: nil)
+                throw error
+            default:
+                print("CloudKit error deleting user session: \(error.localizedDescription)")
+                throw error
+            }
         } catch {
             print("Failed to delete user session from iCloud: \(error)")
             throw error
@@ -140,13 +174,5 @@ final class iCloudSyncManager {
         }
 
         return settings
-    }
-
-    // MARK: - Sync Conflict Resolution
-
-    /// Resolve sync conflicts by choosing the most recent update
-    func resolveConflict(local: Date, remote: Date) -> Bool {
-        // Return true if remote is more recent
-        return remote > local
     }
 }

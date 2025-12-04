@@ -27,10 +27,11 @@ final class KeychainManager {
 
     // MARK: - Public Methods
 
-    /// Save JWT token to keychain with iCloud sync
+    /// Save JWT token to keychain with optional iCloud sync (based on user preference)
     func saveToken(_ token: String, expiresAt: Date) {
-        save(token, forKey: Keys.jwtToken, syncWithiCloud: true)
-        save(ISO8601DateFormatter().string(from: expiresAt), forKey: Keys.tokenExpiresAt, syncWithiCloud: true)
+        let syncEnabled = Settings.shared.keychainSyncEnabled
+        save(token, forKey: Keys.jwtToken, syncWithiCloud: syncEnabled)
+        save(ISO8601DateFormatter().string(from: expiresAt), forKey: Keys.tokenExpiresAt, syncWithiCloud: syncEnabled)
     }
 
     /// Retrieve JWT token from keychain
@@ -62,9 +63,10 @@ final class KeychainManager {
         delete(forKey: Keys.tokenExpiresAt)
     }
 
-    /// Save user ID to keychain with iCloud sync
+    /// Save user ID to keychain with optional iCloud sync (based on user preference)
     func saveUserId(_ userId: String) {
-        save(userId, forKey: Keys.userId, syncWithiCloud: true)
+        let syncEnabled = Settings.shared.keychainSyncEnabled
+        save(userId, forKey: Keys.userId, syncWithiCloud: syncEnabled)
     }
 
     /// Retrieve user ID from keychain
@@ -97,7 +99,8 @@ final class KeychainManager {
 
         // Create persistent UUID that survives app reinstalls (stored in keychain)
         let fallbackId = UUID().uuidString
-        save(fallbackId, forKey: Keys.fallbackDeviceId, syncWithiCloud: true)
+        let syncEnabled = Settings.shared.keychainSyncEnabled
+        save(fallbackId, forKey: Keys.fallbackDeviceId, syncWithiCloud: syncEnabled)
         return fallbackId
     }
 

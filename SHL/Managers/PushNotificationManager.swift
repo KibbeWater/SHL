@@ -128,7 +128,7 @@ final class PushNotificationManager: NSObject, ObservableObject {
         self.isRegistered = true
 
         #if DEBUG
-        print("✅ APNs token received: \(tokenString.prefix(20))...")
+        print("✅ APNs token received: [REDACTED]")
         #endif
 
         // Auto-register with backend if user management is enabled
@@ -190,7 +190,7 @@ final class PushNotificationManager: NSObject, ObservableObject {
 
         ========== PUSH TOKEN REGISTRATION ==========
         Token Type: regular
-        Token: \(token.prefix(20))...
+        Token: [REDACTED]
         Device ID: \(KeychainManager.shared.getDeviceId())
         Primary Team Code: \(Settings.shared.getPrimaryTeamCode() ?? "nil")
         Environment: \(environment)
@@ -244,25 +244,39 @@ final class PushNotificationManager: NSObject, ObservableObject {
         }
     }
 
+    // MARK: - Notification Handler Stubs
+    // TODO: Implement notification handling logic
+    // These handlers should:
+    // - Extract relevant data from userInfo
+    // - Post NotificationCenter notifications for UI updates
+    // - Consider deep linking to match detail view
+    // - Update live activities if applicable (iOS 17.2+)
+
     private func handleMatchStartNotification(_ userInfo: [AnyHashable: Any]) {
-        print("Match started notification")
-        // Handle match start notification
-        // You can post a notification or update UI here
+        // TODO: Implement match start notification handling
+        // - Extract match ID and team info from userInfo
+        // - Post notification to update UI or start Live Activity
+        // - Consider showing an in-app notification
     }
 
     private func handleGoalNotification(_ userInfo: [AnyHashable: Any]) {
-        print("Goal notification")
-        // Handle goal notification
+        // TODO: Implement goal notification handling
+        // - Extract goal details (scorer, team, time)
+        // - Update Live Activity if active
+        // - Play haptic feedback for user's interested teams
     }
 
     private func handlePeriodEndNotification(_ userInfo: [AnyHashable: Any]) {
-        print("Period end notification")
-        // Handle period end notification
+        // TODO: Implement period end notification handling
+        // - Extract period number and scores
+        // - Update Live Activity if active
     }
 
     private func handleFinalScoreNotification(_ userInfo: [AnyHashable: Any]) {
-        print("Final score notification")
-        // Handle final score notification
+        // TODO: Implement final score notification handling
+        // - Extract final score
+        // - Update Live Activity to completed state
+        // - Post notification for UI refresh
     }
 }
 
@@ -321,8 +335,8 @@ extension PushNotificationManager {
         var info = "Push Notification Debug Info\n"
         info += "============================\n\n"
 
-        if let token = pushToken {
-            info += "Token: \(token.prefix(20))...\n"
+        if pushToken != nil {
+            info += "Token: [REDACTED]\n"
         } else {
             info += "Token: None\n"
         }

@@ -49,7 +49,22 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                     // Register for push notifications on launch
                     await PushNotificationManager.shared.registerForRemoteNotifications()
                 } catch {
-                    print("Failed to initialize user session: \(error)")
+                    // Log detailed error for debugging
+                    #if DEBUG
+                    print("❌ Failed to initialize user session: \(error.localizedDescription)")
+                    print("   Error details: \(error)")
+                    #endif
+
+                    // Post notification that user management is unavailable
+                    // This allows other parts of the app to handle degraded functionality
+                    NotificationCenter.default.post(
+                        name: .userManagementInitializationFailed,
+                        object: nil,
+                        userInfo: ["error": error]
+                    )
+
+                    // App continues to function with degraded capabilities
+                    // Push notifications and cross-device sync will be unavailable
                 }
             }
 

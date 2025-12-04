@@ -11,6 +11,9 @@ import SwiftUI
 
 extension Notification.Name {
     static let interestedTeamsDidChange = Notification.Name("interestedTeamsDidChange")
+    static let iCloudQuotaExceeded = Notification.Name("iCloudQuotaExceeded")
+    static let iCloudNotAuthenticated = Notification.Name("iCloudNotAuthenticated")
+    static let userManagementInitializationFailed = Notification.Name("userManagementInitializationFailed")
 }
 
 public enum SharedPreferenceKeys {
@@ -132,6 +135,17 @@ class Settings: ObservableObject {
         }
     }
 
+    // MARK: - Security Settings
+
+    /// Controls whether authentication tokens sync to iCloud Keychain across devices
+    /// Default: true (opt-in for convenience and security)
+    @CloudStorage(key: "keychainSyncEnabled", default: true)
+    public var keychainSyncEnabled: Bool {
+        didSet {
+            objectWillChange.send()
+        }
+    }
+
     // MARK: - User Management Settings
 
     @CloudStorage(key: "userManagementEnabled", default: false)
@@ -225,6 +239,15 @@ class Settings: ObservableObject {
             get: { self.notificationSettings },
             set: { newValue in
                 self.notificationSettings = newValue
+            }
+        )
+    }
+
+    public func binding_keychainSyncEnabled() -> Binding<Bool> {
+        return Binding(
+            get: { self.keychainSyncEnabled },
+            set: { newValue in
+                self.keychainSyncEnabled = newValue
             }
         )
     }

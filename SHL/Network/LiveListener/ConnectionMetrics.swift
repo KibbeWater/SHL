@@ -9,6 +9,21 @@ import Foundation
 import PostHog
 
 /// Tracks connection quality metrics and health for the live listener
+///
+/// ## Threading Model
+/// This class is a `@MainActor` isolated `ObservableObject` because:
+/// - All `@Published` properties must be updated on the main thread for SwiftUI
+/// - Metrics are displayed in the UI and drive visual updates
+/// - Callers must wrap calls in `Task { @MainActor in ... }` or call from MainActor context
+///
+/// Example usage from non-MainActor context:
+/// ```swift
+/// Task { @MainActor in
+///     metrics.recordConnectionSuccess()
+/// }
+/// ```
+///
+/// All public methods are marked with `@MainActor` to enforce this requirement.
 public class ConnectionMetrics: ObservableObject {
     /// Connection health status
     public enum HealthStatus: String, Sendable {

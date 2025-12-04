@@ -306,6 +306,17 @@ struct SettingsView: View {
                 } message: {
                     Text("Are you sure you want to delete your account? This action cannot be undone and will remove all your data from our servers.")
                 }
+
+                // MARK: - Security Settings
+
+                Section {
+                    Toggle("Sync Authentication Across Devices", isOn: settings.binding_keychainSyncEnabled())
+                        .tint(.accentColor)
+                } header: {
+                    Text("Security")
+                } footer: {
+                    Text("When enabled, your login will sync to other devices signed into iCloud. This allows you to stay logged in across all your devices. You can disable this if you prefer to manage authentication separately on each device.")
+                }
             }
 
             // MARK: - Debug Tools Section

@@ -18,6 +18,9 @@ class SHLAPIClient {
     /// Flag to prevent recursive token refresh attempts
     private var isRefreshingToken = false
 
+    /// Track in-flight token refresh continuation to prevent concurrent refresh attempts
+    private var refreshContinuations: [CheckedContinuation<Void, Error>] = []
+
     private init() {
         // Configure decoder
         decoder = JSONDecoder()
@@ -228,14 +231,6 @@ class SHLAPIClient {
             }
             #endif
 
-            // Prevent recursive refresh attempts
-            guard !isRefreshingToken else {
-                #if DEBUG
-                print("❌ Already refreshing token, not retrying to prevent infinite loop")
-                #endif
-                throw SHLAPIError.unauthorized
-            }
-
             // Check if this is the refresh endpoint itself - don't try to refresh again
             if endpoint == "/auth/refresh" {
                 #if DEBUG
@@ -244,19 +239,48 @@ class SHLAPIClient {
                 throw SHLAPIError.unauthorized
             }
 
-            // Try to refresh token
-            do {
-                isRefreshingToken = true
-                defer { isRefreshingToken = false }
-
+            // If a refresh is already in progress, wait for it to complete
+            if isRefreshingToken {
                 #if DEBUG
-                print("🔄 Attempting to refresh token...")
+                print("⏳ Token refresh already in progress, waiting for it to complete...")
                 #endif
 
+                // Wait for the ongoing refresh to complete
+                try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                    refreshContinuations.append(continuation)
+                }
+
+                #if DEBUG
+                print("✅ Token refresh completed, retrying original request...")
+                #endif
+
+                // Retry request with new token
+                return try await self.request(endpoint: endpoint, method: method, body: body, requiresAuth: requiresAuth)
+            }
+
+            // No refresh in progress, start a new one
+            isRefreshingToken = true
+
+            #if DEBUG
+            print("🔄 Attempting to refresh token...")
+            #endif
+
+            do {
                 try await AuthenticationManager.shared.refreshToken()
 
                 #if DEBUG
-                print("✅ Token refreshed, retrying original request...")
+                print("✅ Token refreshed successfully")
+                #endif
+
+                // Resume all waiting continuations with success
+                for continuation in refreshContinuations {
+                    continuation.resume()
+                }
+                refreshContinuations.removeAll()
+                isRefreshingToken = false
+
+                #if DEBUG
+                print("✅ Retrying original request with new token...")
                 #endif
 
                 // Retry request with new token
@@ -265,6 +289,14 @@ class SHLAPIClient {
                 #if DEBUG
                 print("❌ Token refresh failed: \(error)")
                 #endif
+
+                // Resume all waiting continuations with failure
+                for continuation in refreshContinuations {
+                    continuation.resume(throwing: error)
+                }
+                refreshContinuations.removeAll()
+                isRefreshingToken = false
+
                 throw SHLAPIError.unauthorized
             }
         }
@@ -284,9 +316,15 @@ class SHLAPIClient {
         if httpResponse.statusCode == 201 && data.isEmpty {
             if T.self == RegisterPushTokenResponse.self {
                 // Return a success response with default values
-                return RegisterPushTokenResponse(success: true, message: nil) as! T
+                guard let result = RegisterPushTokenResponse(success: true, message: nil) as? T else {
+                    throw SHLAPIError.invalidResponse
+                }
+                return result
             } else if T.self == EmptyResponse.self {
-                return EmptyResponse() as! T
+                guard let result = EmptyResponse() as? T else {
+                    throw SHLAPIError.invalidResponse
+                }
+                return result
             }
         }
 
@@ -294,7 +332,10 @@ class SHLAPIClient {
         if httpResponse.statusCode == 204 {
             // Return empty response for Void type
             if T.self == EmptyResponse.self {
-                return EmptyResponse() as! T
+                guard let result = EmptyResponse() as? T else {
+                    throw SHLAPIError.invalidResponse
+                }
+                return result
             }
         }
 

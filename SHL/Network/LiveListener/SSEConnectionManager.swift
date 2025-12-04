@@ -35,6 +35,13 @@ actor SSEConnectionManager {
         self.metrics = metrics
     }
 
+    deinit {
+        // Clean up resources to prevent memory leaks
+        session?.invalidateAndCancel()
+        session = nil
+        dataTask = nil
+    }
+
     // MARK: - Public API
 
     /// Subscribe to live game updates
@@ -143,6 +150,10 @@ actor SSEConnectionManager {
         while let event = await buffer.extractEvent() {
             if let update = parseSSEEvent(event) {
                 // Update cache
+                // Note: We don't implement timestamp-based deduplication because the SSE API
+                // doesn't provide event timestamps in the payload. Out-of-order events are
+                // rare in practice due to TCP's ordering guarantees. If out-of-order updates
+                // become an issue, the upstream API would need to include timestamps in events.
                 cache[update.gameUuid] = update
 
                 // Broadcast to all subscribers
