@@ -163,13 +163,15 @@ struct RegisterPushTokenRequest: Codable {
     let deviceId: String
     let type: String
     let teamCode: String?
+    let matchId: String?
     let environment: String?
 
-    init(token: String, deviceId: String, type: String = "regular", teamCode: String? = nil, environment: String? = "production") {
+    init(token: String, deviceId: String, type: String = "regular", teamCode: String? = nil, matchId: String? = nil, environment: String? = "production") {
         self.token = token
         self.deviceId = deviceId
         self.type = type
         self.teamCode = teamCode
+        self.matchId = matchId
         self.environment = environment
     }
 }

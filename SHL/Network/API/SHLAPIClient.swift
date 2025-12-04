@@ -432,7 +432,7 @@ class SHLAPIClient {
         )
     }
 
-    /// Register push token for live match
+    /// Register push token for live match subscription
     func registerLiveActivityToken(matchUUID: String, token: String) async throws -> RegisterPushTokenResponse {
         let deviceId = keychain.getDeviceId()
         let environment: String
@@ -445,12 +445,13 @@ class SHLAPIClient {
         let request = RegisterPushTokenRequest(
             token: token,
             deviceId: deviceId,
-            type: "live_activity",
+            type: "match",
+            matchId: matchUUID,
             environment: environment
         )
 
         return try await self.request(
-            endpoint: "/live/\(matchUUID)",
+            endpoint: "/push-tokens/register",
             method: .post,
             body: request,
             requiresAuth: true
