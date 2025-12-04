@@ -6,12 +6,10 @@
 //
 
 import SwiftUI
-import HockeyKit
 
 struct StandingObj: Identifiable, Equatable {
     public var id: String
     public var position: Int
-    public var logo: String
     public var team: String
     public var teamCode: String
     public var matches: String
@@ -31,10 +29,7 @@ struct StandingView: View {
             Text("\(standing.points)p")
                 .padding(.trailing, 24)
             
-            Image("Team/\(standing.teamCode)")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 32, height: 32)
+            TeamLogoView(teamCode: standing.teamCode, size: .small)
         }
     }
 }
@@ -74,7 +69,7 @@ struct StandingsTable: View {
                 StandingObj(
                     id: "1",
                     position: 1,
-                    logo: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg",
+                    // logo: "https://sportality.cdn.s8y.se/team-logos/lhf1_lhf.svg",
                     team: "Luleå Hockey",
                     teamCode: "LHF",
                     matches: "123",

@@ -7,11 +7,10 @@
 
 import MapKit
 import SwiftUI
-import HockeyKit
 
 struct LargeOverview: View {
-    var game: Game
-    var liveGame: GameData.GameOverview?
+    var game: Match
+    var liveGame: LiveMatch?
     
     @State private var homeColor: Color = .black // Default color, updated on appear
     @State private var awayColor: Color = .black // Default color, updated on appear
@@ -33,15 +32,15 @@ struct LargeOverview: View {
         }
     }
     
-    init(game: Game, liveGame: GameData.GameOverview? = nil) {
+    init(game: Match, liveGame: LiveMatch? = nil) {
         self.game = game
-        if game.id == liveGame?.gameUuid {
+        if game.externalUUID == liveGame?.externalId {
             self.liveGame = liveGame
         }
     }
-    
+
     func isHomeLeading() -> Bool {
-        liveGame?.homeGoals ?? game.homeTeam.result > liveGame?.awayGoals ?? game.awayTeam.result
+        liveGame?.homeScore ?? game.homeScore > liveGame?.awayScore ?? game.awayScore
     }
     
     func isToday() -> Bool {
@@ -50,20 +49,18 @@ struct LargeOverview: View {
     
     var gameStatusTag: some View {
         if let _liveGame = liveGame {
-            switch _liveGame.state {
-            case .starting:
+            switch _liveGame.gameState {
+            case .scheduled:
                 return Text("Starting")
             case .ongoing:
-                return Text("P\(_liveGame.time.period): \(_liveGame.time.periodTime)")
-            case .onbreak:
-                return Text("P\(_liveGame.time.period): Pause")
-            case .overtime:
-                return Text("OT: \(_liveGame.time.periodTime)")
-            case .ended:
+                return Text("P\(_liveGame.period): \(_liveGame.periodTime)")
+            case .paused:
+                return Text("P\(_liveGame.period): Pause")
+            case .played:
                 return Text("Ended")
             }
         } else {
-            return Text(game.shootout ? "Shootout" : game.overtime ? "Overtime" : game.played ? "Full-Time" : isToday() ? game.formatTime() : game.formatDate())
+            return Text((game.shootout ?? false) ? "Shootout" : (game.overtime ?? false) ? "Overtime" : game.played ? "Full-Time" : isToday() ? game.formatTime() : game.formatDate())
                 .fontWeight(.medium)
         }
     }
@@ -72,11 +69,8 @@ struct LargeOverview: View {
         VStack {
             HStack {
                 HStack(spacing: 34) {
-                    Image("Team/\(game.homeTeam.code.uppercased())")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 128, height: 128)
-                    Text(String(liveGame?.homeGoals ?? game.homeTeam.result))
+                    TeamLogoView(teamCode: game.homeTeam.code, size: .custom(128))
+                    Text(String(liveGame?.homeScore ?? game.homeScore))
                         .font(.system(size: 100))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
@@ -93,7 +87,7 @@ struct LargeOverview: View {
                 }
                 Spacer()
                 HStack(spacing: 34) {
-                    Text(String(liveGame?.awayGoals ?? game.awayTeam.result))
+                    Text(String(liveGame?.awayScore ?? game.awayScore))
                         .font(.system(size: 100))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
@@ -101,10 +95,7 @@ struct LargeOverview: View {
                             !isHomeLeading() ? .white : .white.opacity(0.5)
                         )
                         .padding(.bottom, -2)
-                    Image("Team/\(game.awayTeam.code.uppercased())")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 128, height: 128)
+                    TeamLogoView(teamCode: game.awayTeam.code, size: .custom(128))
                 }
             }
             HStack {
@@ -172,7 +163,7 @@ struct LargeOverview: View {
 
 #Preview {
     VStack {
-        LargeOverview(game: .fakeData())
+        LargeOverview(game: Match.fakeData())
         Spacer()
     }
 }

@@ -6,32 +6,31 @@
 //
 
 import SwiftUI
-import HockeyKit
 
 struct MatchOverview: View {
-    var game: Game
-    var liveGame: GameData.GameOverview?
-    
+    var game: Match
+    var liveGame: LiveMatch?
+
     @State private var homeColor: Color = .black // Default color, updated on appear
     @State private var awayColor: Color = .black // Default color, updated on appear
-    
+
     private func loadTeamColors() {
         game.awayTeam.getTeamColor { clr in
             withAnimation {
                 self.awayColor = clr
             }
         }
-        
+
         game.homeTeam.getTeamColor { clr in
             withAnimation {
                 self.homeColor = clr
             }
         }
     }
-    
-    init(game: Game, liveGame: GameData.GameOverview? = nil) {
+
+    init(game: Match, liveGame: LiveMatch? = nil) {
         self.game = game
-        if game.id == liveGame?.gameUuid {
+        if game.externalUUID == liveGame?.externalId {
             self.liveGame = liveGame
         }
     }
@@ -42,18 +41,15 @@ struct MatchOverview: View {
                 HStack {
                     VStack {
                         Spacer()
-                        Image("Team/\(game.homeTeam.code.uppercased())")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 48, height: 48)
+                        TeamLogoView(teamCode: game.homeTeam.code, size: .medium)
                         Spacer()
                     }
                     Spacer()
-                    Text(String(liveGame?.homeGoals ?? game.homeTeam.result))
+                    Text(String(liveGame?.homeScore ?? game.homeScore))
                         .font(.system(size: 48))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
-                        .foregroundStyle(liveGame?.homeGoals ?? game.homeTeam.result > liveGame?.awayGoals ?? game.awayTeam.result ? .primary : .secondary)
+                        .foregroundStyle(liveGame?.homeScore ?? game.homeScore > liveGame?.awayScore ?? game.awayScore ? .primary : .secondary)
                 }
                 .overlay(alignment: .bottomLeading) {
                     Text(game.homeTeam.name)
@@ -76,19 +72,18 @@ struct MatchOverview: View {
             VStack {
                 Spacer()
                 if let _liveGame = liveGame {
-                    if _liveGame.state == .starting {
+                    switch _liveGame.gameState {
+                    case .scheduled:
                         Text("Starting")
-                    } else if _liveGame.state == .ongoing {
-                        Text("P\(_liveGame.time.period): \(_liveGame.time.periodTime)")
-                    } else if _liveGame.state == .onbreak {
-                        Text("P\(_liveGame.time.period): Pause")
-                    } else if _liveGame.state == .overtime {
-                        Text("OT: \(_liveGame.time.periodTime)")
-                    } else if _liveGame.state == .ended {
+                    case .ongoing:
+                        Text("P\(_liveGame.period): \(_liveGame.periodTime)")
+                    case .paused:
+                        Text("P\(_liveGame.period): Pause")
+                    case .played:
                         Text("Ended")
                     }
                 } else {
-                    Text(game.shootout ? "Shootout" : game.overtime ? "Overtime" : game.played ? "Full-Time" : Calendar.current.isDate(game.date, inSameDayAs: Date()) ? game.formatTime() : game.formatDate())
+                    Text((game.shootout ?? false) ? "Shootout" : (game.overtime ?? false) ? "Overtime" : game.played ? "Full-Time" : Calendar.current.isDate(game.date, inSameDayAs: Date()) ? game.formatTime() : game.formatDate())
                         .fontWeight(.medium)
                 }
                 Spacer()
@@ -103,18 +98,15 @@ struct MatchOverview: View {
             Spacer()
             VStack {
                 HStack {
-                    Text(String(liveGame?.awayGoals ?? game.awayTeam.result))
+                    Text(String(liveGame?.awayScore ?? game.awayScore))
                         .font(.system(size: 48))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
-                        .foregroundStyle(liveGame?.awayGoals ?? game.awayTeam.result > liveGame?.homeGoals ?? game.homeTeam.result ? .primary : .secondary)
+                        .foregroundStyle(liveGame?.awayScore ?? game.awayScore > liveGame?.homeScore ?? game.homeScore ? .primary : .secondary)
                     Spacer()
                     VStack {
                         Spacer()
-                        Image("Team/\(game.awayTeam.code.uppercased())")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 48, height: 48)
+                        TeamLogoView(teamCode: game.awayTeam.code, size: .medium)
                         Spacer()
                     }
                 }
@@ -140,12 +132,14 @@ struct MatchOverview: View {
         .frame(height: 102)
         .background(.ultraThinMaterial)
         .overlay(alignment: .topLeading) {
-            Text(game.venue)
-                .font(.caption2)
-                .fontWeight(.semibold)
-                .foregroundStyle(.secondary)
-                .padding(.leading)
-                .padding(.top, 8)
+            if let venue = game.venue {
+                Text(venue)
+                    .font(.caption2)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.secondary)
+                    .padding(.leading)
+                    .padding(.top, 8)
+            }
         }
         .onAppear {
             if awayColor == .black || homeColor == .black {
@@ -158,7 +152,7 @@ struct MatchOverview: View {
 }
 
 #Preview {
-    MatchOverview(game: Game.fakeData())
+    MatchOverview(game: Match.fakeData())
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
 }

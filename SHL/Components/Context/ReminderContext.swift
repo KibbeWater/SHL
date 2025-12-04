@@ -7,15 +7,14 @@
 
 import SwiftUI
 import PostHog
-import HockeyKit
 
 struct ReminderContext: View {
-    let game: Game
-    
+    let game: Match
+
     @State private var isNotificationScheduled: Bool = false
     static private var activeReminders: [String:Bool] = [:]
-    
-    init(game: Game) {
+
+    init(game: Match) {
         self.game = game
         reloadReminders()
     }
@@ -29,12 +28,12 @@ struct ReminderContext: View {
         }
     }
     
-    private func removeMatchNotification(match: Game) async {
+    private func removeMatchNotification(match: Match) async {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [match.id])
         await ReminderContext.refreshActiveReminders()
     }
     
-    private func scheduleMatchNotification(match: Game) async {
+    private func scheduleMatchNotification(match: Match) async {
         ReminderContext.requestNotificationAuthorization()
         
         let content = UNMutableNotificationContent()
@@ -59,7 +58,7 @@ struct ReminderContext: View {
                     match.awayTeam.code
                 ]
             ],
-            userProperties: ["preferred_team": Settings.shared.getPreferredTeam() ?? "N/A"]
+            userProperties: ["interested_teams_count": Settings.shared.getInterestedTeamIds().count]
         )
         
         let notificationCenter = UNUserNotificationCenter.current()
@@ -115,6 +114,6 @@ struct ReminderContext: View {
         .frame(width: 200, height: 200)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .contextMenu {
-            ReminderContext(game: .fakeData())
+            ReminderContext(game: Match.fakeData())
         }
 }

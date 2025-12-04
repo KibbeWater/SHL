@@ -7,13 +7,13 @@
 
 import WidgetKit
 import SwiftUI
-import HockeyKit
+import UIKit
 
 struct Provider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
         SimpleEntry(
             date: Date(),
-            game: .fakeData(),
+            game: WidgetGame.fakeData(),
             leftClr: .red,
             rightClr: .blue,
             configuration: ConfigurationAppIntent()
@@ -23,7 +23,7 @@ struct Provider: AppIntentTimelineProvider {
     func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
         SimpleEntry(
             date: Date(),
-            game: .fakeData(),
+            game: WidgetGame.fakeData(),
             leftClr: .red,
             rightClr: .blue,
             configuration: configuration
@@ -31,31 +31,38 @@ struct Provider: AppIntentTimelineProvider {
     }
 
     func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
-        let api = HockeyAPI()
-        let games = try? await api.match.getLatest()
-        
+        let api = WidgetAPI()
+        let games = (try? await api.getLatestMatches()) ?? []
+
         let nextUpdateDate = Calendar.current.date(byAdding: .minute, value: 30, to: Date.now)!
-        
-        let game = await FeaturedGameAlgo.GetFeaturedGame(api, matches: games ?? [])
+
+        let game = WidgetFeaturedGame.getFeaturedGame(from: games)
 
         return Timeline(
             entries: [
                 SimpleEntry(
                     date: Date.now,
                     game: game,
-                    leftClr: Color(UIImage(named: "Team/\(game?.homeTeam.code ?? "TBD")")?.getColors(quality: .low)?.background ?? UIColor.black),
-                    rightClr: Color(UIImage(named: "Team/\(game?.awayTeam.code ?? "TBD")")?.getColors(quality: .low)?.background ?? UIColor.black),
+                    leftClr: getTeamColor(code: game?.homeTeam.code ?? "TBD"),
+                    rightClr: getTeamColor(code: game?.awayTeam.code ?? "TBD"),
                     configuration: ConfigurationAppIntent()
                 )
             ],
             policy: .after(nextUpdateDate)
         )
     }
+
+    private func getTeamColor(code: String) -> Color {
+        if let image = UIImage(named: "Team/\(code)") {
+            return Color(image.getColors(quality: .low)?.background ?? UIColor.black)
+        }
+        return .black
+    }
 }
 
 struct SimpleEntry: TimelineEntry {
     var date: Date
-    let game: Game?
+    let game: WidgetGame?
     let leftClr: Color
     let rightClr: Color
     let configuration: ConfigurationAppIntent
@@ -257,14 +264,14 @@ extension ConfigurationAppIntent {
 } timeline: {
     SimpleEntry(
         date: .now,
-        game: .fakeData(),
+        game: WidgetGame.fakeData(),
         leftClr: .red,
         rightClr: .blue,
         configuration: ConfigurationAppIntent()
     )
     SimpleEntry(
         date: .now,
-        game: .fakeData(),
+        game: WidgetGame.fakeData(),
         leftClr: .red,
         rightClr: .blue,
         configuration: ConfigurationAppIntent()
@@ -276,14 +283,14 @@ extension ConfigurationAppIntent {
 } timeline: {
     SimpleEntry(
         date: .now,
-        game: .fakeData(),
+        game: WidgetGame.fakeData(),
         leftClr: .red,
         rightClr: .blue,
         configuration: ConfigurationAppIntent()
     )
     SimpleEntry(
         date: .now,
-        game: .fakeData(),
+        game: WidgetGame.fakeData(),
         leftClr: .red,
         rightClr: .blue,
         configuration: ConfigurationAppIntent()

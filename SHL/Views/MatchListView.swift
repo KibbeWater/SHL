@@ -1,7 +1,6 @@
 import SwiftUI
 import PostHog
 import ActivityKit
-import HockeyKit
 
 private enum Tabs: String, CaseIterable {
     case previous = "Previous"
@@ -11,16 +10,15 @@ private enum Tabs: String, CaseIterable {
 
 struct MatchListView: View {
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(\.hockeyAPI) private var api: HockeyAPI
-    
+
     @State private var selectedTab: Tabs = .today
-    
+
     @State private var openDates: [String:Bool] = [:]
 
     @StateObject private var viewModel = MatchListViewModel()
     
-    private func getLiveMatch(gameId: String) -> GameData.GameOverview? {
-        return viewModel.matchListeners[gameId]?.gameOverview
+    private func getLiveMatch(match: Match) -> LiveMatch? {
+        return viewModel.matchListeners[match.externalUUID]
     }
     
     var body: some View {
@@ -42,9 +40,6 @@ struct MatchListView: View {
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
         }
-        .task {
-            viewModel.setAPI(api)
-        }
     }
     
     private var tabSelectionView: some View {
@@ -64,20 +59,20 @@ struct MatchListView: View {
         }
     }
     
-    private func matchItem(_ match: Game) -> some View {
+    private func matchItem(_ match: Match) -> some View {
         HStack {
             if match.date < Date.now {
                 NavigationLink {
                     MatchView(match, referrer: "match_list")
                 } label: {
                     if #available(iOS 17.2, *) {
-                        MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
+                        MatchOverview(game: match, liveGame: getLiveMatch(match: match))
                             .id("pm-\(match.id)")
                             .clipShape(RoundedRectangle(cornerRadius: 12.0))
                             .contextMenu {
                                 #if !APPCLIP
                                 Button("Start Activity", systemImage: "plus") {
-                                    if let live = getLiveMatch(gameId: match.id) {
+                                    if let live = getLiveMatch(match: match) {
                                         do {
                                             PostHogSDK.shared.capture(
                                                 "started_live_activity",
@@ -98,7 +93,7 @@ struct MatchListView: View {
                             }
                             .padding(.horizontal)
                     } else {
-                        MatchOverview(game: match, liveGame: getLiveMatch(gameId: match.id))
+                        MatchOverview(game: match, liveGame: getLiveMatch(match: match))
                             .id("pm-\(match.id)")
                             .clipShape(RoundedRectangle(cornerRadius: 12.0))
                             .padding(.horizontal)
@@ -136,7 +131,7 @@ struct MatchListView: View {
         return dateFormatter.string(from: date)
     }
     
-    private func matchesScrollView(for matches: [Game]) -> some View {
+    private func matchesScrollView(for matches: [Match]) -> some View {
         VStack {
             ScrollView {
                 if matches.first?.date ?? Date.now > Date.now {

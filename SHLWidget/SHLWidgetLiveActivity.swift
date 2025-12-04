@@ -8,7 +8,6 @@
 import ActivityKit
 import WidgetKit
 import SwiftUI
-import HockeyKit
 
 extension AnyTransition {
     static var moveDown: AnyTransition {
@@ -48,35 +47,20 @@ struct SHLWidgetLiveActivity: Widget {
                 VStack {
                     HStack {
                         let _periodEnd = ISODateToStr(dateString: context.state.period.periodEnd)
+                        let cappedEnd = min(_periodEnd, Date.now.addingTimeInterval(1200)) // Cap at 20:00 (1200 seconds)
                         switch context.state.period.state {
                         case .ended:
                             Text("Ended")
                                 .font(.largeTitle)
                                 .fontWeight(.semibold)
                         case .onbreak:
-                            /* Text(
-                                timerInterval: _periodEnd...Date.now,
-                                pauseTime: _periodEnd,
-                                countsDown: false,
-                                showsHours: false
-                            ) */
-                            Text(_periodEnd, style: .timer)
+                            Text(cappedEnd, style: .timer)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .multilineTextAlignment(.center)
                                 .font(.largeTitle)
                                 .fontWeight(.semibold)
                         case .ongoing, .overtime:
-                            /* Text(
-                                timerInterval: Date.now..._periodEnd,
-                                pauseTime: _periodEnd,
-                                countsDown: true,
-                                showsHours: false
-                            )
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .multilineTextAlignment(.center)
-                            .font(.largeTitle)
-                            .fontWeight(.semibold) */
-                            Text(_periodEnd, style: .timer)
+                            Text(cappedEnd, style: .timer)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .multilineTextAlignment(.center)
                                 .font(.largeTitle)
@@ -251,16 +235,16 @@ struct SHLWidgetLiveActivity: Widget {
                         .fontWeight(.bold)
                 }
             }
-            .widgetURL(URL(string: "http://www.apple.com"))
+            .widgetURL(URL(string: "shltracker://open-game?id=\(context.attributes.id)"))
             .keylineTint(Color.white)
         }
     }
     
     func ISODateToStr(dateString: String) -> Date {
         let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        // formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
 
-        return formatter.date(from: dateString) ?? Date()
+        return formatter.date(from: dateString) ?? .distantFuture
     }
 }
 

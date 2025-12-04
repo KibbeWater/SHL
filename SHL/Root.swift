@@ -6,19 +6,20 @@
 //
 
 import SwiftUI
-import HockeyKit
 
 enum RootTabs: Equatable, Hashable, Identifiable {
     case home
     case calendar
     case settings
-    case team(SiteTeam)
-    
+    case search
+    case team(Team)
+
     var id: String {
         switch self {
         case .home: return "home"
         case .calendar: return "calendar"
         case .settings: return "settings"
+        case .search: return "search"
         case .team(let team): return "team_\(team.id)"
         }
     }
@@ -26,16 +27,17 @@ enum RootTabs: Equatable, Hashable, Identifiable {
 
 struct Root: View {
     @State private var loggedIn = false
-    
-    @Environment(\.hockeyAPI) var hockeyApi: HockeyAPI
-    
+    @State private var showOnboarding = false
+
+    private let api = SHLAPIClient.shared
+
     @State private var openedGame: MatchView?
     @State private var isGameOpen = false
-    
+
     @State private var selectedTab: RootTabs = .home
-    
-    @State private var teams: [SiteTeam] = []
-    
+
+    @State private var teams: [Team] = []
+
     var body: some View {
         ZStack {
             if #available(iOS 18.0, *) {
@@ -56,8 +58,18 @@ struct Root: View {
                     }
                     
                     Tab("Settings", systemImage: "gearshape", value: RootTabs.settings) {
-                        SettingsView()
+                        NavigationStack {
+                            SettingsView()
+                        }
                     }
+                    
+                    #if DEBUG
+                    if #available(iOS 26.0, *) {
+                        Tab(value: RootTabs.search, role: .search) {
+                            SearchView()
+                        }
+                    }
+                    #endif
                     
                     if UIDevice.current.userInterfaceIdiom == .pad {
                         TabSection("Teams") {
@@ -66,11 +78,11 @@ struct Root: View {
                                     TeamView(team: team)
                                 } label: {
                                     HStack {
-                                        if let img = svgToImage(named: "Team/\(team.teamNames.code.uppercased())", width: 28) {
+                                        if let img = svgToImage(named: "Team/\(team.code.uppercased())", width: 28) {
                                             img
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fit)
-                                            Text(team.teamNames.longSite ?? team.name)
+                                            Text(team.name)
                                         } else {
                                             EmptyView()
                                         }
@@ -122,33 +134,37 @@ struct Root: View {
                 .zIndex(10)
                 .transition(
                     .move(edge: .bottom)
-                    .animation(.easeInOut(duration: 300))
+                        .animation(.easeInOut(duration: 300))
                 )
                 .task {
                     do {
-                        if let ssgtUuid = try? await hockeyApi.season.getCurrentSsgt() {
-                            let _ = try await hockeyApi.standings.getStandings(ssgtUuid: ssgtUuid)
-                        }
+                        let _ = try? await api.getCurrentStandings()
                     } catch let _err {
                         print(_err)
                     }
-                    
+
                     do {
-                        let _ = try await hockeyApi.match.getLatest()
+                        let _ = try await api.getLatestMatches()
                     } catch let _err {
                         print(_err)
                     }
-                    
+
                     withAnimation {
                         loggedIn = true
                     }
+
+                    // Check if onboarding needed (after splash)
+                    if !Settings.shared.hasCompletedOnboarding {
+                        showOnboarding = true
+                    }
                 }
-                
             }
         }
         .task {
             do {
-                teams = try await hockeyApi.team.getTeams()
+                // Get basic teams, then fetch details for each
+                let basicTeams = try await api.getTeams()
+                teams = try await api.getTeams()
             } catch let _err {
                 print(_err)
             }
@@ -161,6 +177,9 @@ struct Root: View {
         .onOpenURL { incomingURL in
             print("App was opened via URL: \(incomingURL)")
             handleIncomingURL(incomingURL)
+        }
+        .fullScreenCover(isPresented: $showOnboarding) {
+            OnboardingContainerView()
         }
     }
     
@@ -178,25 +197,24 @@ struct Root: View {
             return
         }
         
-        guard (components.queryItems?.first(where: { $0.name == "id" })?.value) != nil else {
-            print("Hello")
+        guard let gameId = components.queryItems?.first(where: { $0.name == "id" })?.value else {
             return
         }
         
         // TODO: Find Games based on ID and display it
-        /* Task {
-            guard let game = try? await hockeyApi.match.getMatchExtra(matchId) else {
+        Task { // shltracker:open-game?id=0BC4115B-A6F8-49E4-A9A4-57C0120ECDA9
+            guard let game = try? await api.getMatchDetail(id: gameId) else {
                 print("Unable to find game")
                 return
             }
+            
             selectedTab = .home
-            openedGame = MatchView(match: Game(game))
+            openedGame = MatchView(game, referrer: "url-schema")
             isGameOpen = true
-        } */
+        }
     }
 }
 
 #Preview {
     Root()
-        .environment(\.hockeyAPI, HockeyAPI())
 }

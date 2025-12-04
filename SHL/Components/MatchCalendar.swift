@@ -6,10 +6,9 @@
 //
 
 import SwiftUI
-import HockeyKit
 
 struct MatchCalendar: View {
-    var matches: [Game]
+    var matches: [Match]
     
     var body: some View {
         ForEach(matches.filter({!$0.played})) { match in
@@ -17,19 +16,13 @@ struct MatchCalendar: View {
                 MatchView(match, referrer: "calendar")
             } label: {
                 HStack {
-                    Image("Team/\(match.homeTeam.code.uppercased())")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 42, height: 42)
+                    TeamLogoView(teamCode: match.homeTeam.code, size: .custom(42))
                     Text(match.homeTeam.code)
                         .fontWeight(.semibold)
                     Spacer()
                     Text(match.awayTeam.code)
                         .fontWeight(.semibold)
-                    Image("Team/\(match.awayTeam.code.uppercased())")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 42, height: 42)
+                    TeamLogoView(teamCode: match.awayTeam.code, size: .custom(42))
                 }
                 .overlay(alignment: .center, content: {
                     VStack {
@@ -63,9 +56,9 @@ struct MatchCalendar: View {
 
 #Preview {
     MatchCalendar(matches: [
-        .fakeData(),
-        .fakeData(),
-        .fakeData(),
-        .fakeData(),
+        Match.fakeData(),
+        Match.fakeData(),
+        Match.fakeData(),
+        Match.fakeData(),
     ])
 }

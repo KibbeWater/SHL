@@ -47,3 +47,34 @@ xcuserdata/
 !*.xcworkspace/contents.xcworkspacedata
 /*.gcno
 **/xcshareddata/WorkspaceSettings.xcsettings
+
+# Exclude user-specific workspace files
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# Exclude user interface state
+**/UserInterfaceState.xcuserstate
+
+# Exclude user scheme management
+**/xcuserdata/**/xcschemes/
+
+# Build products
+build/
+DerivedData/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+# Swift Package Manager
+.swiftpm/
+.build/
+
+# Note: Package.resolved is intentionally tracked for reproducible builds
+# If you want to ignore it, uncomment the following line:
+# *.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+.DS_Store
