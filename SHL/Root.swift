@@ -62,11 +62,13 @@ struct Root: View {
                         }
                     }
                     
+                    #if DEBUG
                     if #available(iOS 26.0, *) {
                         Tab(value: RootTabs.search, role: .search) {
                             SearchView()
                         }
                     }
+                    #endif
                     
                     if UIDevice.current.userInterfaceIdiom == .pad {
                         TabSection("Teams") {
