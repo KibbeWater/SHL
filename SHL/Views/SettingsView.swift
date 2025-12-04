@@ -18,8 +18,10 @@ struct SettingsView: View {
     @State private var teamsLoaded: Bool = false
     @State private var showDeleteAccountAlert = false
     @State private var showTeamSelectionSheet = false
+    @State private var showFavoriteTeamPicker = false
     @State private var devices: [Device] = []
     @State private var isLoadingDevices = false
+    @State private var showResetOnboardingAlert = false
 
     private let api = SHLAPIClient.shared
     
@@ -79,17 +81,49 @@ struct SettingsView: View {
             Section {
                 if teamsLoaded {
                     let interestedTeams = settings.getInterestedTeams()
+                    let favoriteTeam = settings.getFavoriteTeam()
+
+                    // Favorite team
+                    if let favoriteTeam = favoriteTeam {
+                        Button {
+                            showFavoriteTeamPicker = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "star.fill")
+                                    .foregroundStyle(.yellow)
+                                    .font(.caption)
+
+                                Text(favoriteTeam.name)
+                                    .foregroundStyle(.primary)
+
+                                Spacer()
+
+                                Text(favoriteTeam.code)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+
+                                Image(systemName: "chevron.right")
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+                    }
+
+                    // Interested teams
                     if interestedTeams.isEmpty {
                         Text("No teams selected")
                             .foregroundStyle(.secondary)
                     } else {
                         ForEach(interestedTeams) { team in
-                            HStack {
-                                Text(team.name)
-                                Spacer()
-                                Text(team.code)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                            // Don't show favorite team twice
+                            if team.id != settings.getFavoriteTeamId() {
+                                HStack {
+                                    Text(team.name)
+                                    Spacer()
+                                    Text(team.code)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
                     }
@@ -98,6 +132,14 @@ struct SettingsView: View {
                         showTeamSelectionSheet = true
                     } label: {
                         Label("Select Teams", systemImage: "person.2.fill")
+                    }
+
+                    if !interestedTeams.isEmpty && favoriteTeam == nil {
+                        Button {
+                            showFavoriteTeamPicker = true
+                        } label: {
+                            Label("Set Favorite Team", systemImage: "star")
+                        }
                     }
                 } else {
                     HStack {
@@ -109,12 +151,20 @@ struct SettingsView: View {
             } header: {
                 Text("Interested Teams")
             } footer: {
-                Text("You'll receive notifications for matches involving your selected teams.")
+                if let favoriteTeam = settings.getFavoriteTeam() {
+                    Text("You'll receive notifications for your selected teams. \(favoriteTeam.name) matches will be prioritized on your home screen.")
+                } else {
+                    Text("You'll receive notifications for matches involving your selected teams.")
+                }
             }
 
 #if DEBUG
-            Section("Debug") {
+            Section("Debug Tools") {
                 Button("Reset Cache", role: .destructive) {
+                }
+
+                Button("Reset Onboarding") {
+                    showResetOnboardingAlert = true
                 }
             }
 #endif
@@ -370,6 +420,69 @@ struct SettingsView: View {
                 }
                 settings.setInterestedTeams(selectedTeams)
             }
+        }
+        .sheet(isPresented: $showFavoriteTeamPicker) {
+            NavigationStack {
+                List {
+                    let interestedTeams = settings.getInterestedTeams()
+                    let currentFavorite = settings.getFavoriteTeamId()
+
+                    Section {
+                        ForEach(interestedTeams) { team in
+                            Button {
+                                settings.setFavoriteTeamId(team.id)
+                                showFavoriteTeamPicker = false
+                            } label: {
+                                HStack {
+                                    Text(team.name)
+                                        .foregroundStyle(.primary)
+
+                                    Spacer()
+
+                                    Text(team.code)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+
+                                    if currentFavorite == team.id {
+                                        Image(systemName: "star.fill")
+                                            .foregroundStyle(.yellow)
+                                    }
+                                }
+                            }
+                        }
+
+                        if currentFavorite != nil {
+                            Button(role: .destructive) {
+                                settings.setFavoriteTeamId(nil)
+                                showFavoriteTeamPicker = false
+                            } label: {
+                                Label("Remove Favorite", systemImage: "star.slash")
+                            }
+                        }
+                    } header: {
+                        Text("Select Favorite Team")
+                    } footer: {
+                        Text("Your favorite team's matches will be prioritized on your home screen.")
+                    }
+                }
+                .navigationTitle("Favorite Team")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            showFavoriteTeamPicker = false
+                        }
+                    }
+                }
+            }
+        }
+        .alert("Reset Onboarding", isPresented: $showResetOnboardingAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Reset", role: .destructive) {
+                settings.hasCompletedOnboarding = false
+            }
+        } message: {
+            Text("This will reset the onboarding flow. You'll need to restart the app to see it again.")
         }
     }
 }

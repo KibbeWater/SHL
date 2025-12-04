@@ -131,7 +131,8 @@ class HomeViewModel: ObservableObject {
 
         featuredGame = await FeaturedGameAlgo.getFeaturedGame(
             matches,
-            interestedTeams: Settings.shared.getInterestedTeamIds()
+            interestedTeams: Settings.shared.getInterestedTeamIds(),
+            favoriteTeamId: Settings.shared.getFavoriteTeamId()
         )
     }
 }

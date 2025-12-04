@@ -103,6 +103,11 @@
 		806DBE552EA4041500E07695 /* WidgetFeaturedGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806DBE532EA4041500E07695 /* WidgetFeaturedGame.swift */; };
 		806DBE582EA4041C00E07695 /* WidgetAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806DBE562EA4041C00E07695 /* WidgetAPI.swift */; };
 		806DF94A2EDA100F00065FD2 /* TeamSelectionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806DF9492EDA100F00065FD2 /* TeamSelectionSheet.swift */; };
+		806DFA322EE239FE00065FD2 /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806DFA2D2EE239FE00065FD2 /* OnboardingContainerView.swift */; };
+		806DFA332EE239FE00065FD2 /* FavoriteTeamPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806DFA2C2EE239FE00065FD2 /* FavoriteTeamPageView.swift */; };
+		806DFA342EE239FE00065FD2 /* TeamSelectionPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806DFA2F2EE239FE00065FD2 /* TeamSelectionPageView.swift */; };
+		806DFA352EE239FE00065FD2 /* WelcomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806DFA302EE239FE00065FD2 /* WelcomePageView.swift */; };
+		806DFA362EE239FE00065FD2 /* OnlineFeaturesPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806DFA2E2EE239FE00065FD2 /* OnlineFeaturesPageView.swift */; };
 		8075FBB42CA62706004C6438 /* GameExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB32CA62706004C6438 /* GameExtensions.swift */; };
 		8075FBB82CA6A1AE004C6438 /* LargeOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB72CA6A1AE004C6438 /* LargeOverview.swift */; };
 		808F89BD2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808F89BA2CC96C5F00452D6E /* FeaturedGameAlgo.swift */; };
@@ -228,6 +233,11 @@
 		806DBE532EA4041500E07695 /* WidgetFeaturedGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetFeaturedGame.swift; sourceTree = "<group>"; };
 		806DBE562EA4041C00E07695 /* WidgetAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetAPI.swift; sourceTree = "<group>"; };
 		806DF9492EDA100F00065FD2 /* TeamSelectionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamSelectionSheet.swift; sourceTree = "<group>"; };
+		806DFA2C2EE239FE00065FD2 /* FavoriteTeamPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteTeamPageView.swift; sourceTree = "<group>"; };
+		806DFA2D2EE239FE00065FD2 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
+		806DFA2E2EE239FE00065FD2 /* OnlineFeaturesPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineFeaturesPageView.swift; sourceTree = "<group>"; };
+		806DFA2F2EE239FE00065FD2 /* TeamSelectionPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamSelectionPageView.swift; sourceTree = "<group>"; };
+		806DFA302EE239FE00065FD2 /* WelcomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomePageView.swift; sourceTree = "<group>"; };
 		8075FBB32CA62706004C6438 /* GameExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameExtensions.swift; sourceTree = "<group>"; };
 		8075FBB72CA6A1AE004C6438 /* LargeOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeOverview.swift; sourceTree = "<group>"; };
 		808F89BA2CC96C5F00452D6E /* FeaturedGameAlgo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedGameAlgo.swift; sourceTree = "<group>"; };
@@ -534,6 +544,18 @@
 			path = API;
 			sourceTree = "<group>";
 		};
+		806DFA312EE239FE00065FD2 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				806DFA2C2EE239FE00065FD2 /* FavoriteTeamPageView.swift */,
+				806DFA2D2EE239FE00065FD2 /* OnboardingContainerView.swift */,
+				806DFA2E2EE239FE00065FD2 /* OnlineFeaturesPageView.swift */,
+				806DFA2F2EE239FE00065FD2 /* TeamSelectionPageView.swift */,
+				806DFA302EE239FE00065FD2 /* WelcomePageView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 		BC374DF82BAD920F00378412 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -673,6 +695,7 @@
 		BCD7BC162BAF69E000E208B3 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				806DFA312EE239FE00065FD2 /* Onboarding */,
 				806DF9492EDA100F00065FD2 /* TeamSelectionSheet.swift */,
 				801A962E2ED30D4400530970 /* Debug */,
 				BCAFE2CF2B4095170044225A /* HomeView.swift */,
@@ -922,6 +945,11 @@
 				806DBE1B2EA401FA00E07695 /* SHLAPIClient.swift in Sources */,
 				801A96312ED30D8900530970 /* SHLAPIDebug.swift in Sources */,
 				806DBE1C2EA401FA00E07695 /* Match.swift in Sources */,
+				806DFA322EE239FE00065FD2 /* OnboardingContainerView.swift in Sources */,
+				806DFA332EE239FE00065FD2 /* FavoriteTeamPageView.swift in Sources */,
+				806DFA342EE239FE00065FD2 /* TeamSelectionPageView.swift in Sources */,
+				806DFA352EE239FE00065FD2 /* WelcomePageView.swift in Sources */,
+				806DFA362EE239FE00065FD2 /* OnlineFeaturesPageView.swift in Sources */,
 				806DBE1D2EA401FA00E07695 /* SHLAPIError.swift in Sources */,
 				802AD9712EB1834900916E9F /* SearchView.swift in Sources */,
 				806DBE1E2EA401FA00E07695 /* NetworkLoggerPlugin.swift in Sources */,

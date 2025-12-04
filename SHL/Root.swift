@@ -27,6 +27,7 @@ enum RootTabs: Equatable, Hashable, Identifiable {
 
 struct Root: View {
     @State private var loggedIn = false
+    @State private var showOnboarding = false
 
     private let api = SHLAPIClient.shared
 
@@ -36,7 +37,7 @@ struct Root: View {
     @State private var selectedTab: RootTabs = .home
 
     @State private var teams: [Team] = []
-    
+
     var body: some View {
         ZStack {
             if #available(iOS 18.0, *) {
@@ -151,6 +152,11 @@ struct Root: View {
                     withAnimation {
                         loggedIn = true
                     }
+
+                    // Check if onboarding needed (after splash)
+                    if !Settings.shared.hasCompletedOnboarding {
+                        showOnboarding = true
+                    }
                 }
             }
         }
@@ -171,6 +177,9 @@ struct Root: View {
         .onOpenURL { incomingURL in
             print("App was opened via URL: \(incomingURL)")
             handleIncomingURL(incomingURL)
+        }
+        .fullScreenCover(isPresented: $showOnboarding) {
+            OnboardingContainerView()
         }
     }
     

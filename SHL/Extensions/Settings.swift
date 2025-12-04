@@ -87,6 +87,11 @@ class Settings: ObservableObject {
         _interestedTeamIds.removeAll { $0 == id }
         _cachedInterestedTeams.removeAll { $0.id == id }
 
+        // Clear favorite if it was this team
+        if _favoriteTeamId == id {
+            _favoriteTeamId = nil
+        }
+
         // Sync with backend if user management is enabled
         if userManagementEnabled {
             Task {
@@ -115,6 +120,43 @@ class Settings: ObservableObject {
         return _interestedTeamIds.contains(teamId)
     }
 
+    // MARK: - Favorite Team
+
+    @CloudStorage(key: "favoriteTeamId", default: nil)
+    private var _favoriteTeamId: String?
+
+    /// Returns the favorite team ID (UUID)
+    public func getFavoriteTeamId() -> String? {
+        return _favoriteTeamId
+    }
+
+    /// Sets the favorite team ID
+    public func setFavoriteTeamId(_ id: String?) {
+        objectWillChange.send()
+        _favoriteTeamId = id
+
+        // If favorite team is set but not in interested teams, clear it
+        if let id = id, !_interestedTeamIds.contains(id) {
+            _favoriteTeamId = nil
+        }
+    }
+
+    /// Returns the favorite team with full details
+    public func getFavoriteTeam() -> InterestedTeam? {
+        guard let favoriteId = _favoriteTeamId else { return nil }
+        return _cachedInterestedTeams.first(where: { $0.id == favoriteId })
+    }
+
+    /// Binding helper for favorite team ID
+    public func binding_favoriteTeamId() -> Binding<String?> {
+        return Binding(
+            get: { self.getFavoriteTeamId() },
+            set: { newValue in
+                self.setFavoriteTeamId(newValue)
+            }
+        )
+    }
+
     // MARK: - Migration from old preferredTeam
 
     /// Migrate old single preferredTeam to new interestedTeams array (call once on app launch)
@@ -133,6 +175,20 @@ class Settings: ObservableObject {
             // Clear old key
             defaults?.removeObject(forKey: oldKey)
         }
+    }
+
+    // MARK: - Onboarding
+
+    @CloudStorage(key: "hasCompletedOnboarding", default: false)
+    public var hasCompletedOnboarding: Bool {
+        didSet {
+            objectWillChange.send()
+        }
+    }
+
+    public func completeOnboarding() {
+        objectWillChange.send()
+        hasCompletedOnboarding = true
     }
 
     // MARK: - Security Settings
