@@ -152,9 +152,9 @@ struct MatchView: View {
             }
             .padding(.horizontal, 24)
 
-            // Upcoming time badge below score
+            // Countdown badge for upcoming games
             if !hasStarted && viewModel.liveGame == nil {
-                upcomingTimeBadge
+                countdownBadge
             }
 
             // Venue
@@ -205,10 +205,23 @@ struct MatchView: View {
                 .font(.system(size: 48, weight: .bold, design: .rounded))
                 .fontWidth(.compressed)
             } else {
-                Text("VS")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.white.opacity(0.5))
+                // Future game - show date and time prominently
+                VStack(spacing: 6) {
+                    Text(match.date.formatted(.dateTime.weekday(.wide)))
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundStyle(.white.opacity(0.7))
+                        .textCase(.uppercase)
+
+                    Text(match.date.formatted(.dateTime.month(.abbreviated).day()))
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+
+                    Text(match.date.formatted(date: .omitted, time: .shortened))
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.white.opacity(0.9))
+                }
             }
         }
     }
@@ -243,16 +256,30 @@ struct MatchView: View {
         }
     }
 
-    private var upcomingTimeBadge: some View {
-        VStack(spacing: 2) {
-            Text(match.date.formatted(date: .abbreviated, time: .omitted))
-                .font(.caption2)
-                .foregroundStyle(.white.opacity(0.6))
-            Text(match.date.formatted(date: .omitted, time: .shortened))
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .foregroundStyle(.white)
+    private var countdownBadge: some View {
+        let timeUntilGame = match.date.timeIntervalSince(Date.now)
+        let days = Int(timeUntilGame / 86400)
+        let hours = Int((timeUntilGame.truncatingRemainder(dividingBy: 86400)) / 3600)
+
+        return HStack(spacing: 6) {
+            Image(systemName: "clock.fill")
+                .font(.caption)
+
+            if days > 0 {
+                Text("\(days)d \(hours)h until puck drop")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+            } else if hours > 0 {
+                Text("\(hours)h until puck drop")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+            } else {
+                Text("Starting soon")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+            }
         }
+        .foregroundStyle(.white)
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
         .background(.ultraThinMaterial)
@@ -315,11 +342,97 @@ struct MatchView: View {
                 statsCard
             }
 
+            // Future game content
+            if !hasStarted {
+                upcomingGameInfoCard
+            }
+
             if match.venue != nil {
                 venueMapCard
             }
         }
         .padding(.horizontal)
+    }
+
+    // MARK: - Upcoming Game Content
+
+    private var upcomingGameInfoCard: some View {
+        VStack(spacing: 16) {
+            HStack {
+                Label("Game Info", systemImage: "hockey.puck.fill")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+            }
+
+            VStack(spacing: 12) {
+                // Date & Time Row
+                HStack {
+                    HStack(spacing: 10) {
+                        Image(systemName: "calendar")
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+                            .frame(width: 24)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Date & Time")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Text(match.date.formatted(.dateTime.weekday(.wide).month(.wide).day().hour().minute()))
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                    }
+                    Spacer()
+                }
+
+                Divider()
+
+                // Venue Row
+                if let venue = match.venue {
+                    HStack {
+                        HStack(spacing: 10) {
+                            Image(systemName: "mappin.and.ellipse")
+                                .font(.body)
+                                .foregroundStyle(.secondary)
+                                .frame(width: 24)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Venue")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Text(venue)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                            }
+                        }
+                        Spacer()
+                    }
+
+                    Divider()
+                }
+
+                // Matchup Row
+                HStack {
+                    HStack(spacing: 10) {
+                        Image(systemName: "sportscourt.fill")
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+                            .frame(width: 24)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Matchup")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Text("\(currentMatch.homeTeam.name) vs \(currentMatch.awayTeam.name)")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                    }
+                    Spacer()
+                }
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     private var liveActivityCard: some View {
