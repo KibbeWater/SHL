@@ -16,146 +16,323 @@ private enum TeamTabs: String, CaseIterable {
 struct TeamView: View {
     @StateObject var viewModel: TeamViewModel
 
-    @State var teamColor: Color = .black
+    @State private var teamColor: Color = .gray
     @State private var selectedTab: TeamTabs = .history
-    
+
     let team: Team
-    
+
     init(team: Team) {
         self.team = team
         self._viewModel = .init(wrappedValue: .init(team))
     }
-    
-    func loadTeamColors() {
-        team.getTeamColor { _color in
-            teamColor = _color
-        }
+
+    // MARK: - Computed Properties
+
+    private var upcomingGames: [Match] {
+        viewModel.history.filter { !$0.played }.reversed()
     }
-    
-    var matchHistoryTab: some View {
-        LazyVStack {
-            let upcomingGames = viewModel.history.filter { !$0.played }.reversed()
-            let playedGames = viewModel.history.filter { $0.played }
-            
-            if viewModel.history.isEmpty {
-                VStack {
-                    ProgressView()
+
+    private var playedGames: [Match] {
+        viewModel.history.filter { $0.played }
+    }
+
+    private var teamRank: Int? {
+        viewModel.standings.first(where: { $0.team.code == team.code })?.rank
+    }
+
+    private var goalkeepers: [Player] {
+        viewModel.lineup.filter { $0.position == .goalkeeper }
+    }
+
+    private var defenders: [Player] {
+        viewModel.lineup.filter { $0.position == .defense }
+    }
+
+    private var forwards: [Player] {
+        viewModel.lineup.filter { $0.position == .forward }
+    }
+
+    // MARK: - Body
+
+    var body: some View {
+        ZStack {
+            backgroundGradient
+
+            ScrollView {
+                VStack(spacing: 24) {
+                    headerSection
+
+                    tabPicker
+
+                    contentSection
                 }
-            } else {
-                if UIDevice.current.userInterfaceIdiom == .pad {
-                    VStack {
-                        VStack {
-                            HStack {
-                                Text("Played Games")
-                                    .font(.title2)
-                                    .fontWeight(.semibold)
-                                    .padding(.top)
-                                Spacer()
-                            }
-                            .padding(.horizontal)
-                            
-                            ForEach(playedGames.prefix(3), id: \.id) { match in
-                                NavigationLink {
-                                    MatchView(match, referrer: "team_view")
-                                } label: {
-                                    MatchOverview(game: match)
-                                        .background(Color(uiColor: .systemBackground))
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                                        .padding(.horizontal)
-                                }
-                            }
-                        }
-                        VStack {
-                            HStack {
-                                Text("Upcoming Games")
-                                    .font(.title2)
-                                    .fontWeight(.semibold)
-                                Spacer()
-                            }
-                            .padding(.horizontal)
-                            
-                            ForEach(upcomingGames, id: \.id) { match in
-                                NavigationLink {
-                                    MatchView(match, referrer: "team_view")
-                                } label: {
-                                    MatchOverview(game: match)
-                                        .background(Color(uiColor: .systemBackground))
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                                        .padding(.horizontal)
-                                }
-                            }
-                        }
-                        .padding(.top)
-                    }
-                    .background(.ultraThickMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .padding()
-                } else {
-                    VStack {
-                        HStack {
-                            Text("Upcoming Games")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        
-                        LazyVStack {
-                            ForEach(upcomingGames.prefix(3), id: \.id) { match in
-                                NavigationLink {
-                                    MatchView(match, referrer: "team_view")
-                                } label: {
-                                    MatchOverview(game: match)
-                                        .background(Color(uiColor: .systemBackground))
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                                        .padding(.horizontal)
-                                }
-                                .foregroundStyle(.primary)
-                            }
-                        }
-                    }
-                    .padding(.top)
-                    VStack {
-                        HStack {
-                            Text("Played Games")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                                .padding(.top)
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        
-                        LazyVStack {
-                            ForEach(playedGames, id: \.id) { match in
-                                NavigationLink {
-                                    MatchView(match, referrer: "team_view")
-                                } label: {
-                                    MatchOverview(game: match)
-                                        .background(Color(uiColor: .systemBackground))
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                                        .padding(.horizontal)
-                                }
-                                .foregroundStyle(.primary)
-                            }
-                        }
-                    }
-                }
+                .padding(.bottom, 32)
+            }
+            .refreshable {
+                try? await viewModel.refresh()
+            }
+        }
+        .task {
+            loadTeamColors()
+        }
+        .onAppear {
+            Task {
+                try? await viewModel.refresh()
             }
         }
     }
-    
-    func lineupName(_ position: PositionCode) -> String {
-        switch position {
-        case .defense:
-            return "Defense"
-        case .forward:
-            return "Forward"
-        case .goalkeeper:
-            return "Goalkeeper"
+
+    // MARK: - Background
+
+    private var backgroundGradient: some View {
+        ZStack {
+            LinearGradient(
+                colors: [teamColor, teamColor.opacity(0.3)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            LinearGradient(
+                colors: [.clear, Color(uiColor: .systemBackground)],
+                startPoint: .top,
+                endPoint: .center
+            )
+        }
+        .ignoresSafeArea()
+    }
+
+    // MARK: - Header Section
+
+    private var headerSection: some View {
+        VStack(spacing: 16) {
+            TeamLogoView(team: team, size: .custom(100))
+                .shadow(color: .black.opacity(0.3), radius: 10, y: 4)
+
+            VStack(spacing: 6) {
+                Text(team.name)
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+
+                if let rank = teamRank {
+                    HStack(spacing: 6) {
+                        Image(systemName: "trophy.fill")
+                            .font(.caption)
+                        Text("#\(rank) in standings")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                    }
+                    .foregroundStyle(.white.opacity(0.8))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Capsule())
+                }
+            }
+        }
+        .padding(.top, 16)
+    }
+
+    // MARK: - Tab Picker
+
+    private var tabPicker: some View {
+        Picker("", selection: $selectedTab) {
+            ForEach(TeamTabs.allCases, id: \.self) { tab in
+                Text(tab.rawValue).tag(tab)
+            }
+        }
+        .pickerStyle(.segmented)
+        .padding(.horizontal)
+    }
+
+    // MARK: - Content Section
+
+    @ViewBuilder
+    private var contentSection: some View {
+        switch selectedTab {
+        case .history:
+            matchHistoryContent
+        case .lineup:
+            lineupContent
         }
     }
-    
-    func playerCountryColor(_ player: Player) -> LinearGradient {
+
+    // MARK: - Match History Content
+
+    private var matchHistoryContent: some View {
+        VStack(spacing: 16) {
+            if viewModel.history.isEmpty {
+                loadingStateView
+            } else {
+                // Upcoming Games Section
+                if !upcomingGames.isEmpty {
+                    matchSection(
+                        title: "Upcoming Games",
+                        icon: "calendar",
+                        matches: Array(upcomingGames.prefix(5))
+                    )
+                }
+
+                // Played Games Section
+                if !playedGames.isEmpty {
+                    matchSection(
+                        title: "Recent Results",
+                        icon: "clock.arrow.circlepath",
+                        matches: Array(playedGames.prefix(10))
+                    )
+                }
+            }
+        }
+        .padding(.horizontal)
+    }
+
+    private func matchSection(title: String, icon: String, matches: [Match]) -> some View {
+        VStack(spacing: 12) {
+            HStack {
+                Label(title, systemImage: icon)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+            }
+
+            LazyVStack(spacing: 10) {
+                ForEach(matches, id: \.id) { match in
+                    NavigationLink {
+                        MatchView(match, referrer: "team_view")
+                    } label: {
+                        MatchOverview(game: match)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    // MARK: - Lineup Content
+
+    private var lineupContent: some View {
+        VStack(spacing: 16) {
+            if viewModel.lineup.isEmpty {
+                loadingStateView
+            } else {
+                // Goalkeepers
+                if !goalkeepers.isEmpty {
+                    playerSection(
+                        title: "Goalkeepers",
+                        icon: "person.fill.checkmark",
+                        players: goalkeepers
+                    )
+                }
+
+                // Defenders
+                if !defenders.isEmpty {
+                    playerSection(
+                        title: "Defenders",
+                        icon: "shield.fill",
+                        players: defenders
+                    )
+                }
+
+                // Forwards
+                if !forwards.isEmpty {
+                    playerSection(
+                        title: "Forwards",
+                        icon: "figure.hockey",
+                        players: forwards
+                    )
+                }
+            }
+        }
+        .padding(.horizontal)
+    }
+
+    private func playerSection(title: String, icon: String, players: [Player]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label(title, systemImage: icon)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+                Text("\(players.count)")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 4)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(players, id: \.id) { player in
+                        playerCard(player)
+                    }
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 4)
+            }
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func playerCard(_ player: Player) -> some View {
+        NavigationLink {
+            PlayerView(player, teamColor: $teamColor)
+        } label: {
+            VStack(spacing: 0) {
+                // Player Image
+                if let url = player.portraitURL, let imageURL = URL(string: url) {
+                    KFImage(imageURL)
+                        .placeholder {
+                            playerPlaceholder
+                        }
+                        .setProcessor(DownsamplingImageProcessor(size: CGSize(width: 160, height: 200)))
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 120, height: 150)
+                        .background(playerCountryGradient(player))
+                        .clipped()
+                } else {
+                    playerPlaceholder
+                        .frame(width: 120, height: 150)
+                }
+
+                // Player Info
+                VStack(spacing: 4) {
+                    Text(player.fullName)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+
+                    if let number = player.jerseyNumber {
+                        Text("#\(number)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 10)
+                .frame(width: 120)
+            }
+            .background(Color(uiColor: .secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var playerPlaceholder: some View {
+        ZStack {
+            Color(uiColor: .tertiarySystemFill)
+            Image(systemName: "person.fill")
+                .font(.system(size: 40))
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func playerCountryGradient(_ player: Player) -> LinearGradient {
         switch player.nationality {
         case .sweden:
             return LinearGradient(colors: [.blue, .yellow], startPoint: .top, endPoint: .bottom)
@@ -168,197 +345,42 @@ struct TeamView: View {
         case .norway:
             return LinearGradient(colors: [.red, .white, .blue], startPoint: .top, endPoint: .bottom)
         case .none, .unknown:
-            return LinearGradient(colors: [.gray, .gray], startPoint: .top, endPoint: .bottom)
+            return LinearGradient(colors: [.gray, .gray.opacity(0.5)], startPoint: .top, endPoint: .bottom)
         }
     }
-    
-    var lineupTab: some View {
-        Group {
-            if !viewModel.lineup.isEmpty {
-                // Filter concrete arrays for each position
-                let goalkeepers: [Player] = viewModel.lineup.filter { $0.position == .goalkeeper }
-                let defenders: [Player] = viewModel.lineup.filter { $0.position == .defense }
-                let forwards: [Player] = viewModel.lineup.filter { $0.position == .forward }
 
-                VStack(alignment: .leading, spacing: 16) {
-                    // Goalkeepers
-                    if !goalkeepers.isEmpty {
-                        VStack(alignment: .leading) {
-                            Text(lineupName(.goalkeeper))
-                                .font(.title)
-                                .fontWeight(.semibold)
-                                .padding(.horizontal)
-                            ScrollView(.horizontal) {
-                                HStack {
-                                    ForEach(goalkeepers, id: \.id) { player in
-                                        renderPlayerCard(player)
-                                    }
-                                }
-                                .padding(.vertical, 4)
-                                .padding(.horizontal)
-                            }
-                        }
-                    }
+    // MARK: - Loading State
 
-                    // Defenders
-                    if !defenders.isEmpty {
-                        VStack(alignment: .leading) {
-                            Text(lineupName(.defense))
-                                .font(.title)
-                                .fontWeight(.semibold)
-                                .padding(.horizontal)
-                            ScrollView(.horizontal) {
-                                HStack {
-                                    ForEach(defenders, id: \.id) { player in
-                                        renderPlayerCard(player)
-                                    }
-                                }
-                                .padding(.vertical, 4)
-                                .padding(.horizontal)
-                            }
-                        }
-                    }
+    private var loadingStateView: some View {
+        VStack(spacing: 12) {
+            ProgressView()
+                .scaleEffect(1.2)
 
-                    // Forwards
-                    if !forwards.isEmpty {
-                        VStack(alignment: .leading) {
-                            Text(lineupName(.forward))
-                                .font(.title)
-                                .fontWeight(.semibold)
-                                .padding(.horizontal)
-                            ScrollView(.horizontal) {
-                                HStack {
-                                    ForEach(forwards, id: \.id) { player in
-                                        renderPlayerCard(player)
-                                    }
-                                }
-                                .padding(.vertical, 4)
-                                .padding(.horizontal)
-                            }
-                        }
-                    }
-                }
-            } else {
-                VStack { ProgressView() }
-            }
+            Text("Loading...")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 48)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
-    
-    func renderPlayerCard(_ player: Player) -> some View {
-        return LazyVStack {
-            if let url = player.portraitURL {
-                NavigationLink {
-                    PlayerView(player, teamColor: $teamColor)
-                } label: {
-                    VStack {
-                        Text(player.fullName)
-                            .padding(.horizontal, 4)
-                            .padding(.top, 8)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(Color(uiColor: .label))
-                        
-                        KFImage(.init(string: url)!)
-                            .placeholder {
-                                ProgressView()
-                                    .frame(width: 200)
-                            }
-                            .setProcessor(DownsamplingImageProcessor(size: CGSize(
-                                width: 186,
-                                height: 224
-                            )))
-                            .resizable()
-                            .background(playerCountryColor(player))
-                            .aspectRatio(contentMode: .fit)
-                            .overlay(alignment: .topLeading) {
-                                if let _number = player.jerseyNumber {
-                                    Text("#\(_number)")
-                                        .padding(.all, 8)
-                                        .foregroundStyle(Color(uiColor: .label))
-                                }
-                            }
-                    }
-                    .frame(height: 256)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-            }
-        }
-    }
-    
-    var body: some View {
-        ZStack {
-            LinearGradient(colors: [
-                teamColor,
-                .clear,
-                .clear,
-            ], startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
-            
-            ScrollView {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(team.name)
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.white)
-                        if let pos = viewModel.standings.first(where: { $0.team.code == team.code }) {
-                            Text("#\(pos.rank)")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(.white)
-                        }
-                    }
-                    Spacer()
-                    TeamLogoView(team: team, size: .large)
-                }
-                .padding(.horizontal)
-                .padding(.bottom)
-                
-                VStack {
-                    HStack {
-                        Spacer()
-                        ForEach(TeamTabs.allCases, id: \.self) { tab in
-                            Button(tab.rawValue) {
-                                selectedTab = tab
-                            }
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                            .buttonStyle(.plain)
-                            .foregroundStyle(selectedTab == tab ? .white : .white.opacity(0.5))
-                            Spacer()
-                        }
-                    }
-                    
-                    VStack {
-                        switch selectedTab {
-                        case .history:
-                            matchHistoryTab
-                        case .lineup:
-                            lineupTab
-                        }
-                    }
-                    .padding(.top)
-                }
-                .padding(.top, 52)
-            }
-            .refreshable {
-                try? await viewModel.refresh()
-            }
-        }
-        .onAppear {
-            Task {
-                do {
-                    try await viewModel.refresh()
-                } catch let err {
-                    print(err)
-                }
-            }
 
-            loadTeamColors()
+    // MARK: - Actions
+
+    private func loadTeamColors() {
+        team.getTeamColor { color in
+            withAnimation(.easeInOut(duration: 0.3)) {
+                teamColor = color
+            }
         }
     }
 }
 
+// MARK: - Preview
+
 #Preview {
-    TeamView(team: .fakeData())
+    NavigationStack {
+        TeamView(team: .fakeData())
+    }
 }
