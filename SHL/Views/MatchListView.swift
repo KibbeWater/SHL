@@ -26,15 +26,15 @@ struct MatchListView: View {
             tabSelectionView
             
             TabView(selection: $selectedTab) {
-                matchesScrollView(for: viewModel.previousMatches)
+                matchesScrollView(for: viewModel.previousMatches, tab: .previous)
                     .id(Tabs.previous)
                     .tag(Tabs.previous)
-                
-                matchesScrollView(for: viewModel.todayMatches)
+
+                matchesScrollView(for: viewModel.todayMatches, tab: .today)
                     .id(Tabs.today)
                     .tag(Tabs.today)
-                
-                matchesScrollView(for: viewModel.upcomingMatches)
+
+                matchesScrollView(for: viewModel.upcomingMatches, tab: .upcoming)
                     .id(Tabs.upcoming)
                     .tag(Tabs.upcoming)
             }
@@ -131,7 +131,7 @@ struct MatchListView: View {
         return dateFormatter.string(from: date)
     }
     
-    private func matchesScrollView(for matches: [Match]) -> some View {
+    private func matchesScrollView(for matches: [Match], tab: Tabs) -> some View {
         VStack {
             ScrollView {
                 if matches.first?.date ?? Date.now > Date.now {
@@ -182,13 +182,70 @@ struct MatchListView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity)
-        .overlay(alignment: .center, content: {
-            if (matches.isEmpty) {
-                Text("No matches")
+        .overlay(alignment: .center) {
+            if matches.isEmpty {
+                emptyStateView(for: tab)
             }
-        })
+        }
         .refreshable {
             try? await viewModel.refresh(hard: true)
+        }
+    }
+
+    // MARK: - Empty State
+
+    private func emptyStateView(for tab: Tabs) -> some View {
+        VStack(spacing: 16) {
+            Image(systemName: emptyStateIcon(for: tab))
+                .font(.system(size: 48))
+                .foregroundStyle(.secondary)
+
+            VStack(spacing: 6) {
+                Text(emptyStateTitle(for: tab))
+                    .font(.headline)
+                    .fontWeight(.semibold)
+
+                Text(emptyStateMessage(for: tab))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 48)
+    }
+
+    private func emptyStateIcon(for tab: Tabs) -> String {
+        switch tab {
+        case .previous:
+            return "clock.arrow.circlepath"
+        case .today:
+            return "calendar.badge.clock"
+        case .upcoming:
+            return "calendar"
+        }
+    }
+
+    private func emptyStateTitle(for tab: Tabs) -> String {
+        switch tab {
+        case .previous:
+            return "No Previous Matches"
+        case .today:
+            return "No Games Today"
+        case .upcoming:
+            return "No Upcoming Matches"
+        }
+    }
+
+    private func emptyStateMessage(for tab: Tabs) -> String {
+        switch tab {
+        case .previous:
+            return "Past match results will appear here once games have been played."
+        case .today:
+            return "There are no games scheduled for today. Check the upcoming tab for future matches."
+        case .upcoming:
+            return "No upcoming games scheduled at the moment. Pull to refresh for updates."
         }
     }
 }
