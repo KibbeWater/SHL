@@ -279,6 +279,42 @@ class Settings: ObservableObject {
         }
     }
 
+    // MARK: - Notification Reminder Tracking
+
+    /// Tracks how many times the user has viewed match details
+    @CloudStorage(key: "matchViewInteractionCount", default: 0)
+    public var matchViewInteractionCount: Int {
+        didSet {
+            objectWillChange.send()
+        }
+    }
+
+    /// Tracks if the user has dismissed the notification reminder
+    @CloudStorage(key: "hasSeenNotificationReminder", default: false)
+    public var hasSeenNotificationReminder: Bool {
+        didSet {
+            objectWillChange.send()
+        }
+    }
+
+    /// Increment match view interaction count
+    public func incrementMatchViewCount() {
+        matchViewInteractionCount += 1
+    }
+
+    /// Check if we should show the notification reminder
+    /// Shows after 10 match views if user hasn't seen it
+    /// Actual notification permission status is checked separately
+    public func shouldShowNotificationReminder() -> Bool {
+        return matchViewInteractionCount >= 10
+            && !hasSeenNotificationReminder
+    }
+
+    /// Mark notification reminder as seen
+    public func markNotificationReminderSeen() {
+        hasSeenNotificationReminder = true
+    }
+
     // MARK: - Binding Helpers
 
     public func binding_userManagementEnabled() -> Binding<Bool> {

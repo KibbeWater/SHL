@@ -15,42 +15,15 @@ struct MatchCalendar: View {
             NavigationLink {
                 MatchView(match, referrer: "calendar")
             } label: {
-                HStack {
-                    TeamLogoView(teamCode: match.homeTeam.code, size: .custom(42))
-                    Text(match.homeTeam.code)
-                        .fontWeight(.semibold)
-                    Spacer()
-                    Text(match.awayTeam.code)
-                        .fontWeight(.semibold)
-                    TeamLogoView(teamCode: match.awayTeam.code, size: .custom(42))
-                }
-                .overlay(alignment: .center, content: {
-                    VStack {
-                        Text(FormatDate(match.date))
-                            .font(.callout)
-                            .fontWeight(.semibold)
-                        Text("vs.")
-                            .font(.callout)
-                        Spacer()
-                    }
-                })
-                .padding(8)
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                MatchCardCompact(game: match)
             }
-            .foregroundStyle(.primary)
+            .buttonStyle(PlainButtonStyle())
             .contextMenu {
                 #if !APPCLIP
                 ReminderContext(game: match)
                 #endif
             }
         }
-    }
-    
-    func FormatDate(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM dd"
-        return dateFormatter.string(from: date)
     }
 }
 

@@ -108,10 +108,12 @@
 		806DFA342EE239FE00065FD2 /* TeamSelectionPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806DFA2F2EE239FE00065FD2 /* TeamSelectionPageView.swift */; };
 		806DFA352EE239FE00065FD2 /* WelcomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806DFA302EE239FE00065FD2 /* WelcomePageView.swift */; };
 		806DFA362EE239FE00065FD2 /* OnlineFeaturesPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806DFA2E2EE239FE00065FD2 /* OnlineFeaturesPageView.swift */; };
+		806DFACC2EE35C4600065FD2 /* MatchCardCompact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806DFACB2EE35C4600065FD2 /* MatchCardCompact.swift */; };
 		8075FBB42CA62706004C6438 /* GameExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB32CA62706004C6438 /* GameExtensions.swift */; };
 		8075FBB82CA6A1AE004C6438 /* LargeOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB72CA6A1AE004C6438 /* LargeOverview.swift */; };
 		808F89BD2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808F89BA2CC96C5F00452D6E /* FeaturedGameAlgo.swift */; };
 		8095D07D2D8DA059006469A4 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 8095D07C2D8DA059006469A4 /* PostHog */; };
+		80DAAC8E2EE37D3D001E7506 /* NotificationReminderSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DAAC8D2EE37D3D001E7506 /* NotificationReminderSheet.swift */; };
 		80DBB7A92EA3FD530051C807 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 80DBB7A82EA3FD530051C807 /* CombineMoya */; };
 		80DBB7AB2EA3FD530051C807 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 80DBB7AA2EA3FD530051C807 /* Moya */; };
 		80DBB7AD2EA3FD530051C807 /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 80DBB7AC2EA3FD530051C807 /* ReactiveMoya */; };
@@ -238,9 +240,11 @@
 		806DFA2E2EE239FE00065FD2 /* OnlineFeaturesPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineFeaturesPageView.swift; sourceTree = "<group>"; };
 		806DFA2F2EE239FE00065FD2 /* TeamSelectionPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamSelectionPageView.swift; sourceTree = "<group>"; };
 		806DFA302EE239FE00065FD2 /* WelcomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomePageView.swift; sourceTree = "<group>"; };
+		806DFACB2EE35C4600065FD2 /* MatchCardCompact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCardCompact.swift; sourceTree = "<group>"; };
 		8075FBB32CA62706004C6438 /* GameExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameExtensions.swift; sourceTree = "<group>"; };
 		8075FBB72CA6A1AE004C6438 /* LargeOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeOverview.swift; sourceTree = "<group>"; };
 		808F89BA2CC96C5F00452D6E /* FeaturedGameAlgo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedGameAlgo.swift; sourceTree = "<group>"; };
+		80DAAC8D2EE37D3D001E7506 /* NotificationReminderSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationReminderSheet.swift; sourceTree = "<group>"; };
 		80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCache.swift; sourceTree = "<group>"; };
 		80E0F5812BD9346100A4C232 /* Root.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Root.swift; sourceTree = "<group>"; };
 		80E9ED8D2CB14DDC00D0E4E9 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
@@ -634,6 +638,7 @@
 		BC8C150F2BAC780F0010AB59 /* GameDisplays */ = {
 			isa = PBXGroup;
 			children = (
+				806DFACB2EE35C4600065FD2 /* MatchCardCompact.swift */,
 				BC8C15102BAC787B0010AB59 /* MatchOverview.swift */,
 				8075FBB72CA6A1AE004C6438 /* LargeOverview.swift */,
 			);
@@ -712,6 +717,7 @@
 		BCF54B572B40E44200960F47 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				80DAAC8D2EE37D3D001E7506 /* NotificationReminderSheet.swift */,
 				801A95ED2EBF7F5300530970 /* TeamLogoView.swift */,
 				802AD9472EAE656C00916E9F /* PBPEventRowView.swift */,
 				8008FC7C2C9DCC3A00B23669 /* Context */,
@@ -907,8 +913,10 @@
 				802AD9442EAE654500916E9F /* PBPEventDTO.swift in Sources */,
 				802AD9452EAE654500916E9F /* PBPEventData.swift in Sources */,
 				802AD9462EAE654500916E9F /* PBPController.swift in Sources */,
+				80DAAC8E2EE37D3D001E7506 /* NotificationReminderSheet.swift in Sources */,
 				8008FC7E2C9DCC4E00B23669 /* ReminderContext.swift in Sources */,
 				80E9ED8F2CB14DDC00D0E4E9 /* Settings.swift in Sources */,
+				806DFACC2EE35C4600065FD2 /* MatchCardCompact.swift in Sources */,
 				BC369E1C2BBAF5CC00940F42 /* VersusBar.swift in Sources */,
 				804375AA2CAA09FC0041F46D /* PlayerView.swift in Sources */,
 				802AD96E2EB17EF100916E9F /* MatchSearch.swift in Sources */,

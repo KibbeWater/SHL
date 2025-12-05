@@ -22,6 +22,7 @@ struct SettingsView: View {
     @State private var devices: [Device] = []
     @State private var isLoadingDevices = false
     @State private var showResetOnboardingAlert = false
+    @State private var showNotificationReminderSheet = false
 
     private let api = SHLAPIClient.shared
     
@@ -158,16 +159,6 @@ struct SettingsView: View {
                 }
             }
 
-#if DEBUG
-            Section("Debug Tools") {
-                Button("Reset Cache", role: .destructive) {
-                }
-
-                Button("Reset Onboarding") {
-                    showResetOnboardingAlert = true
-                }
-            }
-#endif
 
             // MARK: - User Management Section
 
@@ -372,7 +363,7 @@ struct SettingsView: View {
             // MARK: - Debug Tools Section
 
 #if DEBUG
-            Section("Debug Tools") {
+            Section {
                 if settings.userManagementEnabled && authManager.isAuthenticated {
                     NavigationLink {
                         NotificationTestView()
@@ -380,6 +371,35 @@ struct SettingsView: View {
                         Label("Test Push Notifications", systemImage: "bell.badge.fill")
                     }
                 }
+
+                Button {
+                    showNotificationReminderSheet = true
+                } label: {
+                    Label("Show Notification Reminder", systemImage: "bell.badge")
+                }
+
+                Button {
+                    settings.objectWillChange.send()
+                    settings.hasSeenNotificationReminder = false
+                    settings.matchViewInteractionCount = 10 // Set to 10 to trigger on next match view
+                } label: {
+                    Label("Reset Reminder State", systemImage: "arrow.counterclockwise")
+                }
+
+                HStack {
+                    Text("Match View Count")
+                    Spacer()
+                    Text("\(settings.matchViewInteractionCount)")
+                        .foregroundStyle(.secondary)
+                }
+
+                Button("Reset Onboarding") {
+                    showResetOnboardingAlert = true
+                }
+            } header: {
+                Text("Debug Tools")
+            } footer: {
+                Text("Notification reminder shows after 10 match views if notifications aren't enabled.")
             }
 #endif
 
@@ -484,6 +504,27 @@ struct SettingsView: View {
         } message: {
             Text("This will reset the onboarding flow. You'll need to restart the app to see it again.")
         }
+        #if DEBUG
+        .sheet(isPresented: $showNotificationReminderSheet) {
+            NotificationReminderSheet(
+                onEnable: {
+                    Task {
+                        // Only enable user management if not already enabled
+                        if !Settings.shared.userManagementEnabled {
+                            Settings.shared.userManagementEnabled = true
+                        }
+                        await PushNotificationManager.shared.requestPermissionsAndRegister()
+                    }
+                    Settings.shared.markNotificationReminderSeen()
+                    showNotificationReminderSheet = false
+                },
+                onSkip: {
+                    Settings.shared.markNotificationReminderSeen()
+                    showNotificationReminderSheet = false
+                }
+            )
+        }
+        #endif
     }
 }
 

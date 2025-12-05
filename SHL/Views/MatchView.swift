@@ -30,6 +30,7 @@ struct MatchView: View {
     @State private var selectedTab: MatchTab = .summary
 
     @State var hasLogged = false
+    @State private var showNotificationReminder = false
     private var referrer: String
 
     init(_ match: Match, referrer: String) {
@@ -97,6 +98,46 @@ struct MatchView: View {
             }
             startTimer()
             logAnalytics()
+            trackMatchViewInteraction()
+        }
+        .sheet(isPresented: $showNotificationReminder) {
+            NotificationReminderSheet(
+                onEnable: {
+                    Task {
+                        // Only enable user management if not already enabled
+                        if !Settings.shared.userManagementEnabled {
+                            Settings.shared.userManagementEnabled = true
+                        }
+                        await PushNotificationManager.shared.requestPermissionsAndRegister()
+                    }
+                    Settings.shared.markNotificationReminderSeen()
+                    showNotificationReminder = false
+                },
+                onSkip: {
+                    Settings.shared.markNotificationReminderSeen()
+                    showNotificationReminder = false
+                }
+            )
+        }
+    }
+
+    // MARK: - Notification Reminder
+
+    private func trackMatchViewInteraction() {
+        Settings.shared.incrementMatchViewCount()
+
+        // Check if we should show the notification reminder
+        Task {
+            let status = await PushNotificationManager.shared.checkNotificationPermission()
+            await MainActor.run {
+                if Settings.shared.shouldShowNotificationReminder() &&
+                   (status == .notDetermined || status == .denied) {
+                    // Small delay to not interrupt the initial view load
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        showNotificationReminder = true
+                    }
+                }
+            }
         }
     }
 
