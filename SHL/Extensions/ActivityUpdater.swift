@@ -19,6 +19,9 @@ public class ActivityUpdater {
     private var pushToStartTokenTask: Task<Void, Never>?
     private var activityUpdatesTask: Task<Void, Never>?
 
+    /// Callback for tracking activity starts (set by main app to avoid PostHog dependency in widget)
+    public var onActivityStarted: ((_ matchId: String, _ homeTeam: String, _ awayTeam: String) -> Void)?
+
     // MARK: - Push-to-Start Token Observation
 
     /// Start observing push-to-start token updates (iOS 17.2+)
@@ -113,6 +116,13 @@ public class ActivityUpdater {
                 #if DEBUG
                 print("📱 Activity detected: \(activity.id) - observing push token updates")
                 #endif
+
+                // Track activity start via callback
+                self.onActivityStarted?(
+                    activity.attributes.internalId,
+                    activity.attributes.homeTeam.teamCode,
+                    activity.attributes.awayTeam.teamCode
+                )
 
                 // Start observing this activity's push token updates
                 observePushTokenUpdates(for: activity)

@@ -7,6 +7,7 @@
 
 import UIKit
 import UserNotifications
+import PostHog
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -73,6 +74,20 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 Task { @MainActor in
                     // Fetch team code first, then start observing
                     await Self.fetchAndCacheInterestedTeams()
+
+                    // Set up analytics callback for activity starts
+                    ActivityUpdater.shared.onActivityStarted = { matchId, homeTeam, awayTeam in
+                        PostHogSDK.shared.capture(
+                            "started_live_activity",
+                            properties: [
+                                "join_type": "push_to_start",
+                                "match_id": matchId,
+                                "home_team": homeTeam,
+                                "away_team": awayTeam
+                            ]
+                        )
+                    }
+
                     ActivityUpdater.shared.startObservingPushToStartToken()
                 }
             }
