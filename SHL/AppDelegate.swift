@@ -127,10 +127,22 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     // Handle notification tap
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
-        PushNotificationManager.shared.handleRemoteNotification(userInfo: userInfo)
+        let identifier = response.notification.request.identifier
 
-        // Handle notification tap action here
-        // For example, navigate to match detail if it's a match notification
+        // Check for matchId in userInfo (works for both push and local notifications)
+        if let matchId = userInfo["matchId"] as? String {
+            Task { @MainActor in
+                NavigationCoordinator.shared.navigateToMatch(id: matchId, source: "notification_tap")
+            }
+        } else if userInfo["type"] == nil {
+            // Fallback for old local notifications: identifier IS the match ID
+            Task { @MainActor in
+                NavigationCoordinator.shared.navigateToMatch(id: identifier, source: "local_reminder")
+            }
+        }
+
+        // Still call original handler for any additional processing
+        PushNotificationManager.shared.handleRemoteNotification(userInfo: userInfo)
 
         completionHandler()
     }

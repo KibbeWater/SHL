@@ -235,7 +235,7 @@ struct SHLWidgetLiveActivity: Widget {
                         .fontWeight(.bold)
                 }
             }
-            .widgetURL(URL(string: "shltracker://open-game?id=\(context.attributes.id)"))
+            .widgetURL(URL(string: "shltracker://open-game?id=\(context.attributes.internalId)"))
             .keylineTint(Color.white)
         }
     }
@@ -250,7 +250,7 @@ struct SHLWidgetLiveActivity: Widget {
 
 extension SHLWidgetAttributes {
     fileprivate static var preview: SHLWidgetAttributes {
-        SHLWidgetAttributes(id: "123", homeTeam: ActivityTeam(name: "Luleå Hockey", teamCode: "LHF"), awayTeam: ActivityTeam(name: "MODO Hockey", teamCode: "MODO"))
+        SHLWidgetAttributes(id: "123", internalId: "preview-id", homeTeam: ActivityTeam(name: "Luleå Hockey", teamCode: "LHF"), awayTeam: ActivityTeam(name: "MODO Hockey", teamCode: "MODO"))
     }
 }
 

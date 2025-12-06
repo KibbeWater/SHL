@@ -114,6 +114,7 @@
 		808F89BD2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808F89BA2CC96C5F00452D6E /* FeaturedGameAlgo.swift */; };
 		8095D07D2D8DA059006469A4 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 8095D07C2D8DA059006469A4 /* PostHog */; };
 		80DAAC8E2EE37D3D001E7506 /* NotificationReminderSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DAAC8D2EE37D3D001E7506 /* NotificationReminderSheet.swift */; };
+		80DAAC902EE45200001E7506 /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DAAC8F2EE451FF001E7506 /* NavigationCoordinator.swift */; };
 		80DBB7A92EA3FD530051C807 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 80DBB7A82EA3FD530051C807 /* CombineMoya */; };
 		80DBB7AB2EA3FD530051C807 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 80DBB7AA2EA3FD530051C807 /* Moya */; };
 		80DBB7AD2EA3FD530051C807 /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 80DBB7AC2EA3FD530051C807 /* ReactiveMoya */; };
@@ -245,6 +246,7 @@
 		8075FBB72CA6A1AE004C6438 /* LargeOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeOverview.swift; sourceTree = "<group>"; };
 		808F89BA2CC96C5F00452D6E /* FeaturedGameAlgo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedGameAlgo.swift; sourceTree = "<group>"; };
 		80DAAC8D2EE37D3D001E7506 /* NotificationReminderSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationReminderSheet.swift; sourceTree = "<group>"; };
+		80DAAC8F2EE451FF001E7506 /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
 		80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCache.swift; sourceTree = "<group>"; };
 		80E0F5812BD9346100A4C232 /* Root.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Root.swift; sourceTree = "<group>"; };
 		80E9ED8D2CB14DDC00D0E4E9 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
@@ -360,6 +362,7 @@
 		801A95FE2ED1ECFA00530970 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				80DAAC8F2EE451FF001E7506 /* NavigationCoordinator.swift */,
 				801A95FB2ED1ECFA00530970 /* AuthenticationManager.swift */,
 				801A95FC2ED1ECFA00530970 /* iCloudSyncManager.swift */,
 				801A95FD2ED1ECFA00530970 /* PushNotificationManager.swift */,
@@ -947,6 +950,7 @@
 				801A95F42EC8A5EA00530970 /* ConnectionMetrics.swift in Sources */,
 				801A95F52EC8A5EA00530970 /* SSEConnectionManager.swift in Sources */,
 				806DBE1A2EA401FA00E07695 /* TeamDetail.swift in Sources */,
+				80DAAC902EE45200001E7506 /* NavigationCoordinator.swift in Sources */,
 				801A96042ED1ED0A00530970 /* KeychainManager.swift in Sources */,
 				801A962F2ED30D4400530970 /* NotificationTestView.swift in Sources */,
 				801A96092ED1ED3300530970 /* AppDelegate.swift in Sources */,

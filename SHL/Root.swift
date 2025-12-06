@@ -38,6 +38,8 @@ struct Root: View {
 
     @State private var teams: [Team] = []
 
+    @StateObject private var navigationCoordinator = NavigationCoordinator.shared
+
     var body: some View {
         ZStack {
             if #available(iOS 18.0, *) {
@@ -178,8 +180,38 @@ struct Root: View {
             print("App was opened via URL: \(incomingURL)")
             handleIncomingURL(incomingURL)
         }
+        .onChange(of: navigationCoordinator.pendingMatchId) { oldValue, newValue in
+            guard let matchId = newValue else { return }
+            handlePendingNavigation(matchId: matchId)
+        }
+        .onAppear {
+            // Handle cold start navigation (app was terminated)
+            if let matchId = navigationCoordinator.pendingMatchId {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    handlePendingNavigation(matchId: matchId)
+                }
+            }
+        }
         .fullScreenCover(isPresented: $showOnboarding) {
             OnboardingContainerView()
+        }
+    }
+
+    private func handlePendingNavigation(matchId: String) {
+        let source = navigationCoordinator.navigationSource ?? "unknown"
+        navigationCoordinator.clearPending()
+
+        Task {
+            guard let game = try? await api.getMatchDetail(id: matchId) else {
+                print("Unable to find game for navigation: \(matchId)")
+                return
+            }
+
+            await MainActor.run {
+                selectedTab = .home
+                openedGame = MatchView(game, referrer: source)
+                isGameOpen = true
+            }
         }
     }
     

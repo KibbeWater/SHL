@@ -148,7 +148,12 @@ public class ActivityUpdater {
     // MARK: - Activity Conversion Helpers
 
     func OverviewToAttrib(_ liveMatch: LiveMatch) -> SHLWidgetAttributes {
-        return SHLWidgetAttributes(id: liveMatch.externalId, homeTeam: .init(name: liveMatch.homeTeam.name, teamCode: liveMatch.homeTeam.code), awayTeam: .init(name: liveMatch.awayTeam.name, teamCode: liveMatch.awayTeam.code))
+        return SHLWidgetAttributes(
+            id: liveMatch.externalId,
+            internalId: liveMatch.id,
+            homeTeam: .init(name: liveMatch.homeTeam.name, teamCode: liveMatch.homeTeam.code),
+            awayTeam: .init(name: liveMatch.awayTeam.name, teamCode: liveMatch.awayTeam.code)
+        )
     }
 
     func OverviewToState(_ liveMatch: LiveMatch) -> SHLWidgetAttributes.ContentState {

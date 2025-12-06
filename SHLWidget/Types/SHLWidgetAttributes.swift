@@ -28,11 +28,13 @@ public struct SHLWidgetAttributes: ActivityAttributes {
     }
     
     public var id: String
+    public var internalId: String  // Internal database ID for deep linking
     public var homeTeam: ActivityTeam
     public var awayTeam: ActivityTeam
-    
-    public init(id: String, homeTeam: ActivityTeam, awayTeam: ActivityTeam) {
+
+    public init(id: String, internalId: String, homeTeam: ActivityTeam, awayTeam: ActivityTeam) {
         self.id = id
+        self.internalId = internalId
         self.homeTeam = homeTeam
         self.awayTeam = awayTeam
     }

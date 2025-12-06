@@ -253,30 +253,31 @@ final class PushNotificationManager: NSObject, ObservableObject {
     // - Update live activities if applicable (iOS 17.2+)
 
     private func handleMatchStartNotification(_ userInfo: [AnyHashable: Any]) {
-        // TODO: Implement match start notification handling
-        // - Extract match ID and team info from userInfo
-        // - Post notification to update UI or start Live Activity
-        // - Consider showing an in-app notification
+        guard let matchId = userInfo["matchId"] as? String else { return }
+        Task { @MainActor in
+            NavigationCoordinator.shared.navigateToMatch(id: matchId, source: "push_match_start")
+        }
     }
 
     private func handleGoalNotification(_ userInfo: [AnyHashable: Any]) {
-        // TODO: Implement goal notification handling
-        // - Extract goal details (scorer, team, time)
-        // - Update Live Activity if active
-        // - Play haptic feedback for user's interested teams
+        guard let matchId = userInfo["matchId"] as? String else { return }
+        Task { @MainActor in
+            NavigationCoordinator.shared.navigateToMatch(id: matchId, source: "push_goal")
+        }
     }
 
     private func handlePeriodEndNotification(_ userInfo: [AnyHashable: Any]) {
-        // TODO: Implement period end notification handling
-        // - Extract period number and scores
-        // - Update Live Activity if active
+        guard let matchId = userInfo["matchId"] as? String else { return }
+        Task { @MainActor in
+            NavigationCoordinator.shared.navigateToMatch(id: matchId, source: "push_period_end")
+        }
     }
 
     private func handleFinalScoreNotification(_ userInfo: [AnyHashable: Any]) {
-        // TODO: Implement final score notification handling
-        // - Extract final score
-        // - Update Live Activity to completed state
-        // - Post notification for UI refresh
+        guard let matchId = userInfo["matchId"] as? String else { return }
+        Task { @MainActor in
+            NavigationCoordinator.shared.navigateToMatch(id: matchId, source: "push_final_score")
+        }
     }
 }
 

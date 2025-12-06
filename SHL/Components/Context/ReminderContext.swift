@@ -40,6 +40,7 @@ struct ReminderContext: View {
         content.title = "Match Starting"
         content.body = "The match between \(match.homeTeam.name) and \(match.awayTeam.name) is about to begin in 5 minutes"
         content.sound = UNNotificationSound.default
+        content.userInfo = ["matchId": match.id]
         
         let calendar = Calendar.current
         let remindDate: Date = calendar.date(byAdding: .minute, value: -5, to: match.date)!
