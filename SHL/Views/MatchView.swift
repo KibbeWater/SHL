@@ -670,7 +670,7 @@ struct MatchView: View {
 
     private func stopLiveActivity() {
         var activities = Activity<SHLWidgetAttributes>.activities
-        activities = activities.filter { $0.attributes.id == match.id }
+        activities = activities.filter { $0.attributes.internalId == match.id }
 
         let contentState = SHLWidgetAttributes.ContentState(
             homeScore: match.homeScore,
@@ -710,7 +710,7 @@ struct MatchView: View {
 
     private func checkActiveActivities() {
         let activities = Activity<SHLWidgetAttributes>.activities.filter {
-            $0.attributes.id == match.id
+            $0.attributes.internalId == match.id
         }
         activityRunning = !activities.isEmpty
     }
