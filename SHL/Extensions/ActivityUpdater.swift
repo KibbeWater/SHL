@@ -41,6 +41,17 @@ public class ActivityUpdater {
 
         // Also start observing activity updates to get update tokens for remotely-started activities
         startObservingActivityUpdates()
+
+        // Handle existing activities that may have been created before observation started
+        // (e.g., via push-to-start while app was killed or backgrounded)
+        Task {
+            for activity in Activity<SHLWidgetAttributes>.activities {
+                #if DEBUG
+                print("📱 Found existing activity: \(activity.id) - registering push token updates")
+                #endif
+                observePushTokenUpdates(for: activity)
+            }
+        }
     }
 
     /// Stop observing push-to-start token updates
