@@ -50,23 +50,40 @@ struct Provider: AppIntentTimelineProvider {
     func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
         let api = WidgetAPI()
 
-        // Get cached data (triggers background refresh if stale)
-        let games = api.getLatestMatches() ?? []
+        let game: WidgetGame?
 
-        if games.isEmpty {
-            // No cached data - show error and retry soon
-            let entry = SimpleEntry.error(configuration: configuration)
-            let retryDate = Date.now.addingTimeInterval(60) // Retry in 1 minute
-            return Timeline(entries: [entry], policy: .after(retryDate))
+        // Check if a specific team is selected
+        if let teamCode = configuration.teamFilter.teamCode {
+            // Get team-specific matches
+            let matches = api.getTeamMatches(teamCode: teamCode) ?? []
+
+            if matches.isEmpty {
+                // No cached data - show error and retry soon
+                let entry = SimpleEntry.error(configuration: configuration)
+                let retryDate = Date.now.addingTimeInterval(60)
+                return Timeline(entries: [entry], policy: .after(retryDate))
+            }
+
+            // Get the first upcoming match for this team
+            game = matches.first { $0.date > Date() }
+        } else {
+            // Featured mode - get all matches and pick featured
+            let games = api.getLatestMatches() ?? []
+
+            if games.isEmpty {
+                let entry = SimpleEntry.error(configuration: configuration)
+                let retryDate = Date.now.addingTimeInterval(60)
+                return Timeline(entries: [entry], policy: .after(retryDate))
+            }
+
+            game = WidgetFeaturedGame.getFeaturedGame(from: games)
         }
-
-        let game = WidgetFeaturedGame.getFeaturedGame(from: games)
 
         let entry = SimpleEntry(
             date: Date.now,
             game: game,
             configuration: configuration,
-            loadError: false
+            loadError: game == nil
         )
 
         let nextUpdate = calculateNextUpdate(for: game)
@@ -278,19 +295,18 @@ private struct MediumWidgetView: View {
                     endPoint: .bottom
                 )
 
-                // Team color accents
-                HStack(spacing: 0) {
-                    LinearGradient(
-                        colors: [homeColor.opacity(0.4), homeColor.opacity(0.1)],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                    LinearGradient(
-                        colors: [awayColor.opacity(0.1), awayColor.opacity(0.4)],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                }
+                // Team color accents - smooth blend through center
+                LinearGradient(
+                    stops: [
+                        .init(color: homeColor.opacity(0.5), location: 0.0),
+                        .init(color: homeColor.opacity(0.2), location: 0.35),
+                        .init(color: .clear, location: 0.5),
+                        .init(color: awayColor.opacity(0.2), location: 0.65),
+                        .init(color: awayColor.opacity(0.5), location: 1.0)
+                    ],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
 
                 // Subtle top glow
                 LinearGradient(
@@ -430,18 +446,26 @@ private struct SmallWidgetView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .containerBackground(for: .widget) {
-            // Diagonal split gradient
+            // Diagonal gradient with smooth blend
             ZStack {
-                // Base gradient
+                // Base dark layer
+                Color(white: 0.12)
+
+                // Team colors blending diagonally
                 LinearGradient(
-                    colors: [homeColor, awayColor],
+                    stops: [
+                        .init(color: homeColor.opacity(0.7), location: 0.0),
+                        .init(color: homeColor.opacity(0.3), location: 0.4),
+                        .init(color: awayColor.opacity(0.3), location: 0.6),
+                        .init(color: awayColor.opacity(0.7), location: 1.0)
+                    ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
 
-                // Overlay for depth
+                // Subtle depth overlay
                 LinearGradient(
-                    colors: [.black.opacity(0.1), .clear, .black.opacity(0.2)],
+                    colors: [.white.opacity(0.05), .clear, .black.opacity(0.1)],
                     startPoint: .top,
                     endPoint: .bottom
                 )

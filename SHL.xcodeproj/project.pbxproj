@@ -122,6 +122,7 @@
 		80A16D902EEDC1BB003F9911 /* SharedTeamColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D8F2EEDC1BB003F9911 /* SharedTeamColorCache.swift */; };
 		80A16D912EEDC1BB003F9911 /* SharedTeamColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D8F2EEDC1BB003F9911 /* SharedTeamColorCache.swift */; };
 		80A16D932EEDC213003F9911 /* WidgetSharedColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D922EEDC213003F9911 /* WidgetSharedColorCache.swift */; };
+		80A16D952EEDCD44003F9911 /* WidgetUserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D942EEDCD44003F9911 /* WidgetUserPreferences.swift */; };
 		80DAAC8E2EE37D3D001E7506 /* NotificationReminderSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DAAC8D2EE37D3D001E7506 /* NotificationReminderSheet.swift */; };
 		80DAAC902EE45200001E7506 /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DAAC8F2EE451FF001E7506 /* NavigationCoordinator.swift */; };
 		80DBB7A92EA3FD530051C807 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 80DBB7A82EA3FD530051C807 /* CombineMoya */; };
@@ -262,6 +263,7 @@
 		80A16D8C2EEDBF8D003F9911 /* WidgetDataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataCache.swift; sourceTree = "<group>"; };
 		80A16D8F2EEDC1BB003F9911 /* SharedTeamColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedTeamColorCache.swift; sourceTree = "<group>"; };
 		80A16D922EEDC213003F9911 /* WidgetSharedColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSharedColorCache.swift; sourceTree = "<group>"; };
+		80A16D942EEDCD44003F9911 /* WidgetUserPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetUserPreferences.swift; sourceTree = "<group>"; };
 		80DAAC8D2EE37D3D001E7506 /* NotificationReminderSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationReminderSheet.swift; sourceTree = "<group>"; };
 		80DAAC8F2EE451FF001E7506 /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
 		80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCache.swift; sourceTree = "<group>"; };
@@ -556,6 +558,7 @@
 		806DBE542EA4041500E07695 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				80A16D942EEDCD44003F9911 /* WidgetUserPreferences.swift */,
 				80A16D922EEDC213003F9911 /* WidgetSharedColorCache.swift */,
 				80A16D892EED9018003F9911 /* TeamColorCache.swift */,
 				806DBE532EA4041500E07695 /* WidgetFeaturedGame.swift */,
@@ -910,6 +913,7 @@
 				801A960A2ED1EE1E00530970 /* SHLAPIError.swift in Sources */,
 				801A960B2ED1EE1E00530970 /* SHLAPIClient.swift in Sources */,
 				801A960C2ED1EE1E00530970 /* SHLAPIService.swift in Sources */,
+				80A16D952EEDCD44003F9911 /* WidgetUserPreferences.swift in Sources */,
 				801A96162ED1EE4500530970 /* Player.swift in Sources */,
 				801A96172ED1EE4500530970 /* PlayerGameLog.swift in Sources */,
 				80E9ED8E2CB14DDC00D0E4E9 /* Settings.swift in Sources */,

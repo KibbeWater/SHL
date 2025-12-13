@@ -13,11 +13,19 @@ class BackgroundSessionManager: NSObject {
     static let shared = BackgroundSessionManager()
 
     private let sessionIdentifier = "com.kibbewater.shl.widget.background"
-    private var backgroundCompletionHandler: (() -> Void)?
     private let cache = WidgetDataCache.shared
     private let decoder: JSONDecoder
 
     private let baseURL = "https://api.lrlnet.se"
+
+    // MARK: - Thread-safe completion handler
+
+    private let handlerQueue = DispatchQueue(label: "com.kibbewater.shl.background.handler")
+    private var _backgroundCompletionHandler: (() -> Void)?
+    private var backgroundCompletionHandler: (() -> Void)? {
+        get { handlerQueue.sync { _backgroundCompletionHandler } }
+        set { handlerQueue.sync { _backgroundCompletionHandler = newValue } }
+    }
 
     // MARK: - Download Types
 
@@ -145,9 +153,9 @@ extension BackgroundSessionManager: URLSessionDownloadDelegate {
     }
 
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
-        DispatchQueue.main.async {
-            self.backgroundCompletionHandler?()
-            self.backgroundCompletionHandler = nil
+        DispatchQueue.main.async { [weak self] in
+            self?.backgroundCompletionHandler?()
+            self?.backgroundCompletionHandler = nil
         }
     }
 
@@ -157,48 +165,29 @@ extension BackgroundSessionManager: URLSessionDownloadDelegate {
         switch type {
         case .latestMatches:
             // API returns RecentMatchesResponse: { upcoming: [...], recent: [...] }
-            let response = try decoder.decode(BackendRecentMatchesResponse.self, from: data)
+            let response = try decoder.decode(RecentMatchesResponse.self, from: data)
             let games = response.upcoming.map { $0.toWidgetGame() }
             cache.save(games, for: .latestMatches)
 
         case .standings:
             // API returns direct array [Standings]
-            let standings = try decoder.decode([BackendStanding].self, from: data)
+            let standings = try decoder.decode([Standings].self, from: data)
             let widgetStandings = standings.map { $0.toWidgetStanding() }
             cache.save(widgetStandings, for: .standings)
 
         case .teamMatches:
             guard let code = teamCode else { return }
             // API returns PaginatedResponse: { data: [...], page, limit }
-            let response = try decoder.decode(BackendPaginatedResponse.self, from: data)
+            let response = try decoder.decode(PaginatedResponse<Match>.self, from: data)
             let games = response.data.map { $0.toWidgetGame() }
             cache.save(games, for: WidgetDataCache.CacheKey.teamMatches(code))
         }
     }
 }
 
-// MARK: - Backend Response Models (duplicated for background session decoding)
+// MARK: - Model Extensions for Widget Conversion
 
-private struct BackendRecentMatchesResponse: Codable {
-    let upcoming: [BackendMatch]
-    let recent: [BackendMatch]
-}
-
-private struct BackendPaginatedResponse: Codable {
-    let data: [BackendMatch]
-    let page: Int
-    let limit: Int
-}
-
-private struct BackendMatch: Codable {
-    let id: String
-    let date: Date
-    let venue: String?
-    let homeTeam: BackendTeam
-    let awayTeam: BackendTeam
-    let homeScore: Int
-    let awayScore: Int
-
+extension Match {
     func toWidgetGame() -> WidgetGame {
         WidgetGame(
             id: id,
@@ -212,23 +201,7 @@ private struct BackendMatch: Codable {
     }
 }
 
-private struct BackendTeam: Codable {
-    let name: String
-    let code: String
-}
-
-private struct BackendStanding: Codable {
-    let id: String
-    let seasonID: String?
-    let team: BackendStandingTeam
-    let rank: Int
-    let gamesPlayed: Int
-    let points: Int
-    let goalDifference: Int
-    let wins: Int?
-    let losses: Int?
-    let overtimeLosses: Int?
-
+extension Standings {
     func toWidgetStanding() -> WidgetStanding {
         WidgetStanding(
             id: id,
@@ -242,10 +215,4 @@ private struct BackendStanding: Codable {
             overtimeLosses: overtimeLosses
         )
     }
-}
-
-private struct BackendStandingTeam: Codable {
-    let id: String
-    let name: String
-    let code: String
 }

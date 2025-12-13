@@ -142,6 +142,18 @@ private struct StandingsErrorView: View {
 private struct MediumStandingsView: View {
     let entry: StandingsEntry
 
+    /// Dynamically calculated season string (e.g., "2024/25")
+    private static var currentSeasonString: String {
+        let now = Date()
+        let calendar = Calendar.current
+        let month = calendar.component(.month, from: now)
+        let year = calendar.component(.year, from: now)
+        // Season starts in September, so Aug and earlier = previous season
+        let seasonStartYear = month >= 9 ? year : year - 1
+        let seasonEndYear = seasonStartYear + 1
+        return "\(seasonStartYear)/\(String(seasonEndYear).suffix(2))"
+    }
+
     private var hasHighlight: Bool {
         guard let code = entry.highlightTeamCode else { return false }
         return entry.standings.contains { $0.team.code == code && $0.rank > 4 }
@@ -169,7 +181,7 @@ private struct MediumStandingsView: View {
                     .fill(.white.opacity(0.3))
                     .frame(width: 3, height: 3)
 
-                Text("2024/25")
+                Text(Self.currentSeasonString)
                     .font(.system(size: 9, weight: .bold))
                     .foregroundStyle(.white.opacity(0.7))
 
@@ -251,6 +263,18 @@ private struct MediumStandingsView: View {
 private struct LargeStandingsView: View {
     let entry: StandingsEntry
 
+    /// Dynamically calculated season string (e.g., "2024/25")
+    private static var currentSeasonString: String {
+        let now = Date()
+        let calendar = Calendar.current
+        let month = calendar.component(.month, from: now)
+        let year = calendar.component(.year, from: now)
+        // Season starts in September, so Aug and earlier = previous season
+        let seasonStartYear = month >= 9 ? year : year - 1
+        let seasonEndYear = seasonStartYear + 1
+        return "\(seasonStartYear)/\(String(seasonEndYear).suffix(2))"
+    }
+
     private var hasHighlight: Bool {
         guard let code = entry.highlightTeamCode else { return false }
         return entry.standings.contains { $0.team.code == code && $0.rank > 11 }
@@ -278,7 +302,7 @@ private struct LargeStandingsView: View {
                     .fill(.white.opacity(0.3))
                     .frame(width: 3, height: 3)
 
-                Text("SHL 2024/25")
+                Text("SHL \(Self.currentSeasonString)")
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.white.opacity(0.7))
 
