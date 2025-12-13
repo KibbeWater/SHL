@@ -113,6 +113,15 @@
 		8075FBB82CA6A1AE004C6438 /* LargeOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075FBB72CA6A1AE004C6438 /* LargeOverview.swift */; };
 		808F89BD2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 808F89BA2CC96C5F00452D6E /* FeaturedGameAlgo.swift */; };
 		8095D07D2D8DA059006469A4 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 8095D07C2D8DA059006469A4 /* PostHog */; };
+		80A16D852EED8F6D003F9911 /* SHLWidgetStandings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D832EED8F6D003F9911 /* SHLWidgetStandings.swift */; };
+		80A16D862EED8F6D003F9911 /* SHLWidgetTeamSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D842EED8F6D003F9911 /* SHLWidgetTeamSchedule.swift */; };
+		80A16D882EED900B003F9911 /* WidgetStandings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D872EED900B003F9911 /* WidgetStandings.swift */; };
+		80A16D8A2EED9018003F9911 /* TeamColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D892EED9018003F9911 /* TeamColorCache.swift */; };
+		80A16D8D2EEDBF8D003F9911 /* BackgroundSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D8B2EEDBF8D003F9911 /* BackgroundSessionManager.swift */; };
+		80A16D8E2EEDBF8D003F9911 /* WidgetDataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D8C2EEDBF8D003F9911 /* WidgetDataCache.swift */; };
+		80A16D902EEDC1BB003F9911 /* SharedTeamColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D8F2EEDC1BB003F9911 /* SharedTeamColorCache.swift */; };
+		80A16D912EEDC1BB003F9911 /* SharedTeamColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D8F2EEDC1BB003F9911 /* SharedTeamColorCache.swift */; };
+		80A16D932EEDC213003F9911 /* WidgetSharedColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D922EEDC213003F9911 /* WidgetSharedColorCache.swift */; };
 		80DAAC8E2EE37D3D001E7506 /* NotificationReminderSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DAAC8D2EE37D3D001E7506 /* NotificationReminderSheet.swift */; };
 		80DAAC902EE45200001E7506 /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DAAC8F2EE451FF001E7506 /* NavigationCoordinator.swift */; };
 		80DBB7A92EA3FD530051C807 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 80DBB7A82EA3FD530051C807 /* CombineMoya */; };
@@ -245,6 +254,14 @@
 		8075FBB32CA62706004C6438 /* GameExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameExtensions.swift; sourceTree = "<group>"; };
 		8075FBB72CA6A1AE004C6438 /* LargeOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeOverview.swift; sourceTree = "<group>"; };
 		808F89BA2CC96C5F00452D6E /* FeaturedGameAlgo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedGameAlgo.swift; sourceTree = "<group>"; };
+		80A16D832EED8F6D003F9911 /* SHLWidgetStandings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetStandings.swift; sourceTree = "<group>"; };
+		80A16D842EED8F6D003F9911 /* SHLWidgetTeamSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetTeamSchedule.swift; sourceTree = "<group>"; };
+		80A16D872EED900B003F9911 /* WidgetStandings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetStandings.swift; sourceTree = "<group>"; };
+		80A16D892EED9018003F9911 /* TeamColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamColorCache.swift; sourceTree = "<group>"; };
+		80A16D8B2EEDBF8D003F9911 /* BackgroundSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSessionManager.swift; sourceTree = "<group>"; };
+		80A16D8C2EEDBF8D003F9911 /* WidgetDataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataCache.swift; sourceTree = "<group>"; };
+		80A16D8F2EEDC1BB003F9911 /* SharedTeamColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedTeamColorCache.swift; sourceTree = "<group>"; };
+		80A16D922EEDC213003F9911 /* WidgetSharedColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSharedColorCache.swift; sourceTree = "<group>"; };
 		80DAAC8D2EE37D3D001E7506 /* NotificationReminderSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationReminderSheet.swift; sourceTree = "<group>"; };
 		80DAAC8F2EE451FF001E7506 /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
 		80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCache.swift; sourceTree = "<group>"; };
@@ -530,6 +547,7 @@
 		806DBE512EA4040D00E07695 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				80A16D872EED900B003F9911 /* WidgetStandings.swift */,
 				806DBE502EA4040D00E07695 /* WidgetGame.swift */,
 			);
 			path = Models;
@@ -538,6 +556,8 @@
 		806DBE542EA4041500E07695 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				80A16D922EEDC213003F9911 /* WidgetSharedColorCache.swift */,
+				80A16D892EED9018003F9911 /* TeamColorCache.swift */,
 				806DBE532EA4041500E07695 /* WidgetFeaturedGame.swift */,
 			);
 			path = Helpers;
@@ -546,6 +566,8 @@
 		806DBE572EA4041C00E07695 /* API */ = {
 			isa = PBXGroup;
 			children = (
+				80A16D8B2EEDBF8D003F9911 /* BackgroundSessionManager.swift */,
+				80A16D8C2EEDBF8D003F9911 /* WidgetDataCache.swift */,
 				806DBE562EA4041C00E07695 /* WidgetAPI.swift */,
 			);
 			path = API;
@@ -566,6 +588,7 @@
 		BC374DF82BAD920F00378412 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				80A16D8F2EEDC1BB003F9911 /* SharedTeamColorCache.swift */,
 				804EC8212CFC02560096CA0D /* ActivityUpdater.swift */,
 				805C8AA22CAF32FA00CF7F7D /* CacheAsyncImage.swift */,
 				BC374DF92BAD922000378412 /* UIImageExt.swift */,
@@ -589,8 +612,10 @@
 				804EC7FB2CFBD1AC0096CA0D /* Types */,
 				804316232BDCFFA5007D1D9A /* AppIntent.swift */,
 				BC425E492B4706CC00D82CFB /* SHLWidgetBundle.swift */,
-				BC425E4B2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift */,
+				80A16D832EED8F6D003F9911 /* SHLWidgetStandings.swift */,
 				804316252BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift */,
+				BC425E4B2B4706CC00D82CFB /* SHLWidgetLiveActivity.swift */,
+				80A16D842EED8F6D003F9911 /* SHLWidgetTeamSchedule.swift */,
 				BC425E512B4706CD00D82CFB /* Assets.xcassets */,
 				BC425E532B4706CD00D82CFB /* Info.plist */,
 			);
@@ -864,7 +889,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				80A16D852EED8F6D003F9911 /* SHLWidgetStandings.swift in Sources */,
+				80A16D882EED900B003F9911 /* WidgetStandings.swift in Sources */,
+				80A16D862EED8F6D003F9911 /* SHLWidgetTeamSchedule.swift in Sources */,
 				801A96182ED1EE4A00530970 /* Standings.swift in Sources */,
+				80A16D902EEDC1BB003F9911 /* SharedTeamColorCache.swift in Sources */,
 				801A961C2ED1EE5300530970 /* NetworkLoggerPlugin.swift in Sources */,
 				801A96192ED1EE4A00530970 /* Series.swift in Sources */,
 				801A961A2ED1EE4A00530970 /* Season.swift in Sources */,
@@ -888,15 +917,19 @@
 				801A96152ED1EE4000530970 /* Match+Mock.swift in Sources */,
 				806DBE522EA4040D00E07695 /* WidgetGame.swift in Sources */,
 				805C8AA52CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */,
+				80A16D8D2EEDBF8D003F9911 /* BackgroundSessionManager.swift in Sources */,
+				80A16D8E2EEDBF8D003F9911 /* WidgetDataCache.swift in Sources */,
 				8020C25D2D7644D500F1FB5E /* ScrollPosition.swift in Sources */,
 				806DBE552EA4041500E07695 /* WidgetFeaturedGame.swift in Sources */,
 				801A96142ED1EE3600530970 /* UserModels.swift in Sources */,
 				801A961E2ED1EE8500530970 /* MatchStats.swift in Sources */,
 				801A96202ED1EE9D00530970 /* iCloudSyncManager.swift in Sources */,
 				806BEB1A2CB052BB00CC4565 /* CloudStorage.swift in Sources */,
+				80A16D932EEDC213003F9911 /* WidgetSharedColorCache.swift in Sources */,
 				80DCA05F2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */,
 				801A95FA2EC8AA4500530970 /* LiveGameUpdate.swift in Sources */,
 				806DBE582EA4041C00E07695 /* WidgetAPI.swift in Sources */,
+				80A16D8A2EED9018003F9911 /* TeamColorCache.swift in Sources */,
 				804316262BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift in Sources */,
 				801A96102ED1EE3200530970 /* PBPController.swift in Sources */,
 				801A96112ED1EE3200530970 /* PBPEventDTO.swift in Sources */,
@@ -983,6 +1016,7 @@
 				BCFA44AB2B44C06700B4358C /* StandingsTable.swift in Sources */,
 				BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */,
 				BC374DFA2BAD922000378412 /* UIImageExt.swift in Sources */,
+				80A16D912EEDC1BB003F9911 /* SharedTeamColorCache.swift in Sources */,
 				804EC8232CFC02560096CA0D /* ActivityUpdater.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

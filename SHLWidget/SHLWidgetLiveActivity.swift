@@ -516,8 +516,9 @@ private struct MinimalView: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 24, height: 24)
         } else {
-            Text("SHL")
-                .fontWeight(.bold)
+            Text("\(context.state.homeScore)-\(context.state.awayScore)")
+                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .monospacedDigit()
         }
     }
 }

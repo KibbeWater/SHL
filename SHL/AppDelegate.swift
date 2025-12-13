@@ -17,6 +17,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Migrate from old single preferredTeam to new interestedTeams array (one-time migration)
         Settings.shared.migratePreferredTeamIfNeeded()
 
+        // Populate team color cache for widgets
+        Self.populateTeamColorCache()
+
         // Check if user has opted in to user management
         if Settings.shared.userManagementEnabled {
             // Try to sync with iCloud session
@@ -163,6 +166,40 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     }
 
     // MARK: - Helper Methods
+
+    /// Populate shared team color cache for widgets
+    private static func populateTeamColorCache() {
+        let teamCodes = [
+            "BIF", "DIF", "FBK", "FHC", "HV71", "IKO", "LHC", "LHF",
+            "LIF", "MIF", "MODO", "OHK", "ÖRE", "RBK", "SAIK", "SKE",
+            "TIK", "VLH"
+        ]
+
+        for code in teamCodes {
+            // Skip if already cached
+            guard !SharedTeamColorCache.shared.hasColor(forTeamCode: code) else { continue }
+
+            let teamKey = "Team/\(code)"
+            if let teamImage = UIImage(named: teamKey) {
+                // Check memory/disk cache first
+                if let cachedColor = ColorCache.shared.getColor(forKey: teamKey) {
+                    SharedTeamColorCache.shared.cacheColor(cachedColor, forTeamCode: code)
+                } else {
+                    // Extract color from image
+                    teamImage.getColors(quality: .low) { colors in
+                        if let bgColor = colors?.background {
+                            ColorCache.shared.cacheColor(bgColor, forKey: teamKey)
+                            SharedTeamColorCache.shared.cacheColor(bgColor, forTeamCode: code)
+                        }
+                    }
+                }
+            }
+        }
+
+        #if DEBUG
+        print("✅ Team color cache populated: \(SharedTeamColorCache.shared.cachedTeamCodes.count) teams")
+        #endif
+    }
 
     /// Fetch teams and cache interested team details for push token registration
     private static func fetchAndCacheInterestedTeams() async {
