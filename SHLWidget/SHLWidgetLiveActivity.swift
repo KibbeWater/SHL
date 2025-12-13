@@ -370,15 +370,23 @@ private struct ExpandedLeadingView: View {
     let context: ActivityViewContext<SHLWidgetAttributes>
 
     var body: some View {
-        HStack(spacing: 6) {
-            TeamLogo(teamCode: context.attributes.homeTeam.teamCode, size: 40)
-            Text("\(context.state.homeScore)")
-                .font(.system(size: 36, weight: .bold, design: .rounded))
+        HStack {
+            VStack {
+                Spacer()
+                Image("Team/\(context.attributes.homeTeam.teamCode)")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 52, height: 52)
+                Spacer()
+            }
+            Spacer()
+            Text(String(context.state.homeScore))
+                .font(.system(size: 48))
                 .fontWidth(.compressed)
+                .fontWeight(.bold)
                 .foregroundStyle(context.state.homeScore >= context.state.awayScore ? .primary : .secondary)
-                .contentTransition(.numericText())
-                .monospacedDigit()
         }
+        .frame(width: 96)
     }
 }
 
@@ -386,56 +394,69 @@ private struct ExpandedTrailingView: View {
     let context: ActivityViewContext<SHLWidgetAttributes>
 
     var body: some View {
-        HStack(spacing: 6) {
-            Text("\(context.state.awayScore)")
-                .font(.system(size: 36, weight: .bold, design: .rounded))
+        HStack {
+            Text(String(context.state.awayScore))
+                .font(.system(size: 48))
                 .fontWidth(.compressed)
+                .fontWeight(.bold)
+                .transition(.moveDown)
                 .foregroundStyle(context.state.awayScore >= context.state.homeScore ? .primary : .secondary)
-                .contentTransition(.numericText())
-                .monospacedDigit()
-            TeamLogo(teamCode: context.attributes.awayTeam.teamCode, size: 40)
+            Spacer()
+            VStack {
+                Spacer()
+                Image("Team/\(context.attributes.awayTeam.teamCode)")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 52, height: 52)
+                Spacer()
+            }
         }
+        .frame(width: 96)
     }
 }
 
 private struct ExpandedCenterView: View {
     let context: ActivityViewContext<SHLWidgetAttributes>
 
-    private var gameState: SHLWidgetAttributes.ActivityState {
-        context.state.period.state
-    }
-
-    private var isLive: Bool {
-        gameState == .ongoing || gameState == .overtime
-    }
-
     var body: some View {
-        if isLive {
-            HStack(spacing: 4) {
-                LiveIndicator()
-                Text(cappedPeriodEnd(context.state.period.periodEnd), style: .timer)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .monospacedDigit()
-                Text(gameState == .overtime ? "OT" : "P\(context.state.period.period)")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.secondary)
+        VStack {
+            HStack {
+                switch context.state.period.state {
+                case .ended:
+                    Text("Ended")
+                        .font(.title)
+                        .fontWeight(.semibold)
+                case .onbreak:
+                    Text(cappedPeriodEnd(context.state.period.periodEnd), style: .timer)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .multilineTextAlignment(.center)
+                        .font(.title)
+                        .fontWeight(.semibold)
+                case .ongoing, .overtime:
+                    Text(cappedPeriodEnd(context.state.period.periodEnd), style: .timer)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .multilineTextAlignment(.center)
+                        .font(.title)
+                        .fontWeight(.semibold)
+                case .starting:
+                    Text("0:00")
+                        .font(.title)
+                        .fontWeight(.semibold)
+                case .intermission:
+                    Text("0:00")
+                        .font(.title)
+                        .fontWeight(.semibold)
+                }
             }
-        } else if gameState == .onbreak {
-            Text("INT")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.secondary)
-        } else if gameState == .intermission {
-            Text("VS")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.secondary)
-        } else if gameState == .ended {
-            Text("FINAL")
-                .font(.system(size: 14, weight: .bold))
-                .foregroundStyle(.secondary)
-        } else if gameState == .starting {
-            Text("SOON")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.secondary)
+            if context.state.period.state == .onbreak {
+                Label("Pause", systemImage: "clock")
+                    .foregroundColor(.secondary)
+                    .font(.subheadline)
+            } else {
+                Label("P\(context.state.period.period)", systemImage: "clock")
+                    .foregroundColor(.secondary)
+                    .font(.subheadline)
+            }
         }
     }
 }
@@ -446,22 +467,16 @@ private struct CompactLeadingView: View {
     let context: ActivityViewContext<SHLWidgetAttributes>
 
     var body: some View {
-        HStack(spacing: 4) {
-            // Live indicator
-            if context.state.period.state == .ongoing || context.state.period.state == .overtime {
-                Circle()
-                    .fill(.red)
-                    .frame(width: 6, height: 6)
-            }
-
-            TeamLogo(teamCode: context.attributes.homeTeam.teamCode, size: 22)
-
+        HStack {
+            Image("Team/\(context.attributes.homeTeam.teamCode)")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 24, height: 24)
             Text(String(context.state.homeScore))
                 .fontWeight(.semibold)
                 .fontWidth(.compressed)
-                .font(.system(size: 20, design: .rounded))
+                .font(.system(size: 22))
                 .foregroundStyle(context.state.homeScore >= context.state.awayScore ? .primary : .secondary)
-                .monospacedDigit()
         }
     }
 }
@@ -470,15 +485,16 @@ private struct CompactTrailingView: View {
     let context: ActivityViewContext<SHLWidgetAttributes>
 
     var body: some View {
-        HStack(spacing: 4) {
+        HStack {
             Text(String(context.state.awayScore))
                 .fontWeight(.semibold)
                 .fontWidth(.compressed)
-                .font(.system(size: 20, design: .rounded))
+                .font(.system(size: 22))
                 .foregroundStyle(context.state.awayScore >= context.state.homeScore ? .primary : .secondary)
-                .monospacedDigit()
-
-            TeamLogo(teamCode: context.attributes.awayTeam.teamCode, size: 22)
+            Image("Team/\(context.attributes.awayTeam.teamCode)")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 24, height: 24)
         }
     }
 }
@@ -490,14 +506,18 @@ private struct MinimalView: View {
 
     var body: some View {
         if context.state.homeScore > context.state.awayScore {
-            TeamLogo(teamCode: context.attributes.homeTeam.teamCode, size: 22)
+            Image("Team/\(context.attributes.homeTeam.teamCode)")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 24, height: 24)
         } else if context.state.homeScore < context.state.awayScore {
-            TeamLogo(teamCode: context.attributes.awayTeam.teamCode, size: 22)
+            Image("Team/\(context.attributes.awayTeam.teamCode)")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 24, height: 24)
         } else {
-            // Tied - show score
-            Text("\(context.state.homeScore)-\(context.state.awayScore)")
-                .font(.system(size: 12, weight: .bold, design: .rounded))
-                .monospacedDigit()
+            Text("SHL")
+                .fontWeight(.bold)
         }
     }
 }
