@@ -50,6 +50,7 @@ class Settings: ObservableObject {
         objectWillChange.send()
         _interestedTeamIds = teams.map { $0.id }
         _cachedInterestedTeams = teams
+        syncTeamCodesToWidgets()
 
         // Sync with backend if user management is enabled
         if userManagementEnabled {
@@ -69,6 +70,7 @@ class Settings: ObservableObject {
         objectWillChange.send()
         _interestedTeamIds.append(team.id)
         _cachedInterestedTeams.append(team)
+        syncTeamCodesToWidgets()
 
         // Sync with backend if user management is enabled
         if userManagementEnabled {
@@ -92,6 +94,8 @@ class Settings: ObservableObject {
             _favoriteTeamId = nil
         }
 
+        syncTeamCodesToWidgets()
+
         // Sync with backend if user management is enabled
         if userManagementEnabled {
             Task {
@@ -108,6 +112,29 @@ class Settings: ObservableObject {
         objectWillChange.send()
         _cachedInterestedTeams = teams
         _interestedTeamIds = teams.map { $0.id }
+        syncTeamCodesToWidgets()
+    }
+
+    // MARK: - Widget Preferences Sync
+
+    private static let widgetInterestedCodesKey = "widget_interested_team_codes"
+    private static let widgetFavoriteCodeKey = "widget_favorite_team_code"
+
+    /// Syncs team codes to App Group for widget access
+    private func syncTeamCodesToWidgets() {
+        let defaults = UserDefaults(suiteName: SharedPreferenceKeys.groupIdentifier)
+
+        // Write interested team codes
+        let codes = _cachedInterestedTeams.map { $0.code }
+        defaults?.set(codes, forKey: Self.widgetInterestedCodesKey)
+
+        // Write favorite team code
+        let favoriteCode = _cachedInterestedTeams.first(where: { $0.id == _favoriteTeamId })?.code
+        defaults?.set(favoriteCode, forKey: Self.widgetFavoriteCodeKey)
+
+        #if DEBUG
+        print("✅ Synced team codes to widgets: \(codes), favorite: \(favoriteCode ?? "none")")
+        #endif
     }
 
     /// Returns the primary team code (first team) for push token registration
@@ -139,6 +166,8 @@ class Settings: ObservableObject {
         if let id = id, !_interestedTeamIds.contains(id) {
             _favoriteTeamId = nil
         }
+
+        syncTeamCodesToWidgets()
     }
 
     /// Returns the favorite team with full details

@@ -2,65 +2,99 @@
 //  WidgetAPI.swift
 //  SHLWidget
 //
-//  Simple API client for widget - uses direct URLSession calls
+//  Cache-first API client for widgets with background refresh
 //
 
 import Foundation
 
 class WidgetAPI {
-    private let baseURL: String
-    private let decoder: JSONDecoder
+    private let cache = WidgetDataCache.shared
+    private let backgroundManager = BackgroundSessionManager.shared
 
-    init() {
-        // Use environment variable or default to production
-        self.baseURL = ProcessInfo.processInfo.environment["API_BASE_URL"] ?? "https://api.lrlnet.se"
+    // Cache max ages in seconds
+    private let matchesCacheMaxAge: TimeInterval = 5 * 60      // 5 minutes
+    private let standingsCacheMaxAge: TimeInterval = 30 * 60   // 30 minutes
+    private let teamMatchesCacheMaxAge: TimeInterval = 10 * 60 // 10 minutes
 
-        self.decoder = JSONDecoder()
-        self.decoder.dateDecodingStrategy = .iso8601
-    }
+    init() {}
 
-    func getLatestMatches() async throws -> [WidgetGame] {
-        guard let url = URL(string: "\(baseURL)/matches/latest") else {
-            throw URLError(.badURL)
+    // MARK: - Latest Matches
+
+    /// Returns cached matches, triggering background refresh if stale
+    /// - Parameter forceRefresh: Force a background refresh even if cache is fresh
+    /// - Returns: Cached matches or nil if no cache exists
+    func getLatestMatches(forceRefresh: Bool = false) -> [WidgetGame]? {
+        let cacheKey = WidgetDataCache.CacheKey.latestMatches
+
+        // Check if we have fresh cache
+        if !forceRefresh && cache.isFresh(for: cacheKey, maxAge: matchesCacheMaxAge) {
+            return cache.load(for: cacheKey)
         }
 
-        let (data, response) = try await URLSession.shared.data(from: url)
+        // Trigger background download
+        backgroundManager.startDownload(type: .latestMatches)
 
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
-            throw URLError(.badServerResponse)
+        // Return stale cache if available (better than nothing)
+        return cache.load(for: cacheKey)
+    }
+
+    // MARK: - Team Matches
+
+    /// Returns cached team matches, triggering background refresh if stale
+    /// - Parameters:
+    ///   - teamCode: The team code (e.g., "LHF")
+    ///   - forceRefresh: Force a background refresh even if cache is fresh
+    /// - Returns: Cached matches or nil if no cache exists
+    func getTeamMatches(teamCode: String, forceRefresh: Bool = false) -> [WidgetGame]? {
+        let cacheKey = WidgetDataCache.CacheKey.teamMatches(teamCode)
+
+        // Check if we have fresh cache
+        if !forceRefresh && cache.isFresh(for: cacheKey, maxAge: teamMatchesCacheMaxAge) {
+            return cache.load(for: cacheKey)
         }
 
-        // Backend returns array of matches
-        let matches = try decoder.decode([BackendMatch].self, from: data)
-        return matches.map { $0.toWidgetGame() }
+        // Trigger background download
+        backgroundManager.startDownload(type: .teamMatches, teamCode: teamCode)
+
+        // Return stale cache if available
+        return cache.load(for: cacheKey)
     }
-}
 
-// Backend response models
-private struct BackendMatch: Codable {
-    let id: String
-    let date: Date
-    let venue: String?
-    let homeTeam: BackendTeam
-    let awayTeam: BackendTeam
-    let homeScore: Int
-    let awayScore: Int
+    // MARK: - Standings
 
-    func toWidgetGame() -> WidgetGame {
-        WidgetGame(
-            id: id,
-            date: date,
-            venue: venue ?? "Unknown",
-            homeTeam: WidgetTeam(name: homeTeam.name, code: homeTeam.code),
-            awayTeam: WidgetTeam(name: awayTeam.name, code: awayTeam.code),
-            homeScore: homeScore,
-            awayScore: awayScore
-        )
+    /// Returns cached standings, triggering background refresh if stale
+    /// - Parameter forceRefresh: Force a background refresh even if cache is fresh
+    /// - Returns: Cached standings or nil if no cache exists
+    func getStandings(forceRefresh: Bool = false) -> [WidgetStanding]? {
+        let cacheKey = WidgetDataCache.CacheKey.standings
+
+        // Check if we have fresh cache
+        if !forceRefresh && cache.isFresh(for: cacheKey, maxAge: standingsCacheMaxAge) {
+            return cache.load(for: cacheKey)
+        }
+
+        // Trigger background download
+        backgroundManager.startDownload(type: .standings)
+
+        // Return stale cache if available
+        return cache.load(for: cacheKey)
     }
-}
 
-private struct BackendTeam: Codable {
-    let name: String
-    let code: String
+    // MARK: - Cache Info
+
+    /// Check if data exists in cache (regardless of freshness)
+    func hasCachedMatches() -> Bool {
+        let matches: [WidgetGame]? = cache.load(for: .latestMatches)
+        return matches != nil && !(matches?.isEmpty ?? true)
+    }
+
+    func hasCachedStandings() -> Bool {
+        let standings: [WidgetStanding]? = cache.load(for: .standings)
+        return standings != nil && !(standings?.isEmpty ?? true)
+    }
+
+    func hasCachedTeamMatches(teamCode: String) -> Bool {
+        let matches: [WidgetGame]? = cache.load(for: WidgetDataCache.CacheKey.teamMatches(teamCode))
+        return matches != nil && !(matches?.isEmpty ?? true)
+    }
 }
