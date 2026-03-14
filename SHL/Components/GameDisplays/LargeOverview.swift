@@ -55,9 +55,11 @@ struct LargeOverview: View {
             case .ongoing:
                 return Text("P\(_liveGame.period): \(_liveGame.periodTime)")
             case .paused:
-                return Text("P\(_liveGame.period): Pause")
+                return Text("P\(_liveGame.period): Break")
             case .played:
                 return Text("Ended")
+            case .cancelled:
+                return Text("Cancelled")
             }
         } else {
             return Text((game.shootout ?? false) ? "Shootout" : (game.overtime ?? false) ? "Overtime" : game.played ? "Full-Time" : isToday() ? game.formatTime() : game.formatDate())

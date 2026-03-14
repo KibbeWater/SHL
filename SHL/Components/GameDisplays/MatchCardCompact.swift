@@ -73,14 +73,21 @@ struct MatchCardCompact: View {
     @ViewBuilder
     private var centerContent: some View {
         if isLive {
-            HStack(spacing: 4) {
-                Circle()
-                    .fill(.red)
-                    .frame(width: 6, height: 6)
-                Text("\(homeScore) - \(awayScore)")
-                    .font(.callout)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.red)
+            VStack(spacing: 2) {
+                HStack(spacing: 4) {
+                    Circle()
+                        .fill(.red)
+                        .frame(width: 6, height: 6)
+                    Text("\(homeScore) - \(awayScore)")
+                        .font(.callout)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.red)
+                }
+                if let live = liveGame {
+                    Text(live.gameState == .paused ? "Break" : "P\(live.period)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
             }
         } else if isUpcoming {
             VStack(spacing: 0) {

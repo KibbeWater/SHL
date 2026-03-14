@@ -15,8 +15,8 @@ class FeaturedGameAlgo {
     ///   - interestedTeams: Array of team UUIDs for bonus scoring
     ///   - favoriteTeamId: Optional favorite team UUID for higher priority scoring
     /// - Returns: The highest-scored match, or nil if no matches provided
-    static func getFeaturedGame(_ matches: [Match], interestedTeams: [String], favoriteTeamId: String? = nil) async -> Match? {
-        let scoredMatches = await scoreAndSortMatches(matches, interestedTeams: interestedTeams, favoriteTeamId: favoriteTeamId)
+    static func getFeaturedGame(_ matches: [Match], interestedTeams: [String], favoriteTeamId: String? = nil, liveExternalUUIDs: Set<String> = []) async -> Match? {
+        let scoredMatches = await scoreAndSortMatches(matches, interestedTeams: interestedTeams, favoriteTeamId: favoriteTeamId, liveExternalUUIDs: liveExternalUUIDs)
         return scoredMatches.first?.0
     }
 
@@ -34,7 +34,7 @@ class FeaturedGameAlgo {
     ///   - interestedTeams: Array of team UUIDs for bonus scoring
     ///   - favoriteTeamId: Optional favorite team UUID for higher priority scoring
     /// - Returns: Array of tuples containing match and score, sorted by score (highest first)
-    private static func scoreAndSortMatches(_ matches: [Match], interestedTeams: [String], favoriteTeamId: String? = nil) async -> [(Match, Double)] {
+    private static func scoreAndSortMatches(_ matches: [Match], interestedTeams: [String], favoriteTeamId: String? = nil, liveExternalUUIDs: Set<String> = []) async -> [(Match, Double)] {
         // First, asynchronously get all team UUIDs
         let teamUUIDs = await withTaskGroup(of: (String, String).self) { group in
             for match in matches {
@@ -60,7 +60,7 @@ class FeaturedGameAlgo {
             var score: Double = 0
 
             // Live games get the highest base score
-            if game.isLive() {
+            if game.isLive() || liveExternalUUIDs.contains(game.externalUUID) {
                 score += 1000
             }
 

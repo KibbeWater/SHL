@@ -21,6 +21,7 @@ class MatchListViewModel: ObservableObject {
 
     @Published var matchListeners: [String: LiveMatch] = [:]
     private var cancellable: AnyCancellable?
+    private var pollingTimer: Timer?
 
     init() {
         Task {
@@ -32,6 +33,7 @@ class MatchListViewModel: ObservableObject {
 
     deinit {
         cancellable?.cancel()
+        pollingTimer?.invalidate()
     }
 
     func refresh(hard: Bool = false) async throws {
@@ -46,6 +48,8 @@ class MatchListViewModel: ObservableObject {
             await fetchInitialLiveData()
             // Subscribe with updated todayMatches for live updates
             listenForLiveGame()
+            // Start polling as a fallback for when SSE is unavailable
+            startPollingIfNeeded()
         }
     }
 
@@ -53,10 +57,46 @@ class MatchListViewModel: ObservableObject {
     /// This provides instant data without waiting for SSE cache
     private func fetchInitialLiveData() async {
         for match in todayMatches {
-            if let live = try? await api.getLiveMatch(id: match.externalUUID) {
+            do {
+                let live = try await api.getLiveMatch(id: match.externalUUID)
                 matchListeners[live.externalId] = live
+            } catch {
+                #if DEBUG
+                print("⚠️ Failed to fetch live data for match \(match.id): \(error)")
+                #endif
             }
         }
+    }
+
+    /// Poll for live match data periodically as a fallback when SSE is unavailable
+    private func startPollingIfNeeded() {
+        pollingTimer?.invalidate()
+        pollingTimer = nil
+
+        guard !todayMatches.isEmpty else { return }
+
+        pollingTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                await self?.pollForLiveData()
+            }
+        }
+    }
+
+    /// Fetch live matches from API and update state
+    private func pollForLiveData() async {
+        // Check which matches are currently live via the dedicated endpoint
+        if let liveMatches = try? await api.getLiveMatches() {
+            // Update match states in latestMatches for any that are now live
+            for liveMatch in liveMatches {
+                if let index = latestMatches.firstIndex(where: { $0.id == liveMatch.id }) {
+                    latestMatches[index] = liveMatch
+                }
+            }
+            filterMatches()
+        }
+
+        // Fetch detailed live data from REST API for all today's matches
+        await fetchInitialLiveData()
     }
 
     private func removeUnusedListeners() {

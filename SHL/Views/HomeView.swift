@@ -133,7 +133,8 @@ struct HomeView: View {
                         .filter { !$0.played }
                         .sorted(by: { $0.date < $1.date })
                         .prefix(5)
-                    )
+                    ),
+                    liveMatches: viewModel.calendarLiveMatches
                 )
             }
             .padding(.horizontal)
@@ -179,7 +180,7 @@ struct HomeView: View {
                     renderFeaturedGame(featured)
                 } else {
                     if #available(iOS 17.0, *) {
-                        if featured.isLive() {
+                        if featured.isLive() || viewModel.liveGame?.gameState == .ongoing || viewModel.liveGame?.gameState == .paused {
                             TimelineView(.animation) { _ in
                                 renderFeaturedGame(featured)
                                     .pulseShader(time: getTimeLoop(), center: center, speed: 150.0, amplitude: 0.1, decay: 5.0)
@@ -213,6 +214,13 @@ struct HomeView: View {
         .onChange(of: viewModel.featuredGame) { _, _ in
             guard let featured = viewModel.featuredGame else { return }
             viewModel.selectListenedGame(featured)
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                Task {
+                    try? await viewModel.refresh(hard: true)
+                }
+            }
         }
         .refreshable {
             do {

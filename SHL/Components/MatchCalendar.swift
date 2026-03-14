@@ -9,13 +9,14 @@ import SwiftUI
 
 struct MatchCalendar: View {
     var matches: [Match]
-    
+    var liveMatches: [String: LiveMatch] = [:]
+
     var body: some View {
         ForEach(matches.filter({!$0.played})) { match in
             NavigationLink {
                 MatchView(match, referrer: "calendar")
             } label: {
-                MatchCardCompact(game: match)
+                MatchCardCompact(game: match, liveGame: liveMatches[match.externalUUID])
             }
             .buttonStyle(PlainButtonStyle())
             .contextMenu {

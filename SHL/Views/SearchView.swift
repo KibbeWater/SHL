@@ -10,7 +10,7 @@ import SwiftUI
 
 @available(iOS 26.0, *)
 struct SearchView: View {
-    @State var search: String = "Get me the next 5 games for Lulea Hockey"
+    @State var search: String = "Get me the last 5 games for Lulea Hockey"
 
     let model = SystemLanguageModel.default
     @State var session = LanguageModelSession(tools: [MatchSearch(), CurrentSeasonTool()], instructions: """

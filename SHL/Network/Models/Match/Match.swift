@@ -40,6 +40,7 @@ public enum MatchState: String, Codable {
     case ongoing
     case paused
     case played
+    case cancelled
 }
 
 struct RecentMatchesResponse: Codable {

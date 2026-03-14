@@ -62,6 +62,7 @@ struct MatchSearch: Tool {
             case .ongoing: statusLabel = "LIVE"
             case .played: statusLabel = "FINAL"
             case .paused: statusLabel = "PAUSED"
+            case .cancelled: statusLabel = "CANCELLED"
             }
             return "[\(statusLabel)] \(dateStr) | \(match.homeTeam.name) vs \(match.awayTeam.name) - \(score)\(overtime)\(shootout)"
         }.joined(separator: "\n")

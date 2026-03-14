@@ -201,7 +201,7 @@ struct MatchOverview: View {
         case .ongoing:
             return "P\(live.period) \(live.periodTime)"
         case .paused:
-            return "P\(live.period) Intermission"
+            return "P\(live.period) Break"
         default:
             return ""
         }

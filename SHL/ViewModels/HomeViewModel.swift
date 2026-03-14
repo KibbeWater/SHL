@@ -19,27 +19,23 @@ class HomeViewModel: ObservableObject {
     @Published var latestMatches: [Match] = []
     @Published var standings: [StandingObj]? = nil
     @Published var standingsDisabled: Bool = false
+    @Published var calendarLiveMatches: [String: LiveMatch] = [:]
 
     private var liveGameExternalId: String?
     private var cancellable: AnyCancellable?
+    private var calendarCancellable: AnyCancellable?
+    private var pollingTimer: Timer?
 
     init() {
         Task {
             try? await refresh()
-            // Subscribe to live updates AFTER refresh completes
-            // This ensures latestMatches and featuredGame are populated
-            if let featured = featuredGame {
-                liveGameExternalId = featured.externalUUID
-                // Fetch initial live data from API immediately
-                // This is more reliable than waiting for SSE cache
-                await fetchInitialLiveData(for: featured)
-            }
-            listenForLiveGame()
         }
     }
 
     deinit {
         cancellable?.cancel()
+        calendarCancellable?.cancel()
+        pollingTimer?.invalidate()
     }
 
     func selectListenedGame(_ game: Match) {
@@ -48,13 +44,34 @@ class HomeViewModel: ObservableObject {
             await fetchInitialLiveData(for: game)
         }
         listenForLiveGame()
+        startPollingIfNeeded()
     }
 
     /// Fetch initial live data from API for immediate display
     /// This provides instant data without waiting for SSE cache
     private func fetchInitialLiveData(for game: Match) async {
-        if let live = try? await api.getLiveMatch(id: game.externalUUID) {
+        do {
+            let live = try await api.getLiveMatch(id: game.externalUUID)
             self.liveGame = live
+        } catch {
+            #if DEBUG
+            print("⚠️ Failed to fetch live data for featured game \(game.id): \(error)")
+            #endif
+        }
+    }
+
+    /// Poll for live match data periodically as a fallback when SSE is unavailable
+    private func startPollingIfNeeded() {
+        pollingTimer?.invalidate()
+        pollingTimer = nil
+
+        guard featuredGame != nil else { return }
+
+        pollingTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self = self, let featured = self.featuredGame else { return }
+                await self.fetchInitialLiveData(for: featured)
+            }
         }
     }
 
@@ -75,8 +92,40 @@ class HomeViewModel: ObservableObject {
         .sink { [weak self] liveMatch in
             self?.liveGame = liveMatch
         }
-        // Note: requestInitialData is no longer needed as subscribe() now reliably
-        // delivers cached data via Publishers.Merge with Future
+    }
+
+    private func listenForCalendarMatches() {
+        calendarCancellable?.cancel()
+
+        let calendarMatchIds = latestMatches
+            .filter { !$0.played && Calendar.current.isDateInToday($0.date) }
+            .map { $0.externalUUID }
+
+        guard !calendarMatchIds.isEmpty else { return }
+
+        calendarCancellable = liveListener.subscribe(calendarMatchIds) { [weak self] gameUuid in
+            guard let self = self else { return nil }
+            guard let match = self.latestMatches.first(where: { $0.externalUUID == gameUuid }) else { return nil }
+            return await self.fetchTeamData(for: match)
+        }
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] liveMatch in
+            self?.calendarLiveMatches[liveMatch.externalId] = liveMatch
+        }
+    }
+
+    private func fetchInitialCalendarData() async {
+        let calendarMatches = latestMatches
+            .filter { !$0.played && Calendar.current.isDateInToday($0.date) }
+
+        for match in calendarMatches {
+            do {
+                let live = try await api.getLiveMatch(id: match.externalUUID)
+                calendarLiveMatches[live.externalId] = live
+            } catch {
+                // Match not live yet - expected 404
+            }
+        }
     }
 
     private func fetchTeamData(for match: Match) async -> (match: Match, homeTeam: Team, awayTeam: Team)? {
@@ -95,6 +144,18 @@ class HomeViewModel: ObservableObject {
         try await SelectFeaturedMatch()
         let recentMatches = try await api.getRecentMatches()
         latestMatches = recentMatches.upcoming + recentMatches.recent
+
+        // Refresh live data for featured game
+        if let featured = featuredGame {
+            liveGameExternalId = featured.externalUUID
+            await fetchInitialLiveData(for: featured)
+        }
+        listenForLiveGame()
+        startPollingIfNeeded()
+
+        // Refresh live data for calendar matches
+        await fetchInitialCalendarData()
+        listenForCalendarMatches()
 
         do {
             let _standings = try await api.getCurrentStandings()
@@ -129,10 +190,16 @@ class HomeViewModel: ObservableObject {
         guard let recent = try? await api.getRecentMatches() else { return }
         let matches = recent.upcoming + recent.recent
 
+        // Fetch currently live matches to ensure the algo prioritizes them
+        // even if the static Match.state hasn't updated yet
+        let liveMatches = (try? await api.getLiveMatches()) ?? []
+        let liveUUIDs = Set(liveMatches.map { $0.externalUUID })
+
         featuredGame = await FeaturedGameAlgo.getFeaturedGame(
             matches,
             interestedTeams: Settings.shared.getInterestedTeamIds(),
-            favoriteTeamId: Settings.shared.getFavoriteTeamId()
+            favoriteTeamId: Settings.shared.getFavoriteTeamId(),
+            liveExternalUUIDs: liveUUIDs
         )
     }
 }

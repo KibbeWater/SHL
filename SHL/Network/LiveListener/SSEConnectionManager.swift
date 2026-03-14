@@ -175,13 +175,10 @@ actor SSEConnectionManager {
             }
         }
 
-        // Check if we should reconnect
-        if let lastReceived = lastDataReceivedAt,
-           Date().timeIntervalSince(lastReceived) < keepAliveTimeout {
-            // Recent data, unexpected disconnect - reconnect
+        // Always reconnect if there are active subscribers
+        if !continuations.isEmpty {
             reconnect()
         } else {
-            // No recent data, might be intentional disconnect
             disconnect()
         }
     }

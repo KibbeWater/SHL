@@ -40,6 +40,13 @@ struct MatchListView: View {
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
         }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                Task {
+                    try? await viewModel.refresh(hard: true)
+                }
+            }
+        }
     }
     
     private var tabSelectionView: some View {
@@ -104,7 +111,7 @@ struct MatchListView: View {
                 NavigationLink {
                     MatchView(match, referrer: "match_list")
                 } label: {
-                    MatchOverview(game: match)
+                    MatchOverview(game: match, liveGame: getLiveMatch(match: match))
                         .id("pm-\(match.id)")
                         .clipShape(RoundedRectangle(cornerRadius: 12.0))
                         .contextMenu {

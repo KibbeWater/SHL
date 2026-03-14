@@ -37,6 +37,8 @@ struct GameTime: View {
                 Text("Break")
             case .played:
                 Text("Ended")
+            case .cancelled:
+                Text("Cancelled")
             }
         } else if let match = game {
             if match.date < Date.now && match.state == .played {
