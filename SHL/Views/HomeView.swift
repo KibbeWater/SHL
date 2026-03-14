@@ -117,6 +117,12 @@ struct HomeView: View {
         }
     }
     
+    private var upcomingMatches: [Match] {
+        viewModel.latestMatches
+            .filter { !$0.played }
+            .sorted(by: { $0.date < $1.date })
+    }
+
     var matchCalendar: some View {
         VStack(spacing: 8) {
             HStack {
@@ -126,19 +132,31 @@ struct HomeView: View {
                     .padding(.horizontal)
                 Spacer()
             }
-            
-            VStack(spacing: 12) {
-                MatchCalendar(
-                    matches: Array(viewModel.latestMatches
-                        .filter { !$0.played }
-                        .sorted(by: { $0.date < $1.date })
-                        .prefix(5)
-                    ),
-                    liveMatches: viewModel.calendarLiveMatches
-                )
+
+            if upcomingMatches.isEmpty {
+                VStack(spacing: 8) {
+                    Image(systemName: "calendar")
+                        .font(.title2)
+                        .foregroundStyle(.secondary)
+                    Text("No upcoming matches")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 24)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .padding(.horizontal)
+            } else {
+                VStack(spacing: 12) {
+                    MatchCalendar(
+                        matches: Array(upcomingMatches.prefix(5)),
+                        liveMatches: viewModel.calendarLiveMatches
+                    )
+                }
+                .padding(.horizontal)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-            .padding(.horizontal)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
         }
     }
     
