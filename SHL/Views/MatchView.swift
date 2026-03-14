@@ -16,6 +16,8 @@ private enum MatchTab: String, CaseIterable {
 }
 
 struct MatchView: View {
+    @Environment(\.scenePhase) private var scenePhase
+
     let match: Match
     @StateObject var viewModel: MatchViewModel
 
@@ -31,6 +33,7 @@ struct MatchView: View {
 
     @State var hasLogged = false
     @State private var showNotificationReminder = false
+    @State private var pulseAnimation: Bool = false
     private var referrer: String
 
     init(_ match: Match, referrer: String) {
@@ -100,6 +103,14 @@ struct MatchView: View {
             logAnalytics()
             trackMatchViewInteraction()
         }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                Task {
+                    try? await viewModel.refresh(hard: true)
+                }
+                startTimer()
+            }
+        }
         .sheet(isPresented: $showNotificationReminder) {
             NotificationReminderSheet(
                 onEnable: {
@@ -163,6 +174,20 @@ struct MatchView: View {
 
     private var headerSection: some View {
         VStack(spacing: 20) {
+            if let liveGame = viewModel.liveGame,
+               liveGame.gameState == .ongoing || liveGame.gameState == .paused {
+                liveHeaderSection(liveGame)
+            } else {
+                standardHeaderSection
+            }
+        }
+        .padding(.top, 16)
+    }
+
+    // MARK: - Standard Header
+
+    private var standardHeaderSection: some View {
+        Group {
             // Status badge above score (for live/final states)
             if let liveGame = viewModel.liveGame {
                 gameStatusBadge(liveGame)
@@ -201,7 +226,154 @@ struct MatchView: View {
             // Venue
             venueLabel
         }
-        .padding(.top, 16)
+    }
+
+    // MARK: - Live Header
+
+    private func liveHeaderSection(_ liveGame: LiveMatch) -> some View {
+        Group {
+            // Live / Intermission badge with period
+            liveIndicatorBadge(liveGame)
+
+            // Teams with center timer
+            HStack(alignment: .center, spacing: 16) {
+                // Home team column
+                liveTeamColumn(
+                    code: currentMatch.homeTeam.code,
+                    team: viewModel.home,
+                    score: homeScore,
+                    isWinning: homeScore >= awayScore
+                )
+
+                Spacer()
+
+                // Center timer
+                liveCenterTimer(liveGame)
+
+                Spacer()
+
+                // Away team column
+                liveTeamColumn(
+                    code: currentMatch.awayTeam.code,
+                    team: viewModel.away,
+                    score: awayScore,
+                    isWinning: awayScore >= homeScore
+                )
+            }
+            .padding(.horizontal, 24)
+
+            // Venue
+            venueLabel
+        }
+    }
+
+    @ViewBuilder
+    private func liveIndicatorBadge(_ liveGame: LiveMatch) -> some View {
+        if liveGame.gameState == .ongoing {
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(.red)
+                    .frame(width: 8, height: 8)
+                    .overlay(
+                        Circle()
+                            .fill(.red.opacity(0.4))
+                            .frame(width: 16, height: 16)
+                            .scaleEffect(pulseAnimation ? 1.5 : 1.0)
+                            .opacity(pulseAnimation ? 0 : 1)
+                    )
+                    .onAppear {
+                        withAnimation(.easeOut(duration: 1.2).repeatForever(autoreverses: false)) {
+                            pulseAnimation = true
+                        }
+                    }
+
+                Text("LIVE")
+                    .font(.caption)
+                    .fontWeight(.heavy)
+
+                Text("•")
+                    .foregroundStyle(.white.opacity(0.4))
+
+                Text("P\(liveGame.period)")
+                    .font(.caption)
+                    .fontWeight(.bold)
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(.red.opacity(0.25))
+            .background(.ultraThinMaterial)
+            .clipShape(Capsule())
+        } else {
+            HStack(spacing: 6) {
+                Text("BREAK")
+                    .font(.caption)
+                    .fontWeight(.bold)
+
+                Text("•")
+                    .foregroundStyle(.white.opacity(0.4))
+
+                Text("P\(liveGame.period)")
+                    .font(.caption)
+                    .fontWeight(.bold)
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(.ultraThinMaterial)
+            .clipShape(Capsule())
+        }
+    }
+
+    private func liveTeamColumn(code: String, team: Team?, score: Int, isWinning: Bool) -> some View {
+        Group {
+            if let team = team {
+                NavigationLink {
+                    TeamView(team: team)
+                } label: {
+                    liveTeamColumnContent(code: code, score: score, isWinning: isWinning)
+                }
+                .buttonStyle(.plain)
+            } else {
+                liveTeamColumnContent(code: code, score: score, isWinning: isWinning)
+            }
+        }
+    }
+
+    private func liveTeamColumnContent(code: String, score: Int, isWinning: Bool) -> some View {
+        VStack(spacing: 8) {
+            TeamLogoView(teamCode: code, size: .extraLarge)
+
+            Text(code)
+                .font(.caption)
+                .fontWeight(.bold)
+                .foregroundStyle(.white.opacity(0.8))
+
+            Text("\(score)")
+                .font(.system(size: 36, weight: .bold, design: .rounded))
+                .fontWidth(.compressed)
+                .foregroundStyle(isWinning ? .white : .white.opacity(0.5))
+                .contentTransition(.numericText())
+        }
+    }
+
+    @ViewBuilder
+    private func liveCenterTimer(_ liveGame: LiveMatch) -> some View {
+        if liveGame.gameState == .ongoing {
+            Text(
+                timerInterval: Date.now...max(Date.now, liveGame.periodEnd),
+                pauseTime: Date.now,
+                countsDown: true,
+                showsHours: false
+            )
+            .font(.system(size: 48, weight: .bold, design: .rounded))
+            .monospacedDigit()
+            .foregroundStyle(.white)
+        } else {
+            Text("Break")
+                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.7))
+        }
     }
 
     private func teamLogo(code: String, team: Team?) -> some View {
@@ -291,7 +463,7 @@ struct MatchView: View {
         case .ongoing:
             return "LIVE • P\(liveGame.period)"
         case .paused:
-            return "INTERMISSION"
+            return "BREAK"
         default:
             return "FINAL"
         }
