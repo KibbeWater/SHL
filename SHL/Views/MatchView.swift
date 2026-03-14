@@ -831,7 +831,7 @@ struct MatchView: View {
         PostHogSDK.shared.capture(
             "started_live_activity",
             properties: ["join_type": "match_cta"],
-            userProperties: ["activity_id": ActivityUpdater.shared.deviceUUID.uuidString]
+            userProperties: ["activity_id": KeychainManager.shared.getDeviceId()]
         )
 
         if let liveMatch = viewModel.liveGame {

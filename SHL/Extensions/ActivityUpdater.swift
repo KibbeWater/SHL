@@ -11,10 +11,12 @@ import UserNotifications
 
 public class ActivityUpdater {
     @MainActor public static let shared: ActivityUpdater = ActivityUpdater()
-    public var deviceUUID = UUID()
 
     private let settings = Settings.shared
     private let keychain = KeychainManager.shared
+
+    private let maxRetryAttempts = 3
+    private let initialRetryDelay: TimeInterval = 1
 
     private var pushToStartTokenTask: Task<Void, Never>?
     private var activityUpdatesTask: Task<Void, Never>?
@@ -63,6 +65,27 @@ public class ActivityUpdater {
         activityUpdatesTask = nil
     }
 
+    /// Retry an async operation with exponential backoff
+    private func withRetry<T>(
+        operation: String,
+        body: () async throws -> T
+    ) async throws -> T {
+        var lastError: Error?
+        for attempt in 0..<maxRetryAttempts {
+            do {
+                return try await body()
+            } catch {
+                lastError = error
+                let delay = initialRetryDelay * pow(2.0, Double(attempt))
+                #if DEBUG
+                print("⚠️ \(operation) attempt \(attempt + 1)/\(maxRetryAttempts) failed: \(error). Retrying in \(delay)s...")
+                #endif
+                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+            }
+        }
+        throw lastError!
+    }
+
     /// Register push-to-start token with backend
     private func registerPushToStartToken(_ token: String) async {
         guard settings.userManagementEnabled else {
@@ -98,18 +121,20 @@ public class ActivityUpdater {
         #endif
 
         do {
-            let response = try await SHLAPIClient.shared.registerPushToken(
-                token: token,
-                type: "push_to_start",
-                deviceId: keychain.getDeviceId(),
-                teamCode: settings.getPrimaryTeamCode()
-            )
+            let response = try await withRetry(operation: "Push-to-start registration") {
+                try await SHLAPIClient.shared.registerPushToken(
+                    token: token,
+                    type: "push_to_start",
+                    deviceId: self.keychain.getDeviceId(),
+                    teamCode: self.settings.getPrimaryTeamCode()
+                )
+            }
             #if DEBUG
             print("✅ Successfully registered push-to-start token: \(response)")
             #endif
         } catch {
             #if DEBUG
-            print("❌ Failed to register push-to-start token: \(error)")
+            print("❌ Failed to register push-to-start token after \(maxRetryAttempts) attempts: \(error)")
             #endif
         }
     }
@@ -223,14 +248,16 @@ public class ActivityUpdater {
                 #endif
 
                 do {
-                    let response = try await SHLAPIClient.shared.registerLiveActivityToken(
-                        matchUUID: matchUUID,
-                        token: token
-                    )
+                    let response = try await withRetry(operation: "Live activity token registration") {
+                        try await SHLAPIClient.shared.registerLiveActivityToken(
+                            matchUUID: matchUUID,
+                            token: token
+                        )
+                    }
                     print("✅ Successfully registered live activity token (authenticated): \(response)")
                 } catch {
-                    print("❌ Failed to register live activity token (authenticated): \(error)")
-                    // Fallback to unauthenticated if registration fails
+                    print("❌ Failed to register live activity token after \(maxRetryAttempts) attempts: \(error)")
+                    // Fallback to unauthenticated if all retries fail
                     fallbackUpdatePushToken(matchUUID, token: token)
                 }
             }
@@ -242,7 +269,7 @@ public class ActivityUpdater {
 
     private func fallbackUpdatePushToken(_ matchUUID: String, token: String) {
         var json: [String: Any] = ["token": token,
-                                   "deviceUUID": deviceUUID.uuidString]
+                                   "deviceUUID": keychain.getDeviceId()]
 
         #if DEBUG
         json["environment"] = "development"

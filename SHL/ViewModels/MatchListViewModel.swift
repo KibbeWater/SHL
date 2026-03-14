@@ -59,7 +59,11 @@ class MatchListViewModel: ObservableObject {
         for match in todayMatches {
             do {
                 let live = try await api.getLiveMatch(id: match.externalUUID)
-                matchListeners[live.externalId] = live
+                if live.gameState == .played {
+                    matchListeners.removeValue(forKey: live.externalId)
+                } else {
+                    matchListeners[live.externalId] = live
+                }
             } catch {
                 #if DEBUG
                 print("⚠️ Failed to fetch live data for match \(match.id): \(error)")
@@ -122,7 +126,11 @@ class MatchListViewModel: ObservableObject {
         }
         .receive(on: DispatchQueue.main)
         .sink { [weak self] liveMatch in
-            self?.matchListeners[liveMatch.externalId] = liveMatch
+            if liveMatch.gameState == .played {
+                self?.matchListeners.removeValue(forKey: liveMatch.externalId)
+            } else {
+                self?.matchListeners[liveMatch.externalId] = liveMatch
+            }
         }
     }
 

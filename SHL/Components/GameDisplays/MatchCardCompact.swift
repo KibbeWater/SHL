@@ -23,7 +23,10 @@ struct MatchCardCompact: View {
     }
 
     private var isLive: Bool {
-        liveGame?.gameState == .ongoing || liveGame?.gameState == .paused || game.isLive()
+        if let liveGame {
+            return liveGame.gameState == .ongoing || liveGame.gameState == .paused
+        }
+        return game.isLive()
     }
 
     private var isUpcoming: Bool {

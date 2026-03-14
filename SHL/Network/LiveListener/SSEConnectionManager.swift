@@ -26,6 +26,7 @@ actor SSEConnectionManager {
     private var reconnectAttempts = 0
     private var lastDataReceivedAt: Date?
     private var isConnecting = false
+    private var keepAliveTask: Task<Void, Never>?
 
     private let metrics: ConnectionMetrics
 
@@ -75,6 +76,8 @@ actor SSEConnectionManager {
 
     /// Disconnect and clean up
     func disconnect() {
+        keepAliveTask?.cancel()
+        keepAliveTask = nil
         dataTask?.cancel()
         dataTask = nil
         session?.invalidateAndCancel()
@@ -146,6 +149,8 @@ actor SSEConnectionManager {
     private func handleData(_ data: Data) async {
         await buffer.append(data)
         lastDataReceivedAt = Date()
+        reconnectAttempts = 0
+        scheduleKeepAliveCheck()
 
         while let event = await buffer.extractEvent() {
             if let update = parseSSEEvent(event) {
@@ -164,6 +169,20 @@ actor SSEConnectionManager {
                 Task { @MainActor in
                     metrics.recordDataReceived()
                 }
+            }
+        }
+    }
+
+    private func scheduleKeepAliveCheck() {
+        keepAliveTask?.cancel()
+        keepAliveTask = Task { [keepAliveTimeout] in
+            try? await Task.sleep(nanoseconds: UInt64(keepAliveTimeout * 1_000_000_000))
+            guard !Task.isCancelled else { return }
+
+            // If no data received since we scheduled this check, the connection is dead
+            if let lastReceived = self.lastDataReceivedAt,
+               Date().timeIntervalSince(lastReceived) >= keepAliveTimeout {
+                await self.handleCompletion(error: URLError(.timedOut))
             }
         }
     }

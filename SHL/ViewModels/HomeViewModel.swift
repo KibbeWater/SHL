@@ -52,7 +52,11 @@ class HomeViewModel: ObservableObject {
     private func fetchInitialLiveData(for game: Match) async {
         do {
             let live = try await api.getLiveMatch(id: game.externalUUID)
-            self.liveGame = live
+            if live.gameState == .played {
+                self.liveGame = nil
+            } else {
+                self.liveGame = live
+            }
         } catch {
             #if DEBUG
             print("⚠️ Failed to fetch live data for featured game \(game.id): \(error)")
@@ -90,7 +94,11 @@ class HomeViewModel: ObservableObject {
         }
         .receive(on: DispatchQueue.main)
         .sink { [weak self] liveMatch in
-            self?.liveGame = liveMatch
+            if liveMatch.gameState == .played {
+                self?.liveGame = nil
+            } else {
+                self?.liveGame = liveMatch
+            }
         }
     }
 
@@ -110,7 +118,11 @@ class HomeViewModel: ObservableObject {
         }
         .receive(on: DispatchQueue.main)
         .sink { [weak self] liveMatch in
-            self?.calendarLiveMatches[liveMatch.externalId] = liveMatch
+            if liveMatch.gameState == .played {
+                self?.calendarLiveMatches.removeValue(forKey: liveMatch.externalId)
+            } else {
+                self?.calendarLiveMatches[liveMatch.externalId] = liveMatch
+            }
         }
     }
 
@@ -121,7 +133,11 @@ class HomeViewModel: ObservableObject {
         for match in calendarMatches {
             do {
                 let live = try await api.getLiveMatch(id: match.externalUUID)
-                calendarLiveMatches[live.externalId] = live
+                if live.gameState == .played {
+                    calendarLiveMatches.removeValue(forKey: live.externalId)
+                } else {
+                    calendarLiveMatches[live.externalId] = live
+                }
             } catch {
                 // Match not live yet - expected 404
             }

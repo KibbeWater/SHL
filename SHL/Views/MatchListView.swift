@@ -87,7 +87,7 @@ struct MatchListView: View {
                                                     "join_type": "match_list_ctx"
                                                 ],
                                                 userProperties: [
-                                                    "activity_id": ActivityUpdater.shared.deviceUUID.uuidString
+                                                    "activity_id": KeychainManager.shared.getDeviceId()
                                                 ]
                                             )
                                             try ActivityUpdater.shared.start(match: live)
