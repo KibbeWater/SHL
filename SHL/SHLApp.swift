@@ -26,7 +26,11 @@ struct LHFApp: App {
 
     var body: some Scene {
         WindowGroup {
-            Root()
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                Root_iPadOS()
+            } else {
+                Root_iOS()
+            }
         }
     }
 }
