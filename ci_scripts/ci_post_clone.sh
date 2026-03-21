@@ -17,6 +17,9 @@ cd "$CI_PRIMARY_REPOSITORY_PATH"
 echo "📥 Fetching dependencies..."
 tuist install
 
+echo "📦 Caching dependency binaries..."
+tuist cache
+
 echo "🔧 Generating Xcode project..."
 tuist generate --no-open
 

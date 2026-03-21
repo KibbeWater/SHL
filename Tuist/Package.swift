@@ -9,6 +9,31 @@ let packageSettings = PackageSettings(
         "Kingfisher": .framework,
         "PostHog": .framework,
         "SVGKit": .framework,
+        // TCA and ALL transitive deps as frameworks
+        "ComposableArchitecture": .framework,
+        "CasePaths": .framework,
+        "CasePathsCore": .framework,
+        "CombineSchedulers": .framework,
+        "ConcurrencyExtras": .framework,
+        "CustomDump": .framework,
+        "Dependencies": .framework,
+        "DependenciesMacros": .framework,
+        "DependenciesTestSupport": .framework,
+        "IdentifiedCollections": .framework,
+        "IssueReporting": .framework,
+        "IssueReportingPackageSupport": .framework,
+        "Perception": .framework,
+        "PerceptionCore": .framework,
+        "Sharing": .framework,
+        "SwiftNavigation": .framework,
+        "SwiftUINavigation": .framework,
+        "UIKitNavigation": .framework,
+        "UIKitNavigationShim": .framework,
+        "AppKitNavigation": .framework,
+        "Clocks": .framework,
+        "OrderedCollections": .framework,
+        "XCTestDynamicOverlay": .framework,
+        "Logging": .framework,
     ]
 )
 #endif
@@ -19,5 +44,7 @@ let package = Package(
         .package(url: "https://github.com/onevcat/Kingfisher.git", from: "8.0.0"),
         .package(url: "https://github.com/PostHog/posthog-ios.git", from: "3.0.0"),
         .package(url: "https://github.com/SVGKit/SVGKit.git", from: "3.0.0"),
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.17.0"),
+        .package(url: "https://github.com/apple/swift-log.git", from: "1.5.0"),
     ]
 )

@@ -50,6 +50,8 @@ let project = Project(
         ),
 
         // MARK: - Main App
+        // NOTE: SHLFeatures sources are compiled directly into the app target
+        // until Tuist cross-project TCA dependency is resolved.
         .target(
             name: "SHL",
             destinations: [.iPhone, .iPad],
@@ -69,7 +71,10 @@ let project = Project(
                 "NSSupportsLiveActivitiesFrequentUpdates": .boolean(true),
                 "UILaunchStoryboardName": .string("Launch Screen"),
             ]),
-            sources: ["SHL/**/*.swift"],
+            sources: [
+                "SHL/**/*.swift",
+                "Packages/SHLFeatures/Sources/SHLFeatures/**/*.swift",
+            ],
             resources: [
                 "SHL/Assets.xcassets",
                 "SHL/Preview Content/**",
@@ -84,6 +89,7 @@ let project = Project(
                 .external(name: "Kingfisher"),
                 .external(name: "PostHog"),
                 .external(name: "SVGKit"),
+                .external(name: "ComposableArchitecture"),
                 .target(name: "SHLWidget"),
             ],
             settings: .settings(
