@@ -19,7 +19,7 @@ struct OnlineFeaturesPageView: View {
             // Icon
             Image(systemName: "bell.badge.fill")
                 .font(.system(size: 64))
-                .foregroundStyle(.accent)
+                .foregroundStyle(Color.accentColor)
                 .padding(.bottom, 24)
 
             // Header
@@ -83,7 +83,7 @@ struct FeatureRow: View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 16))
-                .foregroundStyle(.accent)
+                .foregroundStyle(Color.accentColor)
                 .frame(width: 24, height: 24)
 
             Text(text)

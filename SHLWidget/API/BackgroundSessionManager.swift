@@ -8,6 +8,7 @@
 
 import Foundation
 import WidgetKit
+import SHLNetwork
 
 class BackgroundSessionManager: NSObject {
     static let shared = BackgroundSessionManager()

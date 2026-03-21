@@ -5,6 +5,7 @@
 //  Created by Linus Rönnbäck Larsson on 3/3/25.
 //
 
+import SHLNetwork
 import SwiftUI
 
 struct GameTime: View {

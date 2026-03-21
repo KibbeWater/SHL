@@ -5,6 +5,7 @@
 //  Match overview card with team colors and score display
 //
 
+import SHLNetwork
 import SwiftUI
 
 struct MatchOverview: View {
@@ -123,11 +124,11 @@ struct MatchOverview: View {
                 HStack(spacing: 6) {
                     Image(systemName: "calendar")
                         .font(.caption)
-                        .foregroundStyle(game.isToday ? .accent : .secondary)
+                        .foregroundStyle(game.isToday ? Color.accentColor : .secondary)
                     Text(game.formatDate())
                         .font(.caption)
                         .fontWeight(game.isToday ? .bold : .medium)
-                        .foregroundStyle(game.isToday ? .accent : .primary)
+                        .foregroundStyle(game.isToday ? Color.accentColor : .primary)
                     Text("•")
                         .foregroundStyle(.secondary)
                     Text(game.formatTime())

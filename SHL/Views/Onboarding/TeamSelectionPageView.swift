@@ -5,6 +5,7 @@
 //  Created by Claude Code
 //
 
+import SHLNetwork
 import SwiftUI
 
 struct TeamSelectionPageView: View {
@@ -29,7 +30,7 @@ struct TeamSelectionPageView: View {
                 if !selectedTeamIds.isEmpty {
                     Text("\(selectedTeamIds.count) \(selectedTeamIds.count == 1 ? "team" : "teams") selected")
                         .font(.caption)
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(Color.accentColor)
                         .padding(.top, 4)
                 }
             }
@@ -61,7 +62,7 @@ struct TeamSelectionPageView: View {
 
                                 if selectedTeamIds.contains(team.id) {
                                     Image(systemName: "checkmark.circle.fill")
-                                        .foregroundStyle(.accent)
+                                        .foregroundStyle(Color.accentColor)
                                         .fontWeight(.semibold)
                                 }
                             }

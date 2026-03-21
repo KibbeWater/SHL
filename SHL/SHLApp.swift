@@ -5,6 +5,7 @@
 //  Created by user242911 on 12/30/23.
 //
 
+import SHLCore
 import SwiftUI
 import PostHog
 

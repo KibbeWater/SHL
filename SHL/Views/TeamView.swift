@@ -6,6 +6,7 @@
 //
 
 import Kingfisher
+import SHLNetwork
 import SwiftUI
 
 private enum TeamTabs: String, CaseIterable {

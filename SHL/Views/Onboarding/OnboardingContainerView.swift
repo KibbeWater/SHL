@@ -6,6 +6,8 @@
 //
 
 import PostHog
+import SHLCore
+import SHLNetwork
 import SwiftUI
 
 struct OnboardingContainerView: View {

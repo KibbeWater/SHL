@@ -5,6 +5,7 @@
 //  Created by KibbeWater on 2024-04-17.
 //
 
+import SHLNetwork
 import SwiftUI
 
 struct MatchCalendar: View {

@@ -78,3 +78,9 @@ DerivedData/
 # If you want to ignore it, uncomment the following line:
 # *.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 .DS_Store
+
+# Tuist
+Derived/
+*.xcworkspace
+Tuist/.build/
+Packages/*/.build/

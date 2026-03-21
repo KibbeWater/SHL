@@ -5,6 +5,8 @@
 //  Created by user242911 on 3/23/24.
 //
 
+import SHLCore
+import SHLNetwork
 import SwiftUI
 
 enum RootTabs: Equatable, Hashable, Identifiable {

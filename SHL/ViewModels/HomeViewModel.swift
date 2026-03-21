@@ -7,6 +7,8 @@
 
 import Combine
 import Foundation
+import SHLCore
+import SHLNetwork
 import SwiftUI
 
 @MainActor

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SHLNetwork
 import SwiftUI
 
 @MainActor

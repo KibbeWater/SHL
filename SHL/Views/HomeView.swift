@@ -7,6 +7,8 @@
 
 import ActivityKit
 import PostHog
+import SHLCore
+import SHLNetwork
 import SwiftUI
 
 public struct LiveGame {

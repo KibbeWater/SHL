@@ -5,6 +5,7 @@
 
 import Foundation
 import FoundationModels
+import SHLNetwork
 
 @available(iOS 26.0, *)
 struct PromptSeason: PromptRepresentable {

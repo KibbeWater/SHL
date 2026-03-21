@@ -5,6 +5,7 @@
 //  Created by Claude Code
 //
 
+import SHLNetwork
 import SwiftUI
 
 struct TeamSelectionSheet: View {
@@ -46,7 +47,7 @@ struct TeamSelectionSheet: View {
 
                                 if selectedTeamIds.contains(team.id) {
                                     Image(systemName: "checkmark")
-                                        .foregroundStyle(.accent)
+                                        .foregroundStyle(Color.accentColor)
                                         .fontWeight(.semibold)
                                 }
                             }

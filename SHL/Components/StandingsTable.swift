@@ -5,6 +5,7 @@
 //  League standings table component
 //
 
+import SHLNetwork
 import SwiftUI
 
 struct StandingObj: Identifiable, Equatable {

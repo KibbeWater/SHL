@@ -5,6 +5,7 @@
 //  View component for rendering individual PBP events
 //
 
+import SHLNetwork
 import SwiftUI
 
 struct PBPEventRowView: View {

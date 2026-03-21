@@ -6,6 +6,7 @@
 //
 
 import Kingfisher
+import SHLNetwork
 import SwiftUI
 
 private enum PlayerTabs: String, CaseIterable {
@@ -15,7 +16,8 @@ private enum PlayerTabs: String, CaseIterable {
 
 // MARK: - Stats Components
 
-private struct StatItem: View {
+// TODO: MIGRATION - Renamed to avoid collision with SkaterStatsGridView.StatItem
+private struct PlayerStatItem: View {
     let label: String
     let value: String
 
@@ -39,7 +41,7 @@ private struct StatRow: View {
     var body: some View {
         HStack(spacing: 0) {
             ForEach(items, id: \.label) { item in
-                StatItem(label: item.label, value: item.value)
+                PlayerStatItem(label: item.label, value: item.value)
             }
         }
     }

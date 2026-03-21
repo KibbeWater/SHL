@@ -5,6 +5,8 @@
 //  Created by Linus Rönnbäck Larsson on 20/9/24.
 //
 
+import SHLCore
+import SHLNetwork
 import SwiftUI
 import PostHog
 

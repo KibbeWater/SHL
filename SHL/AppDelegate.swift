@@ -5,6 +5,8 @@
 //  Created by Claude Code
 //
 
+import SHLCore
+import SHLNetwork
 import UIKit
 import UserNotifications
 import PostHog

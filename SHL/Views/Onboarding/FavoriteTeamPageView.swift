@@ -5,6 +5,7 @@
 //  Created by Claude Code
 //
 
+import SHLNetwork
 import SwiftUI
 
 struct FavoriteTeamPageView: View {

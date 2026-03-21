@@ -6,6 +6,7 @@
 //
 
 import Kingfisher
+import SHLNetwork
 import SVGKit
 import SwiftUI
 

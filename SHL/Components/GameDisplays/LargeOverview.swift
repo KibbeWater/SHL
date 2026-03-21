@@ -6,6 +6,7 @@
 //
 
 import MapKit
+import SHLNetwork
 import SwiftUI
 
 struct LargeOverview: View {

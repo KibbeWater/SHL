@@ -5,6 +5,7 @@
 //  Compact match card for calendar lists and tight spaces
 //
 
+import SHLNetwork
 import SwiftUI
 
 struct MatchCardCompact: View {

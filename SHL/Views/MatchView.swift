@@ -8,6 +8,9 @@
 import ActivityKit
 import MapKit
 import PostHog
+import SHLCore
+import SHLNetwork
+import SHLWidgetShared
 import SwiftUI
 
 private enum MatchTab: String, CaseIterable {

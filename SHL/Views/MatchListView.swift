@@ -1,6 +1,8 @@
 import SwiftUI
 import PostHog
 import ActivityKit
+import SHLCore
+import SHLNetwork
 
 private enum Tabs: String, CaseIterable {
     case previous = "Previous"

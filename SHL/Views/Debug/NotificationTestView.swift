@@ -6,6 +6,8 @@
 //
 
 #if DEBUG
+import SHLCore
+import SHLNetwork
 import SwiftUI
 
 struct NotificationTestView: View {
