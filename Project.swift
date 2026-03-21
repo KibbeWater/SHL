@@ -2,12 +2,6 @@ import ProjectDescription
 
 let project = Project(
     name: "SHL",
-    packages: [
-        .local(path: "Packages/SHLNetwork"),
-        .local(path: "Packages/SHLCore"),
-        .local(path: "Packages/SHLWidgetShared"),
-        .local(path: "Packages/SHLFeatures"),
-    ],
     settings: .settings(
         base: [
             "DEVELOPMENT_TEAM": "89625ZHN6X",
@@ -23,6 +17,38 @@ let project = Project(
         ]
     ),
     targets: [
+        // MARK: - Shared Frameworks (Tuist targets, not SPM packages)
+
+        .target(
+            name: "SHLNetwork",
+            destinations: [.iPhone, .iPad],
+            product: .staticFramework,
+            bundleId: "com.kibbewater.shl.network",
+            sources: ["Packages/SHLNetwork/Sources/SHLNetwork/**/*.swift"],
+            dependencies: []
+        ),
+
+        .target(
+            name: "SHLWidgetShared",
+            destinations: [.iPhone, .iPad],
+            product: .staticFramework,
+            bundleId: "com.kibbewater.shl.widgetshared",
+            sources: ["Packages/SHLWidgetShared/Sources/SHLWidgetShared/**/*.swift"],
+            dependencies: []
+        ),
+
+        .target(
+            name: "SHLCore",
+            destinations: [.iPhone, .iPad],
+            product: .staticFramework,
+            bundleId: "com.kibbewater.shl.core",
+            sources: ["Packages/SHLCore/Sources/SHLCore/**/*.swift"],
+            dependencies: [
+                .target(name: "SHLNetwork"),
+                .target(name: "SHLWidgetShared"),
+            ]
+        ),
+
         // MARK: - Main App
         .target(
             name: "SHL",
@@ -40,9 +66,9 @@ let project = Project(
             ],
             entitlements: .file(path: "SHL/SHL.entitlements"),
             dependencies: [
-                .package(product: "SHLNetwork", type: .runtime),
-                .package(product: "SHLCore", type: .runtime),
-                .package(product: "SHLWidgetShared", type: .runtime),
+                .target(name: "SHLNetwork"),
+                .target(name: "SHLCore"),
+                .target(name: "SHLWidgetShared"),
                 .external(name: "Kingfisher"),
                 .external(name: "PostHog"),
                 .external(name: "SVGKit"),
@@ -75,7 +101,7 @@ let project = Project(
             ],
             entitlements: .file(path: "SHLWidgetExtension.entitlements"),
             dependencies: [
-                .package(product: "SHLNetwork", type: .runtime),
+                .target(name: "SHLNetwork"),
                 .external(name: "Kingfisher"),
             ],
             settings: .settings(

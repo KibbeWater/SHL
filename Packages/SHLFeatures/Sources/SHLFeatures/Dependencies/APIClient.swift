@@ -8,6 +8,7 @@ public struct APIClient: Sendable {
     public var getMatchStats: @Sendable (_ id: String) async throws -> [MatchStats]
     public var getMatchEvents: @Sendable (_ id: String) async throws -> [PBPEventDTO]
     public var searchMatches: @Sendable (_ date: String?, _ team: String?, _ season: String?, _ state: String?, _ descending: Bool, _ page: Int, _ limit: Int) async throws -> PaginatedResponse<Match>
+    public var getLiveMatch: @Sendable (_ id: String) async throws -> LiveMatch
     public var getLiveMatches: @Sendable () async throws -> [Match]
     public var getTeamDetail: @Sendable (_ id: String) async throws -> Team
     public var getTeamRoster: @Sendable (_ id: String) async throws -> [Player]
@@ -35,6 +36,7 @@ extension APIClient: DependencyKey {
             getMatchStats: { try await client.getMatchStats(id: $0) },
             getMatchEvents: { try await client.getMatchEvents(id: $0) },
             searchMatches: { try await client.searchMatches(date: $0, team: $1, season: $2, state: $3, descending: $4, page: $5, limit: $6) },
+            getLiveMatch: { try await client.getLiveMatch(id: $0) },
             getLiveMatches: { try await client.getLiveMatches() },
             getTeamDetail: { try await client.getTeamDetail(id: $0) },
             getTeamRoster: { try await client.getTeamRoster(id: $0) },
@@ -58,6 +60,7 @@ extension APIClient: DependencyKey {
         getMatchStats: { _ in fatalError("unimplemented") },
         getMatchEvents: { _ in fatalError("unimplemented") },
         searchMatches: { _, _, _, _, _, _, _ in fatalError("unimplemented") },
+        getLiveMatch: { _ in fatalError("unimplemented") },
         getLiveMatches: { fatalError("unimplemented") },
         getTeamDetail: { _ in fatalError("unimplemented") },
         getTeamRoster: { _ in fatalError("unimplemented") },

@@ -7,14 +7,11 @@ let package = Package(
     products: [
         .library(name: "SHLCore", targets: ["SHLCore"]),
     ],
-    dependencies: [
-        .package(path: "../SHLNetwork"),
-        .package(path: "../SHLWidgetShared"),
-    ],
+    dependencies: [],
     targets: [
         .target(
             name: "SHLCore",
-            dependencies: ["SHLNetwork", "SHLWidgetShared"],
+            dependencies: [],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
     ]

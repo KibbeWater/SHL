@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Standings: Codable {
+public struct Standings: Codable, Equatable {
     public let id: String
     public let seasonID: String
     public let team: Team

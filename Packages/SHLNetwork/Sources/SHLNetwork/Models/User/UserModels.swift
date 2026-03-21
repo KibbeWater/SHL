@@ -165,7 +165,7 @@ public struct SetInterestedTeamsRequest: Codable {
 
 // MARK: - Device Management
 
-public struct Device: Codable, Identifiable {
+public struct Device: Codable, Identifiable, Equatable {
     public let id: String
     public let deviceId: String
     public let deviceName: String

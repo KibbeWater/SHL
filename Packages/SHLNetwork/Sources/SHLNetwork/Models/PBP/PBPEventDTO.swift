@@ -10,7 +10,7 @@ import Foundation
 // MARK: - Main PBP Event DTO
 
 /// Play-by-play event with generic fields and dynamic event-specific data
-public struct PBPEventDTO: Codable, Identifiable, Sendable {
+public struct PBPEventDTO: Codable, Identifiable, Sendable, Equatable {
     public let id: String
     public let matchID: String
     public let eventType: String
@@ -47,7 +47,7 @@ public struct PBPEventDTO: Codable, Identifiable, Sendable {
 // MARK: - Event Data Enum
 
 /// Wrapper enum for event-specific data structures
-public enum EventData: Codable, Sendable {
+public enum EventData: Codable, Sendable, Equatable {
     case goal(GoalEventData)
     case shot(ShotEventData)
     case penalty(PenaltyEventData)

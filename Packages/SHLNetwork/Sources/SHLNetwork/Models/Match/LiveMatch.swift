@@ -6,7 +6,7 @@
 //
 import Foundation
 
-public struct LiveMatch: Codable {
+public struct LiveMatch: Codable, Equatable {
     // Basic game information
     public let id: String // Internal database UUID
     public let externalId: String // External match UUID

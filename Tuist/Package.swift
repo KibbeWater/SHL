@@ -9,7 +9,6 @@ let packageSettings = PackageSettings(
         "Kingfisher": .framework,
         "PostHog": .framework,
         "SVGKit": .framework,
-        "ComposableArchitecture": .framework,
     ]
 )
 #endif
@@ -20,6 +19,5 @@ let package = Package(
         .package(url: "https://github.com/onevcat/Kingfisher.git", from: "8.0.0"),
         .package(url: "https://github.com/PostHog/posthog-ios.git", from: "3.0.0"),
         .package(url: "https://github.com/SVGKit/SVGKit.git", from: "3.0.0"),
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.17.0"),
     ]
 )
