@@ -5,6 +5,7 @@
 //  Created by Linus Rönnbäck Larsson on 28/9/24.
 //
 
+import ComposableArchitecture
 import Kingfisher
 import SHLNetwork
 import SwiftUI
@@ -15,7 +16,7 @@ private enum TeamTabs: String, CaseIterable {
 }
 
 struct TeamView: View {
-    @StateObject var viewModel: TeamViewModel
+    let store: StoreOf<TeamFeature>
 
     @State private var teamColor: Color = .gray
     @State private var selectedTab: TeamTabs = .history
@@ -24,33 +25,35 @@ struct TeamView: View {
 
     init(team: Team) {
         self.team = team
-        self._viewModel = .init(wrappedValue: .init(team))
+        self.store = Store(initialState: TeamFeature.State(team: team)) {
+            TeamFeature()
+        }
     }
 
     // MARK: - Computed Properties
 
     private var upcomingGames: [Match] {
-        viewModel.history.filter { !$0.played }.reversed()
+        store.matches.filter { !$0.played }.reversed()
     }
 
     private var playedGames: [Match] {
-        viewModel.history.filter { $0.played }
+        store.matches.filter { $0.played }
     }
 
     private var teamRank: Int? {
-        viewModel.standings.first(where: { $0.team.code == team.code })?.rank
+        store.standings.first(where: { $0.team.code == team.code })?.rank
     }
 
     private var goalkeepers: [Player] {
-        viewModel.lineup.filter { $0.position == .goalkeeper }
+        store.roster.filter { $0.position == .goalkeeper }
     }
 
     private var defenders: [Player] {
-        viewModel.lineup.filter { $0.position == .defense }
+        store.roster.filter { $0.position == .defense }
     }
 
     private var forwards: [Player] {
-        viewModel.lineup.filter { $0.position == .forward }
+        store.roster.filter { $0.position == .forward }
     }
 
     // MARK: - Body
@@ -70,16 +73,14 @@ struct TeamView: View {
                 .padding(.bottom, 32)
             }
             .refreshable {
-                try? await viewModel.refresh()
+                store.send(.refreshed)
             }
         }
         .task {
             loadTeamColors()
         }
         .onAppear {
-            Task {
-                try? await viewModel.refresh()
-            }
+            store.send(.onAppear)
         }
     }
 
@@ -161,7 +162,7 @@ struct TeamView: View {
 
     private var matchHistoryContent: some View {
         VStack(spacing: 16) {
-            if viewModel.history.isEmpty {
+            if store.matches.isEmpty {
                 loadingStateView
             } else {
                 // Upcoming Games Section
@@ -215,7 +216,7 @@ struct TeamView: View {
 
     private var lineupContent: some View {
         VStack(spacing: 16) {
-            if viewModel.lineup.isEmpty {
+            if store.roster.isEmpty {
                 loadingStateView
             } else {
                 // Goalkeepers

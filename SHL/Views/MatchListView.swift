@@ -1,8 +1,9 @@
-import SwiftUI
-import PostHog
 import ActivityKit
+import ComposableArchitecture
+import PostHog
 import SHLCore
 import SHLNetwork
+import SwiftUI
 
 private enum Tabs: String, CaseIterable {
     case previous = "Previous"
@@ -17,10 +18,14 @@ struct MatchListView: View {
 
     @State private var openDates: [String:Bool] = [:]
 
-    @StateObject private var viewModel = MatchListViewModel()
-    
+    let store: StoreOf<MatchListFeature>
+
+    init(store: StoreOf<MatchListFeature>) {
+        self.store = store
+    }
+
     private func getLiveMatch(match: Match) -> LiveMatch? {
-        return viewModel.matchListeners[match.externalUUID]
+        return store.liveMatches[match.externalUUID]
     }
     
     var body: some View {
@@ -28,25 +33,26 @@ struct MatchListView: View {
             tabSelectionView
             
             TabView(selection: $selectedTab) {
-                matchesScrollView(for: viewModel.previousMatches, tab: .previous)
+                matchesScrollView(for: store.previousMatches, tab: .previous)
                     .id(Tabs.previous)
                     .tag(Tabs.previous)
 
-                matchesScrollView(for: viewModel.todayMatches, tab: .today)
+                matchesScrollView(for: store.todayMatches, tab: .today)
                     .id(Tabs.today)
                     .tag(Tabs.today)
 
-                matchesScrollView(for: viewModel.upcomingMatches, tab: .upcoming)
+                matchesScrollView(for: store.upcomingMatches, tab: .upcoming)
                     .id(Tabs.upcoming)
                     .tag(Tabs.upcoming)
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
         }
+        .onAppear {
+            store.send(.onAppear)
+        }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
-                Task {
-                    try? await viewModel.refresh(hard: true)
-                }
+                store.send(.refreshed)
             }
         }
     }
@@ -197,7 +203,7 @@ struct MatchListView: View {
             }
         }
         .refreshable {
-            try? await viewModel.refresh(hard: true)
+            store.send(.refreshed)
         }
     }
 

@@ -5,6 +5,7 @@
 //  Created by Linus Rönnbäck Larsson on 30/9/24.
 //
 
+import ComposableArchitecture
 import Kingfisher
 import SHLNetwork
 import SwiftUI
@@ -50,7 +51,7 @@ private struct StatRow: View {
 // MARK: - Player View
 
 struct PlayerView: View {
-    @StateObject private var viewModel: PlayerViewModel
+    let store: StoreOf<PlayerFeature>
 
     let player: Player
     @Binding var teamColor: Color
@@ -60,13 +61,15 @@ struct PlayerView: View {
     init(_ player: Player, teamColor: Binding<Color>) {
         self.player = player
         self._teamColor = teamColor
-        self._viewModel = .init(wrappedValue: .init(player))
+        self.store = Store(initialState: PlayerFeature.State(player: player)) {
+            PlayerFeature()
+        }
     }
 
     // MARK: - Computed Properties
 
     private var positionText: String {
-        guard let info = viewModel.info else { return "" }
+        guard let info = store.player else { return "" }
         switch info.position {
         case .goalkeeper: return "Goalkeeper"
         case .defense: return "Defense"
@@ -92,13 +95,11 @@ struct PlayerView: View {
                 .padding(.bottom, 32)
             }
             .refreshable {
-                try? await viewModel.refresh()
+                store.send(.refresh)
             }
         }
         .onAppear {
-            Task {
-                try? await viewModel.refresh()
-            }
+            store.send(.onAppear)
         }
     }
 
@@ -143,7 +144,7 @@ struct PlayerView: View {
                         playerInfoBadge(text: positionText, icon: "figure.hockey")
                     }
 
-                    if let info = viewModel.info, let team = info.team {
+                    if let info = store.player, let team = info.team {
                         NavigationLink {
                             TeamView(team: team)
                         } label: {
@@ -169,7 +170,7 @@ struct PlayerView: View {
 
     private var playerImage: some View {
         Group {
-            if let info = viewModel.info, let imageUrl = info.portraitURL {
+            if let info = store.player, let imageUrl = info.portraitURL {
                 KFImage(URL(string: imageUrl))
                     .placeholder {
                         playerImagePlaceholder
@@ -191,7 +192,7 @@ struct PlayerView: View {
                 .fill(.ultraThinMaterial)
                 .frame(width: 120, height: 150)
 
-            if viewModel.info == nil {
+            if store.player == nil {
                 ProgressView()
             } else {
                 Image(systemName: "person.fill")
@@ -246,9 +247,9 @@ struct PlayerView: View {
 
     private var statisticsContent: some View {
         VStack(spacing: 16) {
-            if viewModel.stats.isEmpty {
+            if store.stats.isEmpty {
                 loadingStateView
-            } else if viewModel.isGoalie {
+            } else if store.isGoalie {
                 goalieStatsCards
             } else {
                 skaterStatsCards
@@ -260,7 +261,7 @@ struct PlayerView: View {
     private var skaterStatsCards: some View {
         VStack(spacing: 16) {
             // Career Stats
-            let career = viewModel.careerTotalsSkater
+            let career = store.careerTotalsSkater
             statsCard(
                 title: "Career Totals",
                 icon: "chart.bar.fill"
@@ -270,19 +271,19 @@ struct PlayerView: View {
                     goals: career.goals,
                     assists: career.assists,
                     points: career.points,
-                    pim: career.pim,
+                    pim: career.penaltyMinutes,
                     plusMinus: career.plusMinus,
                     shotsOnGoal: career.shotsOnGoal,
                     shootingPercentage: career.shootingPercentage,
-                    ppg: career.ppg,
-                    shg: career.shg
+                    ppg: career.powerPlayGoals,
+                    shg: career.shortHandedGoals
                 )
             }
 
             // Current Season Stats
-            let current = viewModel.currentSeasonTotalsSkater
+            let current = store.currentSeasonTotalsSkater
             statsCard(
-                title: viewModel.currentSeasonName,
+                title: store.currentSeasonName,
                 icon: "calendar"
             ) {
                 skaterStatsGrid(
@@ -290,12 +291,12 @@ struct PlayerView: View {
                     goals: current.goals,
                     assists: current.assists,
                     points: current.points,
-                    pim: current.pim,
+                    pim: current.penaltyMinutes,
                     plusMinus: current.plusMinus,
                     shotsOnGoal: current.shotsOnGoal,
                     shootingPercentage: current.shootingPercentage,
-                    ppg: current.ppg,
-                    shg: current.shg
+                    ppg: current.powerPlayGoals,
+                    shg: current.shortHandedGoals
                 )
             }
         }
@@ -342,7 +343,7 @@ struct PlayerView: View {
     private var goalieStatsCards: some View {
         VStack(spacing: 16) {
             // Career Stats
-            let career = viewModel.careerTotalsGoalie
+            let career = store.careerTotalsGoalie
             statsCard(
                 title: "Career Totals",
                 icon: "chart.bar.fill"
@@ -362,9 +363,9 @@ struct PlayerView: View {
             }
 
             // Current Season Stats
-            let current = viewModel.currentSeasonTotalsGoalie
+            let current = store.currentSeasonTotalsGoalie
             statsCard(
-                title: viewModel.currentSeasonName,
+                title: store.currentSeasonName,
                 icon: "calendar"
             ) {
                 goalieStatsGrid(
@@ -443,10 +444,10 @@ struct PlayerView: View {
 
     private var historyContent: some View {
         VStack(spacing: 16) {
-            if viewModel.stats.isEmpty {
+            if store.stats.isEmpty {
                 loadingStateView
             } else {
-                ForEach(viewModel.statsGroupedBySeason, id: \.season.id) { group in
+                ForEach(store.statsGroupedBySeason, id: \.season.id) { group in
                     seasonSection(season: group.season, stats: group.stats)
                 }
             }
@@ -512,17 +513,17 @@ struct PlayerView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
-                    Text("•")
+                    Text("\u{2022}")
                         .foregroundStyle(.secondary)
 
-                    if viewModel.isGoalie {
+                    if store.isGoalie {
                         if let goalieStats = stat.goalieStats {
                             Text("\(goalieStats.wins ?? 0)W \(goalieStats.losses ?? 0)L")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
 
                             if let svPct = goalieStats.savePercentage {
-                                Text("•")
+                                Text("\u{2022}")
                                     .foregroundStyle(.secondary)
                                 Text(String(format: "%.1f SV%%", svPct * 100))
                                     .font(.caption)
@@ -534,7 +535,7 @@ struct PlayerView: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
 
-                        Text("•")
+                        Text("\u{2022}")
                             .foregroundStyle(.secondary)
 
                         Text("\(stat.gamesPlayed) GP")

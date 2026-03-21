@@ -5,6 +5,7 @@
 //  iPad-specific root layout — sidebar with team tabs
 //
 
+import ComposableArchitecture
 import SHLCore
 import SHLNetwork
 import SwiftUI
@@ -28,7 +29,9 @@ struct Root_iPadOS: View {
             TabView(selection: $selectedTab) {
                 Tab("Home", systemImage: "house", value: .home) {
                     NavigationStack {
-                        HomeView()
+                        HomeView(store: Store(initialState: HomeFeature.State()) {
+                            HomeFeature()
+                        })
                             .navigationDestination(isPresented: $isGameOpen) {
                                 openedGame
                             }
@@ -37,7 +40,9 @@ struct Root_iPadOS: View {
 
                 Tab("Schedule", systemImage: "calendar", value: RootTabs.calendar) {
                     NavigationStack {
-                        MatchListView()
+                        MatchListView(store: Store(initialState: MatchListFeature.State()) {
+                            MatchListFeature()
+                        })
                     }
                 }
 

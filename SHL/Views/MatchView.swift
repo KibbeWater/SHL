@@ -6,6 +6,7 @@
 //
 
 import ActivityKit
+import ComposableArchitecture
 import MapKit
 import PostHog
 import SHLCore
@@ -21,8 +22,7 @@ private enum MatchTab: String, CaseIterable {
 struct MatchView: View {
     @Environment(\.scenePhase) private var scenePhase
 
-    let match: Match
-    @StateObject var viewModel: MatchViewModel
+    let store: StoreOf<MatchDetailFeature>
 
     @State private var pbpUpdateTimer: Timer?
     @State private var location: CLLocation?
@@ -39,32 +39,39 @@ struct MatchView: View {
     @State private var pulseAnimation: Bool = false
     private var referrer: String
 
-    init(_ match: Match, referrer: String) {
-        self.match = match
-        self._viewModel = .init(wrappedValue: .init(match))
+    init(_ game: Match, referrer: String = "unknown") {
+        self.store = Store(initialState: MatchDetailFeature.State(match: game)) {
+            MatchDetailFeature()
+        }
         self.referrer = referrer
     }
 
     // MARK: - Computed Properties
 
     private var currentMatch: Match {
-        viewModel.match ?? match
+        store.matchDetail ?? store.match
     }
 
     private var homeScore: Int {
-        viewModel.liveGame?.homeScore ?? currentMatch.homeScore
+        store.liveGame?.homeScore ?? currentMatch.homeScore
     }
 
     private var awayScore: Int {
-        viewModel.liveGame?.awayScore ?? currentMatch.awayScore
+        store.liveGame?.awayScore ?? currentMatch.awayScore
     }
 
     private var isLive: Bool {
-        match.isLive()
+        store.match.isLive()
     }
 
     private var hasStarted: Bool {
-        match.date < Date.now
+        store.match.date < Date.now
+    }
+
+    /// Sorted PBP events with period markers, matching the old MatchViewModel logic
+    private var sortedPBPEvents: [PBPEventDTO] {
+        let controller = PBPController(events: store.pbpEvents)
+        return controller.sortedWithPeriodMarkers(reverse: store.liveGame != nil)
     }
 
     // MARK: - Body
@@ -86,11 +93,7 @@ struct MatchView: View {
                 .padding(.bottom, 32)
             }
             .refreshable {
-                do {
-                    try await viewModel.refresh(hard: true)
-                } catch {
-                    print("MatchView: Failed to refresh: \(error)")
-                }
+                store.send(.refreshed)
                 startTimer()
             }
         }
@@ -99,18 +102,14 @@ struct MatchView: View {
             loadTeamColors()
         }
         .onAppear {
-            Task {
-                try? await viewModel.refresh()
-            }
+            store.send(.onAppear)
             startTimer()
             logAnalytics()
             trackMatchViewInteraction()
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
-                Task {
-                    try? await viewModel.refresh(hard: true)
-                }
+                store.send(.refreshed)
                 startTimer()
             }
         }
@@ -177,7 +176,7 @@ struct MatchView: View {
 
     private var headerSection: some View {
         VStack(spacing: 20) {
-            if let liveGame = viewModel.liveGame,
+            if let liveGame = store.liveGame,
                liveGame.gameState == .ongoing || liveGame.gameState == .paused {
                 liveHeaderSection(liveGame)
             } else {
@@ -192,9 +191,9 @@ struct MatchView: View {
     private var standardHeaderSection: some View {
         Group {
             // Status badge above score (for live/final states)
-            if let liveGame = viewModel.liveGame {
+            if let liveGame = store.liveGame {
                 gameStatusBadge(liveGame)
-            } else if match.played {
+            } else if store.match.played {
                 finalBadge
             }
 
@@ -203,7 +202,7 @@ struct MatchView: View {
                 // Home Team
                 teamLogo(
                     code: currentMatch.homeTeam.code,
-                    team: viewModel.home
+                    team: store.homeTeam
                 )
 
                 Spacer()
@@ -216,13 +215,13 @@ struct MatchView: View {
                 // Away Team
                 teamLogo(
                     code: currentMatch.awayTeam.code,
-                    team: viewModel.away
+                    team: store.awayTeam
                 )
             }
             .padding(.horizontal, 24)
 
             // Countdown badge for upcoming games
-            if !hasStarted && viewModel.liveGame == nil {
+            if !hasStarted && store.liveGame == nil {
                 countdownBadge
             }
 
@@ -243,7 +242,7 @@ struct MatchView: View {
                 // Home team column
                 liveTeamColumn(
                     code: currentMatch.homeTeam.code,
-                    team: viewModel.home,
+                    team: store.homeTeam,
                     score: homeScore,
                     isWinning: homeScore >= awayScore
                 )
@@ -258,7 +257,7 @@ struct MatchView: View {
                 // Away team column
                 liveTeamColumn(
                     code: currentMatch.awayTeam.code,
-                    team: viewModel.away,
+                    team: store.awayTeam,
                     score: awayScore,
                     isWinning: awayScore >= homeScore
                 )
@@ -423,23 +422,23 @@ struct MatchView: View {
             } else {
                 // Future game - show date and time prominently
                 VStack(spacing: 6) {
-                    if match.isToday {
+                    if store.match.isToday {
                         Text("Today")
                             .font(.system(size: 28, weight: .heavy, design: .rounded))
                             .foregroundStyle(.white)
                     } else {
-                        Text(match.date.formatted(.dateTime.weekday(.wide)))
+                        Text(store.match.date.formatted(.dateTime.weekday(.wide)))
                             .font(.caption)
                             .fontWeight(.medium)
                             .foregroundStyle(.white.opacity(0.7))
                             .textCase(.uppercase)
 
-                        Text(match.formatDate())
+                        Text(store.match.formatDate())
                             .font(.system(size: 28, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                     }
 
-                    Text(match.date.formatted(date: .omitted, time: .shortened))
+                    Text(store.match.date.formatted(date: .omitted, time: .shortened))
                         .font(.title3)
                         .fontWeight(.semibold)
                         .foregroundStyle(.white.opacity(0.9))
@@ -479,7 +478,7 @@ struct MatchView: View {
     }
 
     private var countdownBadge: some View {
-        let timeUntilGame = match.date.timeIntervalSince(Date.now)
+        let timeUntilGame = store.match.date.timeIntervalSince(Date.now)
         let days = Int(timeUntilGame / 86400)
         let hours = Int((timeUntilGame.truncatingRemainder(dividingBy: 86400)) / 3600)
 
@@ -521,7 +520,7 @@ struct MatchView: View {
 
     @ViewBuilder
     private var venueLabel: some View {
-        if let venue = match.venue {
+        if let venue = store.match.venue {
             Label(venue, systemImage: "mappin.circle.fill")
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.7))
@@ -556,7 +555,7 @@ struct MatchView: View {
 
     private var summaryContent: some View {
         VStack(spacing: 16) {
-            if isLive || (!match.played && hasStarted) {
+            if isLive || (!store.match.played && hasStarted) {
                 liveActivityCard
             }
 
@@ -569,7 +568,7 @@ struct MatchView: View {
                 upcomingGameInfoCard
             }
 
-            if match.venue != nil {
+            if store.match.venue != nil {
                 venueMapCard
             }
         }
@@ -599,7 +598,7 @@ struct MatchView: View {
                             Text("Date & Time")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                            Text("\(match.formatDate()), \(match.formatTime())")
+                            Text("\(store.match.formatDate()), \(store.match.formatTime())")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
                         }
@@ -610,7 +609,7 @@ struct MatchView: View {
                 Divider()
 
                 // Venue Row
-                if let venue = match.venue {
+                if let venue = store.match.venue {
                     HStack {
                         HStack(spacing: 10) {
                             Image(systemName: "mappin.and.ellipse")
@@ -696,9 +695,11 @@ struct MatchView: View {
                 Spacer()
             }
 
-            if let pbpController = viewModel.pbpController,
-               let homeTeamId = match.homeTeam.id,
-               let awayTeamId = match.awayTeam.id {
+            if let homeTeamId = store.match.homeTeam.id,
+               let awayTeamId = store.match.awayTeam.id,
+               !store.pbpEvents.isEmpty {
+
+                let pbpController = PBPController(events: store.pbpEvents)
 
                 let homePenalties = pbpController.penaltyCount(forTeamID: homeTeamId)
                 let awayPenalties = pbpController.penaltyCount(forTeamID: awayTeamId)
@@ -706,8 +707,8 @@ struct MatchView: View {
                 VersusBar("Penalties", homeSide: homePenalties, awaySide: awayPenalties,
                          homeColor: homeColor, awayColor: awayColor)
 
-                if let homeStats = viewModel.matchStats.first(where: { $0.teamID == homeTeamId }),
-                   let awayStats = viewModel.matchStats.first(where: { $0.teamID == awayTeamId }) {
+                if let homeStats = store.matchStats.first(where: { $0.teamID == homeTeamId }),
+                   let awayStats = store.matchStats.first(where: { $0.teamID == awayTeamId }) {
 
                     VersusBar("Shots on Goal", homeSide: homeStats.shotsOnGoal,
                              awaySide: awayStats.shotsOnGoal, homeColor: homeColor, awayColor: awayColor)
@@ -787,9 +788,9 @@ struct MatchView: View {
                     title: "Game Not Started",
                     message: "Play by play will be available once the game begins"
                 )
-            } else if let pbpController = viewModel.pbpController, pbpController.hasEvents {
-                ForEach(viewModel.sortedPBPEvents) { event in
-                    PBPEventRowView(event: event, match: match)
+            } else if !store.pbpEvents.isEmpty {
+                ForEach(sortedPBPEvents) { event in
+                    PBPEventRowView(event: event, match: store.match)
                 }
             } else {
                 emptyStateView(
@@ -843,7 +844,7 @@ struct MatchView: View {
             userProperties: ["activity_id": KeychainManager.shared.getDeviceId()]
         )
 
-        if let liveMatch = viewModel.liveGame {
+        if let liveMatch = store.liveGame {
             try ActivityUpdater.shared.start(match: liveMatch)
             activityRunning = true
         }
@@ -851,11 +852,11 @@ struct MatchView: View {
 
     private func stopLiveActivity() {
         var activities = Activity<SHLWidgetAttributes>.activities
-        activities = activities.filter { $0.attributes.internalId == match.id }
+        activities = activities.filter { $0.attributes.internalId == store.match.id }
 
         let contentState = SHLWidgetAttributes.ContentState(
-            homeScore: match.homeScore,
-            awayScore: match.awayScore,
+            homeScore: store.match.homeScore,
+            awayScore: store.match.awayScore,
             period: .init(period: 1, periodEnd: "20:00", state: .ended)
         )
 
@@ -871,14 +872,14 @@ struct MatchView: View {
     }
 
     private func openInMaps() {
-        guard let venue = match.venue,
+        guard let venue = store.match.venue,
               let url = URL(string: "maps://?q=\(venue)"),
               UIApplication.shared.canOpenURL(url) else { return }
         UIApplication.shared.open(url)
     }
 
     private func loadMap(size: CGSize) {
-        match.findVenue(size) { result in
+        store.match.findVenue(size) { result in
             switch result {
             case .success(let (snapshot, loc)):
                 location = loc
@@ -891,16 +892,16 @@ struct MatchView: View {
 
     private func checkActiveActivities() {
         let activities = Activity<SHLWidgetAttributes>.activities.filter {
-            $0.attributes.internalId == match.id
+            $0.attributes.internalId == store.match.id
         }
         activityRunning = !activities.isEmpty
     }
 
     private func loadTeamColors() {
-        match.awayTeam.getTeamColor { color in
+        store.match.awayTeam.getTeamColor { color in
             withAnimation { awayColor = color }
         }
-        match.homeTeam.getTeamColor { color in
+        store.match.homeTeam.getTeamColor { color in
             withAnimation { homeColor = color }
         }
     }
@@ -911,11 +912,11 @@ struct MatchView: View {
         PostHogSDK.shared.capture(
             "match_view_interaction",
             properties: ["referrer": referrer],
-            userProperties: ["match_id": match.id]
+            userProperties: ["match_id": store.match.id]
         )
 
-        PostHogSDK.shared.capture("team_interaction", properties: ["team_code": match.homeTeam.code])
-        PostHogSDK.shared.capture("team_interaction", properties: ["team_code": match.awayTeam.code])
+        PostHogSDK.shared.capture("team_interaction", properties: ["team_code": store.match.homeTeam.code])
+        PostHogSDK.shared.capture("team_interaction", properties: ["team_code": store.match.awayTeam.code])
 
         hasLogged = true
     }
@@ -930,18 +931,14 @@ struct MatchView: View {
                 return
             }
 
-            if let game = viewModel.liveGame, game.gameState == .played {
+            if let game = store.liveGame, game.gameState == .played {
                 print("Disabling timer, game has ended")
                 timer.invalidate()
                 return
             }
 
-            Task {
-                do {
-                    try await viewModel.refreshPBP()
-                } catch {
-                    print("PBP refresh error: \(error)")
-                }
+            Task { @MainActor in
+                store.send(.refreshed)
             }
         }
     }

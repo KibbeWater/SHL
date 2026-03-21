@@ -6,6 +6,7 @@
 //
 
 import ActivityKit
+import ComposableArchitecture
 import PostHog
 import SHLCore
 import SHLNetwork
@@ -40,12 +41,16 @@ struct HomeView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.scenePhase) private var scenePhase
 
-    @StateObject private var viewModel: HomeViewModel = .init()
-    
+    let store: StoreOf<HomeFeature>
+
     @State private var sortOrder = [KeyPathComparator(\StandingObj.position)]
-    
+
     @State private var date: Date = .init()
     @State private var center: CGPoint = .zero
+
+    init(store: StoreOf<HomeFeature>) {
+        self.store = store
+    }
     
     func renderFeaturedGame(_ featured: Match) -> some View {
         let content: some View = {
@@ -53,14 +58,14 @@ struct HomeView: View {
                 return AnyView(
                     LargeOverview(
                         game: featured,
-                        liveGame: viewModel.liveGame
+                        liveGame: store.liveGame
                     )
                 )
             } else {
                 return AnyView(
                     MatchOverview(
                         game: featured,
-                        liveGame: viewModel.liveGame
+                        liveGame: store.liveGame
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 12.0))
                 )
@@ -101,7 +106,7 @@ struct HomeView: View {
             return false
         }
 
-        guard let featuredGame = viewModel.featuredGame else {
+        guard let featuredGame = store.featuredGame else {
             return false
         }
 
@@ -120,7 +125,7 @@ struct HomeView: View {
     }
     
     private var upcomingMatches: [Match] {
-        viewModel.latestMatches
+        store.latestMatches
             .filter { !$0.played }
             .sorted(by: { $0.date < $1.date })
     }
@@ -153,7 +158,7 @@ struct HomeView: View {
                 VStack(spacing: 12) {
                     MatchCalendar(
                         matches: Array(upcomingMatches.prefix(5)),
-                        liveMatches: viewModel.calendarLiveMatches
+                        liveMatches: store.calendarLiveMatches
                     )
                 }
                 .padding(.horizontal)
@@ -172,7 +177,7 @@ struct HomeView: View {
                 Spacer()
             }
             
-            if viewModel.standingsDisabled {
+            if store.standingsDisabled {
                 HStack {
                     Text("Standings are temporarily unavailable\nWe apologize for the inconvenience")
                         .font(.callout)
@@ -180,8 +185,8 @@ struct HomeView: View {
                 }
                 .padding(.horizontal)
             } else {
-                if let standings = viewModel.standings {
-                    StandingsTable(title: "Table", items: standings, favoriteTeamId: Settings.shared.getFavoriteTeamId())
+                if !store.standings.isEmpty {
+                    StandingsTable(title: "Table", items: formatStandings(store.standings), favoriteTeamId: Settings.shared.getFavoriteTeamId())
                         .frame(maxWidth: .infinity)
                         .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -195,12 +200,12 @@ struct HomeView: View {
     
     var body: some View {
         ScrollView {
-            if let featured = viewModel.featuredGame {
+            if let featured = store.featuredGame {
                 if UIDevice.current.userInterfaceIdiom == .pad {
                     renderFeaturedGame(featured)
                 } else {
                     if #available(iOS 17.0, *) {
-                        if featured.isLive() || viewModel.liveGame?.gameState == .ongoing || viewModel.liveGame?.gameState == .paused {
+                        if featured.isLive() || store.liveGame?.gameState == .ongoing || store.liveGame?.gameState == .paused {
                             TimelineView(.animation) { _ in
                                 renderFeaturedGame(featured)
                                     .pulseShader(time: getTimeLoop(), center: center, speed: 150.0, amplitude: 0.1, decay: 5.0)
@@ -231,24 +236,21 @@ struct HomeView: View {
             }
             .padding(.top)
         }
-        .onChange(of: viewModel.featuredGame) { _, _ in
-            guard let featured = viewModel.featuredGame else { return }
-            viewModel.selectListenedGame(featured)
+        .onChange(of: store.featuredGame) { _, newFeatured in
+            guard let featured = newFeatured else { return }
+            store.send(.featuredGameSelected(featured))
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
-                Task {
-                    try? await viewModel.refresh(hard: true)
-                }
+                store.send(.refreshed)
             }
         }
         .refreshable {
-            do {
-                try await viewModel.refresh(hard: true)
-            } catch let err {
-                print("HomeView: Error refreshing: ", err)
-            }
-         }
+            store.send(.refreshed)
+        }
+        .onAppear {
+            store.send(.onAppear)
+        }
         .ignoresSafeArea(
             .container,
             edges: UIDevice.current.userInterfaceIdiom == .pad ? .all : .horizontal
@@ -258,9 +260,31 @@ struct HomeView: View {
     func remainingTimeUntil(_ targetDate: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss"
-        
+
         let estimatedEndTimeString = formatter.string(from: targetDate)
         return estimatedEndTimeString
+    }
+
+    private func formatStandings(_ standings: [Standings]) -> [StandingObj] {
+        return standings.map { standing in
+            let gd = standing.goalDifference
+            let diffStr = gd > 0 ? "+\(gd)" : String(gd)
+            return StandingObj(
+                id: standing.id,
+                teamId: standing.team.id,
+                position: standing.rank,
+                team: standing.team.name,
+                teamCode: standing.team.code,
+                gamesPlayed: standing.gamesPlayed,
+                wins: standing.wins,
+                overtimeWins: standing.overtimeWins,
+                losses: standing.losses,
+                overtimeLosses: standing.overtimeLosses,
+                diff: diffStr,
+                points: String(standing.points),
+                teamObj: standing.team
+            )
+        }
     }
 }
 
@@ -272,5 +296,7 @@ extension HomeView {
 }
 
 #Preview {
-    HomeView()
+    HomeView(store: Store(initialState: HomeFeature.State()) {
+        HomeFeature()
+    })
 }
