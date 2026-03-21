@@ -16,6 +16,9 @@ struct Standings: Codable {
     let points: Int
     let goalDifference: Int
     let wins: Int?
+    let overtimeWins: Int?
     let losses: Int?
     let overtimeLosses: Int?
+    let goalsFor: Int?
+    let goalsAgainst: Int?
 }

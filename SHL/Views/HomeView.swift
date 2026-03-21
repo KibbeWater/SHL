@@ -179,7 +179,7 @@ struct HomeView: View {
                 .padding(.horizontal)
             } else {
                 if let standings = viewModel.standings {
-                    StandingsTable(title: "Table", items: standings)
+                    StandingsTable(title: "Table", items: standings, favoriteTeamId: Settings.shared.getFavoriteTeamId())
                         .frame(maxWidth: .infinity)
                         .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 8))

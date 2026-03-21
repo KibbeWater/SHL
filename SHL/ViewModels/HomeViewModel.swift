@@ -188,13 +188,20 @@ class HomeViewModel: ObservableObject {
 
     func formatStandings(_ standings: [Standings]) -> [StandingObj] {
         return standings.map { standing in
-            StandingObj(
+            let gd = standing.goalDifference
+            let diffStr = gd > 0 ? "+\(gd)" : String(gd)
+            return StandingObj(
                 id: standing.id,
+                teamId: standing.team.id,
                 position: standing.rank,
                 team: standing.team.name,
                 teamCode: standing.team.code,
-                matches: String(standing.gamesPlayed),
-                diff: String(standing.goalDifference),
+                gamesPlayed: standing.gamesPlayed,
+                wins: standing.wins,
+                overtimeWins: standing.overtimeWins,
+                losses: standing.losses,
+                overtimeLosses: standing.overtimeLosses,
+                diff: diffStr,
                 points: String(standing.points)
             )
         }
