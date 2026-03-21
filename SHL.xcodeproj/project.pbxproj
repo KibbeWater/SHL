@@ -298,6 +298,7 @@
 		1FD07B0545898EEEBD6E4E3E /* PBPEventData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PBPEventData.swift; sourceTree = "<group>"; };
 		21BEB4FD45A25C9828B5EB90 /* Pulse.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Pulse.metal; sourceTree = "<group>"; };
 		224322F1655A6DDB68C4107E /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
+		2280C3E8CB868CEA2B63082D /* SHL-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SHL-Info.plist"; sourceTree = "<group>"; };
 		22DC4E64A1D92BA3E037DF21 /* WidgetSharedColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSharedColorCache.swift; sourceTree = "<group>"; };
 		24C7B7B25821C628DC15B572 /* LiveMatchListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveMatchListener.swift; sourceTree = "<group>"; };
 		2832C5F3060F68FFCFEF23C4 /* TuistBundle+SHL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+SHL.swift"; sourceTree = "<group>"; };
@@ -408,7 +409,6 @@
 		EEE2225E80FFB3399382BB39 /* MatchListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchListViewModel.swift; sourceTree = "<group>"; };
 		F08142CF69B2896DD2E7A4B0 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		F0D08A2D66FD7BBBF21FA44A /* FavoriteTeamPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteTeamPageView.swift; sourceTree = "<group>"; };
-		F740F681FD6E36FCB019B4A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F7E51C9C03388005E8D1BA3D /* SHLNetwork-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SHLNetwork-Info.plist"; sourceTree = "<group>"; };
 		FA9705F6B70E1B3BE06970FF /* View+Ripple.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Ripple.swift"; sourceTree = "<group>"; };
 		FAA93B8F580A7BC466D7D7BF /* Root.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Root.swift; sourceTree = "<group>"; };
@@ -654,7 +654,6 @@
 				9D83EFE95C67C0A9EDBF2F4E /* Views */,
 				A52444C3280CB4BA803D0AD6 /* AppDelegate.swift */,
 				C613D195083BA5B9553E09F5 /* Assets.xcassets */,
-				F740F681FD6E36FCB019B4A8 /* Info.plist */,
 				2B743C39388EB5BBB9CC28C5 /* Launch Screen.storyboard */,
 				CF1F04CDF8B0998428914941 /* Root_iOS.swift */,
 				2E9094E201EEB2615CDB0A06 /* Root_iPadOS.swift */,
@@ -874,6 +873,7 @@
 		D8527A2B8FC7B6D1C9EAAF7A /* InfoPlists */ = {
 			isa = PBXGroup;
 			children = (
+				2280C3E8CB868CEA2B63082D /* SHL-Info.plist */,
 				432700546F0FD04F62D94978 /* SHLCore-Info.plist */,
 				F7E51C9C03388005E8D1BA3D /* SHLNetwork-Info.plist */,
 				9D681A8DC3EE51FC0DE8C9F5 /* SHLWidget-Info.plist */,
@@ -1359,7 +1359,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/plcrashreporter/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 				);
-				INFOPLIST_FILE = SHL/Info.plist;
+				INFOPLIST_FILE = "Derived/InfoPlists/SHL-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1650,7 +1650,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/plcrashreporter/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 				);
-				INFOPLIST_FILE = SHL/Info.plist;
+				INFOPLIST_FILE = "Derived/InfoPlists/SHL-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

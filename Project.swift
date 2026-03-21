@@ -56,7 +56,18 @@ let project = Project(
             product: .app,
             bundleId: "com.kibbewater.shl",
             deploymentTargets: .iOS("18.6"),
-            infoPlist: .file(path: "SHL/Info.plist"),
+            infoPlist: .extendingDefault(with: [
+                "CFBundleURLTypes": .array([
+                    .dictionary([
+                        "CFBundleTypeRole": .string("Viewer"),
+                        "CFBundleURLName": .string("com.kibbewater.shl"),
+                        "CFBundleURLSchemes": .array([.string("shltracker")]),
+                    ]),
+                ]),
+                "NSUserActivityTypes": .array([.string("IntentIntent")]),
+                "UIBackgroundModes": .array([.string("remote-notification")]),
+                "NSSupportsLiveActivitiesFrequentUpdates": .boolean(true),
+            ]),
             sources: ["SHL/**/*.swift"],
             resources: [
                 "SHL/Assets.xcassets",
