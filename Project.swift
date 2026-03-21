@@ -67,6 +67,7 @@ let project = Project(
                 "NSUserActivityTypes": .array([.string("IntentIntent")]),
                 "UIBackgroundModes": .array([.string("remote-notification")]),
                 "NSSupportsLiveActivitiesFrequentUpdates": .boolean(true),
+                "UILaunchStoryboardName": .string("Launch Screen"),
             ]),
             sources: ["SHL/**/*.swift"],
             resources: [
