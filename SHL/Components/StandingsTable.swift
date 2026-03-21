@@ -20,6 +20,7 @@ struct StandingObj: Identifiable, Equatable {
     public var overtimeLosses: Int?
     public var diff: String
     public var points: String
+    public var teamObj: Team?
 
     var hasRecord: Bool {
         wins != nil && losses != nil && overtimeLosses != nil && overtimeWins != nil
@@ -245,11 +246,26 @@ struct StandingsTable: View {
             // Rows
             LazyVStack(spacing: 0) {
                 ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                    StandingRowView(
-                        standing: item,
-                        isTopThree: item.position <= 3,
-                        isFavorite: item.teamId == favoriteTeamId
-                    )
+                    Group {
+                        if let team = item.teamObj {
+                            NavigationLink {
+                                TeamView(team: team)
+                            } label: {
+                                StandingRowView(
+                                    standing: item,
+                                    isTopThree: item.position <= 3,
+                                    isFavorite: item.teamId == favoriteTeamId
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        } else {
+                            StandingRowView(
+                                standing: item,
+                                isTopThree: item.position <= 3,
+                                isFavorite: item.teamId == favoriteTeamId
+                            )
+                        }
+                    }
 
                     if item.position == playoffCutoff && index < items.count - 1 {
                         PlayoffDivider()

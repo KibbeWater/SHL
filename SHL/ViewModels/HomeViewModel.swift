@@ -202,7 +202,8 @@ class HomeViewModel: ObservableObject {
                 losses: standing.losses,
                 overtimeLosses: standing.overtimeLosses,
                 diff: diffStr,
-                points: String(standing.points)
+                points: String(standing.points),
+                teamObj: standing.team
             )
         }
     }
