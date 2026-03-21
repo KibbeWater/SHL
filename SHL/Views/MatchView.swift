@@ -420,15 +420,21 @@ struct MatchView: View {
             } else {
                 // Future game - show date and time prominently
                 VStack(spacing: 6) {
-                    Text(match.date.formatted(.dateTime.weekday(.wide)))
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.white.opacity(0.7))
-                        .textCase(.uppercase)
+                    if match.isToday {
+                        Text("Today")
+                            .font(.system(size: 28, weight: .heavy, design: .rounded))
+                            .foregroundStyle(.white)
+                    } else {
+                        Text(match.date.formatted(.dateTime.weekday(.wide)))
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.white.opacity(0.7))
+                            .textCase(.uppercase)
 
-                    Text(match.date.formatted(.dateTime.month(.abbreviated).day()))
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
+                        Text(match.formatDate())
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                    }
 
                     Text(match.date.formatted(date: .omitted, time: .shortened))
                         .font(.title3)
@@ -590,7 +596,7 @@ struct MatchView: View {
                             Text("Date & Time")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                            Text(match.date.formatted(.dateTime.weekday(.wide).month(.wide).day().hour().minute()))
+                            Text("\(match.formatDate()), \(match.formatTime())")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
                         }

@@ -73,7 +73,23 @@ extension Player {
 }
 
 extension Match {
+    var isToday: Bool {
+        Calendar.current.isDateInToday(date)
+    }
+
     func formatDate() -> String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) {
+            return String(localized: "Today")
+        } else if calendar.isDateInTomorrow(date) {
+            return String(localized: "Tomorrow")
+        } else if let daysUntil = calendar.dateComponents([.day], from: calendar.startOfDay(for: .now), to: calendar.startOfDay(for: date)).day,
+                  daysUntil > 0 && daysUntil < 7 {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "EEEE"
+            formatter.locale = Locale.current
+            return formatter.string(from: date)
+        }
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM dd"
         dateFormatter.locale = Locale.current

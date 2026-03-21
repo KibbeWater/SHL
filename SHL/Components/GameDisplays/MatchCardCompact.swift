@@ -96,8 +96,8 @@ struct MatchCardCompact: View {
             VStack(spacing: 0) {
                 Text(game.formatDate())
                     .font(.caption)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
+                    .fontWeight(game.isToday ? .bold : .semibold)
+                    .foregroundStyle(game.isToday ? .primary : .secondary)
                 Text(game.formatTime())
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
