@@ -29,8 +29,10 @@ struct MatchCardCompact: View {
         return game.isLive()
     }
 
+    private var isCancelled: Bool { game.isCancelled }
+
     private var isUpcoming: Bool {
-        !game.played && !isLive
+        !game.concluded && !isLive
     }
 
     init(game: Match, liveGame: LiveMatch? = nil) {
@@ -70,12 +72,23 @@ struct MatchCardCompact: View {
         .padding(.vertical, 8)
         .background(compactBackground)
         .clipShape(RoundedRectangle(cornerRadius: 8))
+        .saturation(isCancelled ? 0 : 1)
+        .opacity(isCancelled ? 0.65 : 1)
         .onAppear(perform: loadTeamColors)
     }
 
     @ViewBuilder
     private var centerContent: some View {
-        if isLive {
+        if isCancelled {
+            VStack(spacing: 2) {
+                Text("—")
+                    .font(.callout).fontWeight(.bold)
+                    .foregroundStyle(.tertiary)
+                Text("Cancelled")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        } else if isLive {
             VStack(spacing: 2) {
                 HStack(spacing: 4) {
                     Circle()

@@ -57,6 +57,11 @@ class FeaturedGameAlgo {
 
         // Now score the matches
         let scoredMatches = matches.map { game -> (Match, Double) in
+            // Cancelled matches are never featured
+            if game.isCancelled {
+                return (game, -1)
+            }
+
             var score: Double = 0
 
             // Live games get the highest base score
@@ -85,7 +90,7 @@ class FeaturedGameAlgo {
             }
 
             // Upcoming games score
-            if !game.played {
+            if !game.concluded {
                 let timeUntilGame = game.date.timeIntervalSinceNow
                 if timeUntilGame > 0 {
                     score += max(100 - log10(timeUntilGame / 3600) * 20, 0)

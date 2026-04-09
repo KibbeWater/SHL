@@ -29,8 +29,10 @@ struct MatchOverview: View {
         return game.isLive()
     }
 
+    private var isCancelled: Bool { game.isCancelled }
+
     private var isUpcoming: Bool {
-        !game.played && !isLive
+        !game.concluded && !isLive
     }
 
     init(game: Match, liveGame: LiveMatch? = nil) {
@@ -39,7 +41,7 @@ struct MatchOverview: View {
     }
 
     private var showStatusBar: Bool {
-        isLive || isUpcoming
+        isLive || isUpcoming || isCancelled
     }
 
     var body: some View {
@@ -80,7 +82,7 @@ struct MatchOverview: View {
                 .strokeBorder(.white.opacity(0.1), lineWidth: 1)
         )
         .overlay(alignment: .top) {
-            if let resultText = gameResultText, !isLive && !isUpcoming {
+            if let resultText = gameResultText, !isLive && !isUpcoming && !isCancelled {
                 Text(resultText)
                     .font(.caption2)
                     .fontWeight(.medium)
@@ -88,6 +90,8 @@ struct MatchOverview: View {
                     .padding(.top, 6)
             }
         }
+        .saturation(isCancelled ? 0 : 1)
+        .opacity(isCancelled ? 0.65 : 1)
         .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
         .onAppear(perform: loadTeamColors)
     }
@@ -133,6 +137,17 @@ struct MatchOverview: View {
                     Text(game.formatTime())
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                }
+            } else if isCancelled {
+                HStack(spacing: 6) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text("CANCELLED")
+                        .font(.caption)
+                        .fontWeight(.heavy)
+                        .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
                 }
             }
 
@@ -184,7 +199,12 @@ struct MatchOverview: View {
 
     @ViewBuilder
     private var centerDivider: some View {
-        if isUpcoming {
+        if isCancelled {
+            Text("—")
+                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .foregroundStyle(.tertiary)
+                .frame(width: 90)
+        } else if isUpcoming {
             Text("VS")
                 .font(.system(size: 22, weight: .semibold, design: .rounded))
                 .foregroundStyle(.secondary)
@@ -205,7 +225,7 @@ struct MatchOverview: View {
             return "P\(live.period) \(live.periodTime)"
         case .paused:
             return "P\(live.period) Break"
-        default:
+        case .scheduled, .played, .cancelled:
             return ""
         }
     }
@@ -277,6 +297,23 @@ struct MatchOverview: View {
         overtime: nil,
         shootout: nil,
         externalUUID: "preview"
+    ))
+    .padding(.horizontal)
+}
+
+#Preview("Cancelled") {
+    MatchOverview(game: Match(
+        id: "preview-cancelled",
+        date: Date().addingTimeInterval(-3600),
+        venue: "Be-Ge Hockey Center",
+        homeTeam: TeamBasic(id: "team-1", name: "IK Oskarshamn", code: "IKO"),
+        awayTeam: TeamBasic(id: "team-2", name: "Frölunda HC", code: "FHC"),
+        homeScore: 0,
+        awayScore: 0,
+        state: .cancelled,
+        overtime: nil,
+        shootout: nil,
+        externalUUID: "preview-cancelled"
     ))
     .padding(.horizontal)
 }

@@ -59,7 +59,7 @@ class MatchListViewModel: ObservableObject {
         for match in todayMatches {
             do {
                 let live = try await api.getLiveMatch(id: match.externalUUID)
-                if live.gameState == .played {
+                if live.gameState == .played || live.gameState == .cancelled {
                     matchListeners.removeValue(forKey: live.externalId)
                 } else {
                     matchListeners[live.externalId] = live
@@ -117,7 +117,7 @@ class MatchListViewModel: ObservableObject {
             cancellable.cancel()
         }
 
-        cancellable = liveListener.subscribe(todayMatches.map { $0.externalUUID }) { [weak self] gameUuid in
+        cancellable = liveListener.subscribe(todayMatches.filter { !$0.isCancelled }.map { $0.externalUUID }) { [weak self] gameUuid in
             guard let self = self else { return nil }
             guard let match = self.todayMatches.first(where: { $0.externalUUID == gameUuid }) else { return nil }
 
@@ -126,7 +126,7 @@ class MatchListViewModel: ObservableObject {
         }
         .receive(on: DispatchQueue.main)
         .sink { [weak self] liveMatch in
-            if liveMatch.gameState == .played {
+            if liveMatch.gameState == .played || liveMatch.gameState == .cancelled {
                 self?.matchListeners.removeValue(forKey: liveMatch.externalId)
             } else {
                 self?.matchListeners[liveMatch.externalId] = liveMatch

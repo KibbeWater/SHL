@@ -60,6 +60,8 @@ struct MatchView: View {
         match.isLive()
     }
 
+    private var isCancelled: Bool { currentMatch.isCancelled }
+
     private var hasStarted: Bool {
         match.date < Date.now
     }
@@ -74,7 +76,7 @@ struct MatchView: View {
                 VStack(spacing: 24) {
                     headerSection
 
-                    if hasStarted || isLive {
+                    if (hasStarted || isLive) && !isCancelled {
                         tabPicker
                     }
 
@@ -188,8 +190,10 @@ struct MatchView: View {
 
     private var standardHeaderSection: some View {
         Group {
-            // Status badge above score (for live/final states)
-            if let liveGame = viewModel.liveGame {
+            // Status badge above score (for live/final/cancelled states)
+            if isCancelled {
+                cancelledBadge
+            } else if let liveGame = viewModel.liveGame {
                 gameStatusBadge(liveGame)
             } else if match.played {
                 finalBadge
@@ -223,8 +227,8 @@ struct MatchView: View {
                 countdownBadge
             }
 
-            // Venue
-            venueLabel
+            // Date & venue
+            headerMetadata
         }
     }
 
@@ -262,8 +266,8 @@ struct MatchView: View {
             }
             .padding(.horizontal, 24)
 
-            // Venue
-            venueLabel
+            // Date & venue
+            headerMetadata
         }
     }
 
@@ -404,7 +408,16 @@ struct MatchView: View {
 
     private var scoreCenterView: some View {
         VStack(spacing: 4) {
-            if hasStarted {
+            if isCancelled {
+                VStack(spacing: 4) {
+                    Text("—")
+                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.7))
+                    Text("Not played")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+            } else if hasStarted {
                 HStack(spacing: 12) {
                     Text("\(homeScore)")
                         .foregroundStyle(homeScore >= awayScore ? .white : .white.opacity(0.5))
@@ -470,8 +483,12 @@ struct MatchView: View {
             return "LIVE • P\(liveGame.period)"
         case .paused:
             return "BREAK"
-        default:
+        case .played:
             return "FINAL"
+        case .cancelled:
+            return "CANCELLED"
+        case .scheduled:
+            return "SOON"
         }
     }
 
@@ -516,12 +533,63 @@ struct MatchView: View {
             .clipShape(Capsule())
     }
 
+    private var cancelledBadge: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "xmark.circle.fill")
+                .font(.caption)
+            Text("CANCELLED")
+                .font(.caption)
+                .fontWeight(.bold)
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(.ultraThinMaterial)
+        .clipShape(Capsule())
+    }
+
+    private var cancelledNoticeCard: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "xmark.circle.fill")
+                .font(.system(size: 40))
+                .foregroundStyle(.secondary)
+            Text("Match Cancelled")
+                .font(.headline)
+            Text("This game was cancelled and will not be played.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 32)
+        .padding(.horizontal)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var dateLabel: some View {
+        Label {
+            Text("\(match.formatDate()) • \(match.formatTime())")
+        } icon: {
+            Image(systemName: "calendar")
+        }
+        .font(.subheadline)
+        .foregroundStyle(.white.opacity(0.7))
+    }
+
     @ViewBuilder
     private var venueLabel: some View {
         if let venue = match.venue {
             Label(venue, systemImage: "mappin.circle.fill")
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.7))
+        }
+    }
+
+    private var headerMetadata: some View {
+        VStack(spacing: 4) {
+            dateLabel
+            venueLabel
         }
     }
 
@@ -553,17 +621,21 @@ struct MatchView: View {
 
     private var summaryContent: some View {
         VStack(spacing: 16) {
-            if isLive || (!match.played && hasStarted) {
-                liveActivityCard
-            }
+            if isCancelled {
+                cancelledNoticeCard
+            } else {
+                if isLive || (!match.concluded && hasStarted) {
+                    liveActivityCard
+                }
 
-            if hasStarted {
-                statsCard
-            }
+                if hasStarted {
+                    statsCard
+                }
 
-            // Future game content
-            if !hasStarted {
-                upcomingGameInfoCard
+                // Future game content
+                if !hasStarted {
+                    upcomingGameInfoCard
+                }
             }
 
             if match.venue != nil {
@@ -918,6 +990,7 @@ struct MatchView: View {
     }
 
     func startTimer() {
+        if isCancelled { return }
         print("Starting PBP update timer")
         pbpUpdateTimer?.invalidate()
         pbpUpdateTimer = Timer.scheduledTimer(withTimeInterval: 20.0, repeats: true) { timer in
@@ -927,8 +1000,8 @@ struct MatchView: View {
                 return
             }
 
-            if let game = viewModel.liveGame, game.gameState == .played {
-                print("Disabling timer, game has ended")
+            if let game = viewModel.liveGame, game.gameState == .played || game.gameState == .cancelled {
+                print("Disabling timer, game concluded")
                 timer.invalidate()
                 return
             }
@@ -952,6 +1025,25 @@ struct MatchView: View {
 
 #Preview("Upcoming") {
     MatchView(Match.fakeData(), referrer: "PREVIEW")
+}
+
+#Preview("Cancelled") {
+    MatchView(
+        Match(
+            id: "cancelled-preview",
+            date: Date().addingTimeInterval(-3600),
+            venue: "Be-Ge Hockey Center",
+            homeTeam: TeamBasic(id: "team-1", name: "IK Oskarshamn", code: "IKO"),
+            awayTeam: TeamBasic(id: "team-2", name: "Frölunda HC", code: "FHC"),
+            homeScore: 0,
+            awayScore: 0,
+            state: .cancelled,
+            overtime: false,
+            shootout: false,
+            externalUUID: ""
+        ),
+        referrer: "PREVIEW"
+    )
 }
 
 #Preview("Live") {

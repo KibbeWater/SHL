@@ -53,6 +53,7 @@ public struct LiveGameUpdate: Codable, Sendable, Equatable {
         case periodBreak = "PeriodBreak"
         case overtime = "Overtime"
         case gameEnded = "GameEnded"
+        case cancelled = "Cancelled"
 
         /// Maps to Match.State for consistency
         public var matchState: String {
@@ -65,6 +66,8 @@ public struct LiveGameUpdate: Codable, Sendable, Equatable {
                 return "paused"
             case .gameEnded:
                 return "played"
+            case .cancelled:
+                return "cancelled"
             }
         }
     }

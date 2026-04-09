@@ -46,6 +46,7 @@ public struct SHLWidgetAttributes: ActivityAttributes {
         case overtime = "Overtime"
         case ended = "GameEnded"
         case intermission = "Intermission"
+        case cancelled = "Cancelled"
     }
 
     public struct ActivityTeam: Codable {

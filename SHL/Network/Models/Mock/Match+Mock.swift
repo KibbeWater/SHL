@@ -30,6 +30,30 @@ extension Match {
             shootout: false, externalUUID: ""
         )
     }
+
+    static func cancelledFakeData() -> Match {
+        Match(
+            id: "cancelled-mock",
+            date: Date().addingTimeInterval(-3600),
+            venue: "Be-Ge Hockey Center",
+            homeTeam: TeamBasic(
+                id: "team-1",
+                name: "IK Oskarshamn",
+                code: "IKO"
+            ),
+            awayTeam: TeamBasic(
+                id: "team-2",
+                name: "Frölunda HC",
+                code: "FHC"
+            ),
+            homeScore: 0,
+            awayScore: 0,
+            state: .cancelled,
+            overtime: false,
+            shootout: false,
+            externalUUID: "cancelled-mock-ext"
+        )
+    }
 }
 
 extension Team {

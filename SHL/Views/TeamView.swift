@@ -29,11 +29,11 @@ struct TeamView: View {
     // MARK: - Computed Properties
 
     private var upcomingGames: [Match] {
-        viewModel.history.filter { !$0.played }.reversed()
+        viewModel.history.filter { !$0.concluded }.reversed()
     }
 
     private var playedGames: [Match] {
-        viewModel.history.filter { $0.played }
+        viewModel.history.filter { $0.concluded }
     }
 
     private var teamRank: Int? {

@@ -202,8 +202,26 @@ public class ActivityUpdater {
         )
     }
 
+    private func mapActivityState(_ matchState: MatchState) -> SHLWidgetAttributes.ActivityState {
+        switch matchState {
+        case .scheduled: return .starting
+        case .ongoing:   return .ongoing
+        case .paused:    return .onbreak
+        case .played:    return .ended
+        case .cancelled: return .cancelled
+        }
+    }
+
     func OverviewToState(_ liveMatch: LiveMatch) -> SHLWidgetAttributes.ContentState {
-        return SHLWidgetAttributes.ContentState(homeScore: liveMatch.homeScore, awayScore: liveMatch.awayScore, period: .init(period: liveMatch.period, periodEnd: liveMatch.periodEnd.ISO8601Format(), state: .intermission))
+        return SHLWidgetAttributes.ContentState(
+            homeScore: liveMatch.homeScore,
+            awayScore: liveMatch.awayScore,
+            period: .init(
+                period: liveMatch.period,
+                periodEnd: liveMatch.periodEnd.ISO8601Format(),
+                state: mapActivityState(liveMatch.gameState)
+            )
+        )
     }
 
     @available(iOS 16.2, *)

@@ -41,7 +41,9 @@ struct GameTime: View {
                 Text("Cancelled")
             }
         } else if let match = game {
-            if match.date < Date.now && match.state == .played {
+            if match.isCancelled {
+                Text("Cancelled")
+            } else if match.date < Date.now && match.state == .played {
                 Text((match.shootout ?? false) ? "OT" : (match.overtime ?? false) ? "OT" : "Full-Time")
             } else {
                 let isToday = Calendar.current.isDate(match.date, inSameDayAs: Date())

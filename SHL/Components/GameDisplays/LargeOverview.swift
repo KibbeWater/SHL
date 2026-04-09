@@ -62,8 +62,15 @@ struct LargeOverview: View {
                 return Text("Cancelled")
             }
         } else {
-            return Text((game.shootout ?? false) ? "Shootout" : (game.overtime ?? false) ? "Overtime" : game.played ? "Full-Time" : isToday() ? game.formatTime() : game.formatDate())
-                .fontWeight(.medium)
+            return Text(
+                game.isCancelled ? "Cancelled" :
+                (game.shootout ?? false) ? "Shootout" :
+                (game.overtime ?? false) ? "Overtime" :
+                game.played ? "Full-Time" :
+                isToday() ? game.formatTime() :
+                game.formatDate()
+            )
+            .fontWeight(.medium)
         }
     }
     
@@ -72,13 +79,14 @@ struct LargeOverview: View {
             HStack {
                 HStack(spacing: 34) {
                     TeamLogoView(teamCode: game.homeTeam.code, size: .custom(128))
-                    Text(String(liveGame?.homeScore ?? game.homeScore))
+                    Text(game.isCancelled && liveGame == nil ? "—" : String(liveGame?.homeScore ?? game.homeScore))
                         .font(.system(size: 100))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
                         .foregroundStyle(
                             isHomeLeading() ? .white : .white.opacity(0.5)
                         )
+                        .opacity(game.isCancelled && liveGame == nil ? 0.4 : 1)
                         .padding(.bottom, -2)
                 }
                 Spacer()
@@ -89,13 +97,14 @@ struct LargeOverview: View {
                 }
                 Spacer()
                 HStack(spacing: 34) {
-                    Text(String(liveGame?.awayScore ?? game.awayScore))
+                    Text(game.isCancelled && liveGame == nil ? "—" : String(liveGame?.awayScore ?? game.awayScore))
                         .font(.system(size: 100))
                         .fontWidth(.compressed)
                         .fontWeight(.bold)
                         .foregroundStyle(
                             !isHomeLeading() ? .white : .white.opacity(0.5)
                         )
+                        .opacity(game.isCancelled && liveGame == nil ? 0.4 : 1)
                         .padding(.bottom, -2)
                     TeamLogoView(teamCode: game.awayTeam.code, size: .custom(128))
                 }

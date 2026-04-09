@@ -52,7 +52,7 @@ class HomeViewModel: ObservableObject {
     private func fetchInitialLiveData(for game: Match) async {
         do {
             let live = try await api.getLiveMatch(id: game.externalUUID)
-            if live.gameState == .played {
+            if live.gameState == .played || live.gameState == .cancelled {
                 self.liveGame = nil
             } else {
                 self.liveGame = live
@@ -94,7 +94,7 @@ class HomeViewModel: ObservableObject {
         }
         .receive(on: DispatchQueue.main)
         .sink { [weak self] liveMatch in
-            if liveMatch.gameState == .played {
+            if liveMatch.gameState == .played || liveMatch.gameState == .cancelled {
                 self?.liveGame = nil
             } else {
                 self?.liveGame = liveMatch
@@ -106,7 +106,7 @@ class HomeViewModel: ObservableObject {
         calendarCancellable?.cancel()
 
         let calendarMatchIds = latestMatches
-            .filter { !$0.played && Calendar.current.isDateInToday($0.date) }
+            .filter { !$0.concluded && Calendar.current.isDateInToday($0.date) }
             .map { $0.externalUUID }
 
         guard !calendarMatchIds.isEmpty else { return }
@@ -118,7 +118,7 @@ class HomeViewModel: ObservableObject {
         }
         .receive(on: DispatchQueue.main)
         .sink { [weak self] liveMatch in
-            if liveMatch.gameState == .played {
+            if liveMatch.gameState == .played || liveMatch.gameState == .cancelled {
                 self?.calendarLiveMatches.removeValue(forKey: liveMatch.externalId)
             } else {
                 self?.calendarLiveMatches[liveMatch.externalId] = liveMatch
@@ -128,12 +128,12 @@ class HomeViewModel: ObservableObject {
 
     private func fetchInitialCalendarData() async {
         let calendarMatches = latestMatches
-            .filter { !$0.played && Calendar.current.isDateInToday($0.date) }
+            .filter { !$0.concluded && Calendar.current.isDateInToday($0.date) }
 
         for match in calendarMatches {
             do {
                 let live = try await api.getLiveMatch(id: match.externalUUID)
-                if live.gameState == .played {
+                if live.gameState == .played || live.gameState == .cancelled {
                     calendarLiveMatches.removeValue(forKey: live.externalId)
                 } else {
                     calendarLiveMatches[live.externalId] = live

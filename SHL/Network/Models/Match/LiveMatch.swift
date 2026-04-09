@@ -50,6 +50,8 @@ extension LiveMatch {
             gameState = .paused
         case .gameEnded:
             gameState = .played
+        case .cancelled:
+            gameState = .cancelled
         }
 
         return LiveMatch(

@@ -12,7 +12,7 @@ struct MatchCalendar: View {
     var liveMatches: [String: LiveMatch] = [:]
 
     var body: some View {
-        ForEach(matches.filter({!$0.played})) { match in
+        ForEach(matches.filter({!$0.concluded})) { match in
             NavigationLink {
                 MatchView(match, referrer: "calendar")
             } label: {

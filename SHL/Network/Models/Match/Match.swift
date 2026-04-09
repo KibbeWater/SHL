@@ -24,6 +24,16 @@ struct Match: Codable, Identifiable, Equatable {
         state == .played
     }
 
+    /// True when the match will not progress further (final or cancelled).
+    /// Use this for "still upcoming?" filters; do NOT use for "should we show a score?".
+    var concluded: Bool {
+        state == .played || state == .cancelled
+    }
+
+    var isCancelled: Bool {
+        state == .cancelled
+    }
+
     func isLive() -> Bool {
         state == .ongoing
     }

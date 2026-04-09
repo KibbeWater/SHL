@@ -72,9 +72,15 @@ private struct StatusBadge: View {
                 Text("SOON")
                     .font(.caption2)
                     .fontWeight(.bold)
+            case .cancelled:
+                Image(systemName: "xmark.circle.fill")
+                    .font(.caption2)
+                Text("CANCELLED")
+                    .font(.caption2)
+                    .fontWeight(.bold)
             }
 
-            if state != .ended {
+            if state != .ended && state != .cancelled {
                 Text("P\(period)")
                     .font(.caption2)
                     .fontWeight(.medium)
@@ -211,10 +217,11 @@ private struct LockScreenView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 36, height: 36)
 
-                if gameState == .intermission {
+                if gameState == .intermission || gameState == .cancelled {
                     Text(homeCode)
                         .font(.system(size: 18, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
+                        .opacity(gameState == .cancelled ? 0.7 : 1)
                 } else {
                     Text("\(homeScore)")
                         .font(.system(size: 40, weight: .bold, design: .rounded))
@@ -243,6 +250,13 @@ private struct LockScreenView: View {
                     Text("Game Ended")
                         .font(.system(size: 9, weight: .medium))
                         .foregroundStyle(.white.opacity(0.4))
+                } else if gameState == .cancelled {
+                    Text("CANCELLED")
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.8))
+                    Text("Not played")
+                        .font(.system(size: 9, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.4))
                 } else {
                     HStack(spacing: 4) {
                         if isLive {
@@ -269,10 +283,11 @@ private struct LockScreenView: View {
 
             // Away team
             HStack(spacing: 10) {
-                if gameState == .intermission {
+                if gameState == .intermission || gameState == .cancelled {
                     Text(awayCode)
                         .font(.system(size: 18, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
+                        .opacity(gameState == .cancelled ? 0.7 : 1)
                 } else {
                     Text("\(awayScore)")
                         .font(.system(size: 40, weight: .bold, design: .rounded))
@@ -308,6 +323,8 @@ private struct LockScreenView: View {
             return "FINAL"
         case .starting:
             return "SOON"
+        case .cancelled:
+            return "CANCELLED"
         }
     }
 }
@@ -359,6 +376,11 @@ private struct TimerDisplay: View {
             Text("SOON")
                 .font(.system(fontSize == .largeTitle ? .title2 : .headline))
                 .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+        case .cancelled:
+            Text("CANCELLED")
+                .font(.system(fontSize == .largeTitle ? .title2 : .headline))
+                .fontWeight(.bold)
                 .foregroundStyle(.secondary)
         }
     }
@@ -446,10 +468,19 @@ private struct ExpandedCenterView: View {
                     Text("0:00")
                         .font(.title)
                         .fontWeight(.semibold)
+                case .cancelled:
+                    Text("Cancelled")
+                        .font(.title)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.secondary)
                 }
             }
             if context.state.period.state == .onbreak {
                 Label("Pause", systemImage: "clock")
+                    .foregroundColor(.secondary)
+                    .font(.subheadline)
+            } else if context.state.period.state == .cancelled {
+                Label("Not played", systemImage: "xmark.circle")
                     .foregroundColor(.secondary)
                     .font(.subheadline)
             } else {
@@ -584,6 +615,18 @@ extension SHLWidgetAttributes {
             )
         )
     }
+
+    fileprivate static var previewStateCancelled: SHLWidgetAttributes.ContentState {
+        SHLWidgetAttributes.ContentState(
+            homeScore: 0,
+            awayScore: 0,
+            period: SHLWidgetAttributes.ActivityPeriod(
+                period: 1,
+                periodEnd: "",
+                state: .cancelled
+            )
+        )
+    }
 }
 
 #Preview("Lock Screen - Live", as: .content, using: SHLWidgetAttributes.preview) {
@@ -608,6 +651,12 @@ extension SHLWidgetAttributes {
     SHLWidgetLiveActivity()
 } contentStates: {
     SHLWidgetAttributes.previewStateEnded
+}
+
+#Preview("Lock Screen - Cancelled", as: .content, using: SHLWidgetAttributes.preview) {
+    SHLWidgetLiveActivity()
+} contentStates: {
+    SHLWidgetAttributes.previewStateCancelled
 }
 
 #Preview("Minimal - Leading", as: .dynamicIsland(.minimal), using: SHLWidgetAttributes.preview) {
@@ -644,4 +693,10 @@ extension SHLWidgetAttributes {
     SHLWidgetLiveActivity()
 } contentStates: {
     SHLWidgetAttributes.previewStateEnded
+}
+
+#Preview("Expanded - Cancelled", as: .dynamicIsland(.expanded), using: SHLWidgetAttributes.preview) {
+    SHLWidgetLiveActivity()
+} contentStates: {
+    SHLWidgetAttributes.previewStateCancelled
 }

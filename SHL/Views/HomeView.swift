@@ -119,7 +119,7 @@ struct HomeView: View {
     
     private var upcomingMatches: [Match] {
         viewModel.latestMatches
-            .filter { !$0.played }
+            .filter { !$0.concluded }
             .sorted(by: { $0.date < $1.date })
     }
 
