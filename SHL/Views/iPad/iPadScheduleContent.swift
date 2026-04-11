@@ -35,13 +35,26 @@ struct iPadScheduleContent: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Picker("Schedule", selection: $selectedTab) {
-                ForEach(ScheduleTab.allCases, id: \.self) { tab in
-                    Text(tab.rawValue).tag(tab)
+            // Tab picker with match count
+            HStack {
+                Picker("Schedule", selection: $selectedTab) {
+                    ForEach(ScheduleTab.allCases, id: \.self) { tab in
+                        Text(tab.rawValue).tag(tab)
+                    }
                 }
+                .pickerStyle(.segmented)
+                .frame(maxWidth: 360)
+
+                Spacer()
+
+                Text("\(currentMatches.count) matches")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
-            .pickerStyle(.segmented)
-            .padding()
+            .padding(.horizontal)
+            .padding(.vertical, 12)
+
+            Divider().opacity(0.3)
 
             if currentMatches.isEmpty {
                 ContentUnavailableView(
@@ -51,10 +64,10 @@ struct iPadScheduleContent: View {
                 )
             } else {
                 List {
-                    let grouped = currentMatches.groupedByDate
-                    ForEach(grouped.keys.sorted(), id: \.self) { dateKey in
-                        Section(header: Text(dateKey)) {
-                            ForEach(grouped[dateKey]!, id: \.id) { match in
+                    let grouped = groupMatchesByDate(currentMatches)
+                    ForEach(grouped, id: \.date) { group in
+                        Section(header: Text(group.label)) {
+                            ForEach(group.matches, id: \.id) { match in
                                 Button {
                                     onSelectMatch(match)
                                 } label: {
@@ -92,6 +105,32 @@ struct iPadScheduleContent: View {
         }
     }
 
+    // MARK: - Grouping
+
+    private struct MatchGroup {
+        let date: Date
+        let label: String
+        let matches: [Match]
+    }
+
+    private func groupMatchesByDate(_ matches: [Match]) -> [MatchGroup] {
+        let calendar = Calendar.current
+        let formatter = DateFormatter()
+
+        var groups: [Date: [Match]] = [:]
+        for match in matches {
+            let day = calendar.startOfDay(for: match.date)
+            groups[day, default: []].append(match)
+        }
+
+        return groups.keys.sorted().map { day in
+            let matches = groups[day]!
+            let sameYear = calendar.isDate(day, equalTo: Date.now, toGranularity: .year)
+            formatter.dateFormat = sameYear ? "EEEE, d MMM" : "EEEE, d MMM yyyy"
+            return MatchGroup(date: day, label: formatter.string(from: day), matches: matches)
+        }
+    }
+
     // MARK: - Empty State
 
     private var emptyTitle: String {
@@ -116,23 +155,5 @@ struct iPadScheduleContent: View {
         case .today: return "There are no games scheduled for today. Check the upcoming tab for future matches."
         case .upcoming: return "No upcoming games scheduled at the moment. Pull to refresh for updates."
         }
-    }
-}
-
-// MARK: - Match Grouping Helper
-
-private extension Array where Element == Match {
-    var groupedByDate: [String: [Match]] {
-        let formatter = DateFormatter()
-        formatter.dateFormat = Calendar.current.isDate(Date.now, equalTo: first?.date ?? Date.now, toGranularity: .year)
-            ? "EEEE, d MMM"
-            : "EEEE, d MMM yyyy"
-
-        var groups: [String: [Match]] = [:]
-        for match in self {
-            let key = formatter.string(from: match.date)
-            groups[key, default: []].append(match)
-        }
-        return groups
     }
 }

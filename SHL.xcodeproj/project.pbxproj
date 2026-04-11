@@ -13,6 +13,7 @@
 		800119F72F8A567B0017E45B /* iPadScheduleContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119F62F8A567B0017E45B /* iPadScheduleContent.swift */; };
 		800119F92F8A567E0017E45B /* iPadStandingsContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119F82F8A567E0017E45B /* iPadStandingsContent.swift */; };
 		800119FB2F8A56890017E45B /* iPadTeamContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119FA2F8A56890017E45B /* iPadTeamContent.swift */; };
+		800119FD2F8A59030017E45B /* iPadFeaturedGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119FC2F8A59030017E45B /* iPadFeaturedGame.swift */; };
 		8008FC7E2C9DCC4E00B23669 /* ReminderContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8008FC7D2C9DCC4E00B23669 /* ReminderContext.swift */; };
 		800F320E2C00D1300069E436 /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F320D2C00D1300069E436 /* Sequence.swift */; };
 		801A95EE2EBF7F5300530970 /* TeamLogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 801A95ED2EBF7F5300530970 /* TeamLogoView.swift */; };
@@ -199,6 +200,7 @@
 		800119F62F8A567B0017E45B /* iPadScheduleContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadScheduleContent.swift; sourceTree = "<group>"; };
 		800119F82F8A567E0017E45B /* iPadStandingsContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadStandingsContent.swift; sourceTree = "<group>"; };
 		800119FA2F8A56890017E45B /* iPadTeamContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadTeamContent.swift; sourceTree = "<group>"; };
+		800119FC2F8A59030017E45B /* iPadFeaturedGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadFeaturedGame.swift; sourceTree = "<group>"; };
 		8008FC7D2C9DCC4E00B23669 /* ReminderContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderContext.swift; sourceTree = "<group>"; };
 		800F320D2C00D1300069E436 /* Sequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequence.swift; sourceTree = "<group>"; };
 		801A95ED2EBF7F5300530970 /* TeamLogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamLogoView.swift; sourceTree = "<group>"; };
@@ -697,6 +699,7 @@
 				806DFACB2EE35C4600065FD2 /* MatchCardCompact.swift */,
 				BC8C15102BAC787B0010AB59 /* MatchOverview.swift */,
 				8075FBB72CA6A1AE004C6438 /* LargeOverview.swift */,
+				800119FC2F8A59030017E45B /* iPadFeaturedGame.swift */,
 			);
 			path = GameDisplays;
 			sourceTree = "<group>";
@@ -1029,6 +1032,7 @@
 				806DFA332EE239FE00065FD2 /* FavoriteTeamPageView.swift in Sources */,
 				806DFA342EE239FE00065FD2 /* TeamSelectionPageView.swift in Sources */,
 				806DFA352EE239FE00065FD2 /* WelcomePageView.swift in Sources */,
+				800119FD2F8A59030017E45B /* iPadFeaturedGame.swift in Sources */,
 				806DFA362EE239FE00065FD2 /* OnlineFeaturesPageView.swift in Sources */,
 				806DBE1D2EA401FA00E07695 /* SHLAPIError.swift in Sources */,
 				800119F52F8A56710017E45B /* iPadHomeContent.swift in Sources */,

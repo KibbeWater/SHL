@@ -132,14 +132,17 @@ struct iPadRoot: View {
     @ViewBuilder
     private var detailColumn: some View {
         if let route = detailRoute {
-            switch route {
-            case .match(let match):
-                MatchView(match, referrer: "ipad_detail")
-            case .team(let team):
-                TeamView(team: team)
-            case .player(let player):
-                PlayerView(player, teamColor: $detailTeamColor)
+            Group {
+                switch route {
+                case .match(let match):
+                    MatchView(match, referrer: "ipad_detail")
+                case .team(let team):
+                    TeamView(team: team)
+                case .player(let player):
+                    PlayerView(player, teamColor: $detailTeamColor)
+                }
             }
+            .id(route)
         } else {
             ContentUnavailableView(
                 "No Selection",

@@ -19,103 +19,28 @@ struct iPadHomeContent: View {
             .sorted(by: { $0.date < $1.date })
     }
 
-    private var columns: [GridItem] {
-        sizeClass == .regular
-            ? [GridItem(.flexible()), GridItem(.flexible())]
-            : [GridItem(.flexible())]
+    private var recentResults: [Match] {
+        viewModel.latestMatches
+            .filter { $0.concluded }
+            .sorted(by: { $0.date > $1.date })
     }
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
-                // Featured game
-                if let featured = viewModel.featuredGame {
-                    Button {
-                        onSelectMatch(featured)
-                    } label: {
-                        LargeOverview(
-                            game: featured,
-                            liveGame: viewModel.liveGame
-                        )
-                    }
-                    .buttonStyle(.plain)
-                } else {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(.ultraThinMaterial)
-                        .frame(height: 96)
-                        .padding(.horizontal)
-                }
+            VStack(spacing: 20) {
+                // Featured game card
+                featuredGameSection
+                    .padding(.horizontal)
 
-                // Adaptive grid: calendar + standings
-                LazyVGrid(columns: columns, spacing: 20) {
-                    // Match Calendar
-                    VStack(spacing: 8) {
-                        HStack {
-                            Text("Match Calendar")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                            Spacer()
-                        }
-
-                        if upcomingMatches.isEmpty {
-                            VStack(spacing: 8) {
-                                Image(systemName: "calendar")
-                                    .font(.title2)
-                                    .foregroundStyle(.secondary)
-                                Text("No upcoming matches")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 24)
-                            .background(.ultraThinMaterial)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                        } else {
-                            VStack(spacing: 12) {
-                                ForEach(Array(upcomingMatches.prefix(5))) { match in
-                                    Button {
-                                        onSelectMatch(match)
-                                    } label: {
-                                        MatchCardCompact(
-                                            game: match,
-                                            liveGame: viewModel.calendarLiveMatches[match.externalUUID]
-                                        )
-                                    }
-                                    .buttonStyle(.plain)
-                                    .contextMenu {
-                                        #if !APPCLIP
-                                        ReminderContext(game: match)
-                                        #endif
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Standings
-                    VStack(spacing: 8) {
-                        if viewModel.standingsDisabled {
-                            HStack {
-                                Text("Standings are temporarily unavailable")
-                                    .font(.callout)
-                                Spacer()
-                            }
-                        } else if let standings = viewModel.standings {
-                            StandingsTable(
-                                title: "Leaderboard",
-                                items: standings,
-                                favoriteTeamId: Settings.shared.getFavoriteTeamId()
-                            )
-                            .background(.ultraThinMaterial)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                        } else {
-                            ProgressView()
-                                .frame(maxWidth: .infinity, minHeight: 200)
-                        }
-                    }
+                // Content sections stacked vertically
+                VStack(spacing: 16) {
+                    matchCalendarSection
+                    recentResultsSection
+                    standingsSection
                 }
                 .padding(.horizontal)
             }
+            .padding(.vertical)
         }
         .onChange(of: viewModel.featuredGame) { _, _ in
             guard let featured = viewModel.featuredGame else { return }
@@ -123,6 +48,170 @@ struct iPadHomeContent: View {
         }
         .refreshable {
             try? await viewModel.refresh(hard: true)
+        }
+    }
+
+    // MARK: - Featured Game
+
+    @ViewBuilder
+    private var featuredGameSection: some View {
+        if let featured = viewModel.featuredGame {
+            Button {
+                onSelectMatch(featured)
+            } label: {
+                iPadFeaturedGame(
+                    game: featured,
+                    liveGame: viewModel.liveGame
+                )
+            }
+            .buttonStyle(.plain)
+        } else {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(.ultraThinMaterial)
+                .frame(height: 140)
+                .overlay {
+                    ProgressView()
+                }
+        }
+    }
+
+    // MARK: - Match Calendar
+
+    private var matchCalendarSection: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Label("Upcoming", systemImage: "calendar")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+
+            Divider().opacity(0.3)
+
+            if upcomingMatches.isEmpty {
+                VStack(spacing: 8) {
+                    Image(systemName: "calendar")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                    Text("No upcoming matches")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 32)
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(Array(upcomingMatches.prefix(5).enumerated()), id: \.element.id) { index, match in
+                        Button {
+                            onSelectMatch(match)
+                        } label: {
+                            MatchCardCompact(
+                                game: match,
+                                liveGame: viewModel.calendarLiveMatches[match.externalUUID]
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .contextMenu {
+                            #if !APPCLIP
+                            ReminderContext(game: match)
+                            #endif
+                        }
+
+                        if index < min(upcomingMatches.count, 5) - 1 {
+                            Divider()
+                                .padding(.horizontal, 12)
+                                .opacity(0.3)
+                        }
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    // MARK: - Recent Results
+
+    private var recentResultsSection: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Label("Recent Results", systemImage: "clock.arrow.circlepath")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+
+            Divider().opacity(0.3)
+
+            if recentResults.isEmpty {
+                VStack(spacing: 8) {
+                    Text("No recent results")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 24)
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(Array(recentResults.prefix(3).enumerated()), id: \.element.id) { index, match in
+                        Button {
+                            onSelectMatch(match)
+                        } label: {
+                            MatchCardCompact(game: match)
+                        }
+                        .buttonStyle(.plain)
+
+                        if index < min(recentResults.count, 3) - 1 {
+                            Divider()
+                                .padding(.horizontal, 12)
+                                .opacity(0.3)
+                        }
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    // MARK: - Standings
+
+    private var standingsSection: some View {
+        Group {
+            if viewModel.standingsDisabled {
+                VStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                    Text("Standings unavailable")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 48)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            } else if let standings = viewModel.standings {
+                StandingsTable(
+                    title: "Standings",
+                    items: standings,
+                    favoriteTeamId: Settings.shared.getFavoriteTeamId()
+                )
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, minHeight: 200)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
         }
     }
 }
