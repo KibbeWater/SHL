@@ -10,6 +10,7 @@ import SwiftUI
 enum RootTabs: Equatable, Hashable, Identifiable {
     case home
     case calendar
+    case standings
     case settings
     case search
     case team(Team)
@@ -18,6 +19,7 @@ enum RootTabs: Equatable, Hashable, Identifiable {
         switch self {
         case .home: return "home"
         case .calendar: return "calendar"
+        case .standings: return "standings"
         case .settings: return "settings"
         case .search: return "search"
         case .team(let team): return "team_\(team.id)"
@@ -39,25 +41,53 @@ struct Root: View {
     @State private var teams: [Team] = []
 
     @StateObject private var navigationCoordinator = NavigationCoordinator.shared
+    @StateObject private var homeViewModel = HomeViewModel()
+    @StateObject private var scheduleViewModel = MatchListViewModel()
+
+    private var isIPad: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad
+    }
 
     var body: some View {
         ZStack {
-            if UIDevice.current.userInterfaceIdiom == .pad {
-                iPadRoot()
-            } else if #available(iOS 18.0, *) {
+            if #available(iOS 18.0, *) {
                 TabView(selection: $selectedTab) {
                     Tab("Home", systemImage: "house", value: .home) {
                         NavigationStack {
-                            HomeView()
+                            if isIPad {
+                                iPadHomeContent(
+                                    viewModel: homeViewModel,
+                                    onSelectMatch: { match in
+                                        openedGame = MatchView(match, referrer: "home")
+                                        isGameOpen = true
+                                    }
+                                )
                                 .navigationDestination(isPresented: $isGameOpen) {
                                     openedGame
                                 }
+                            } else {
+                                HomeView()
+                                    .navigationDestination(isPresented: $isGameOpen) {
+                                        openedGame
+                                    }
+                            }
                         }
                     }
 
                     Tab("Schedule", systemImage: "calendar", value: RootTabs.calendar) {
                         NavigationStack {
-                            MatchListView()
+                            if isIPad {
+                                iPadScheduleContent(
+                                    viewModel: scheduleViewModel,
+                                    onSelectMatch: { match in
+                                        openedGame = MatchView(match, referrer: "schedule")
+                                        isGameOpen = true
+                                    }
+                                )
+                                .navigationTitle("Schedule")
+                            } else {
+                                MatchListView()
+                            }
                         }
                     }
 
@@ -74,6 +104,7 @@ struct Root: View {
                         }
                     }
                     #endif
+
                 }
                 .tabViewStyle(.sidebarAdaptable)
             } else {

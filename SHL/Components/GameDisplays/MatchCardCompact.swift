@@ -116,15 +116,18 @@ struct MatchCardCompact: View {
                     .foregroundStyle(.tertiary)
             }
         } else {
-            HStack(spacing: 4) {
-                Text("\(homeScore)")
-                    .font(.callout)
-                    .fontWeight(.bold)
-                Text("-")
-                    .foregroundStyle(.tertiary)
-                Text("\(awayScore)")
-                    .font(.callout)
-                    .fontWeight(.bold)
+            VStack(spacing: 2) {
+                HStack(spacing: 4) {
+                    Text("\(homeScore)")
+                        .font(.callout)
+                        .fontWeight(.bold)
+                    Text("-")
+                        .foregroundStyle(.tertiary)
+                    Text("\(awayScore)")
+                        .font(.callout)
+                        .fontWeight(.bold)
+                }
+                .foregroundStyle(.primary)
                 if game.overtime ?? false {
                     Text("OT")
                         .font(.caption2)
@@ -135,7 +138,6 @@ struct MatchCardCompact: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            .foregroundStyle(.primary)
         }
     }
 

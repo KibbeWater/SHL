@@ -2,7 +2,7 @@
 //  iPadHomeContent.swift
 //  SHL
 //
-//  iPad home content column with adaptive grid layout
+//  Full-screen iPad home view with adaptive grid layout
 //
 
 import SwiftUI
@@ -27,21 +27,39 @@ struct iPadHomeContent: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
-                // Featured game card
+            VStack(spacing: 24) {
+                // Featured game — full width
                 featuredGameSection
                     .padding(.horizontal)
 
-                // Content sections stacked vertically
-                VStack(spacing: 16) {
-                    matchCalendarSection
-                    recentResultsSection
-                    standingsSection
+                // Two-column layout: left (calendar + recent) / right (standings)
+                if sizeClass == .regular {
+                    HStack(alignment: .top, spacing: 20) {
+                        // Left column
+                        VStack(spacing: 16) {
+                            matchCalendarSection
+                            recentResultsSection
+                        }
+                        .frame(maxWidth: .infinity)
+
+                        // Right column
+                        standingsSection
+                            .frame(maxWidth: .infinity)
+                    }
+                    .padding(.horizontal)
+                } else {
+                    // Compact: stack vertically
+                    VStack(spacing: 16) {
+                        matchCalendarSection
+                        recentResultsSection
+                        standingsSection
+                    }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
             }
             .padding(.vertical)
         }
+        .navigationTitle("Home")
         .onChange(of: viewModel.featuredGame) { _, _ in
             guard let featured = viewModel.featuredGame else { return }
             viewModel.selectListenedGame(featured)
@@ -68,7 +86,7 @@ struct iPadHomeContent: View {
         } else {
             RoundedRectangle(cornerRadius: 16)
                 .fill(.ultraThinMaterial)
-                .frame(height: 140)
+                .frame(height: 160)
                 .overlay {
                     ProgressView()
                 }
@@ -79,7 +97,6 @@ struct iPadHomeContent: View {
 
     private var matchCalendarSection: some View {
         VStack(spacing: 0) {
-            // Header
             HStack {
                 Label("Upcoming", systemImage: "calendar")
                     .font(.headline)
@@ -103,8 +120,8 @@ struct iPadHomeContent: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 32)
             } else {
-                VStack(spacing: 0) {
-                    ForEach(Array(upcomingMatches.prefix(5).enumerated()), id: \.element.id) { index, match in
+                VStack(spacing: 6) {
+                    ForEach(Array(upcomingMatches.prefix(5)), id: \.id) { match in
                         Button {
                             onSelectMatch(match)
                         } label: {
@@ -119,15 +136,9 @@ struct iPadHomeContent: View {
                             ReminderContext(game: match)
                             #endif
                         }
-
-                        if index < min(upcomingMatches.count, 5) - 1 {
-                            Divider()
-                                .padding(.horizontal, 12)
-                                .opacity(0.3)
-                        }
                     }
                 }
-                .padding(.vertical, 4)
+                .padding(8)
             }
         }
         .background(.ultraThinMaterial)
@@ -158,23 +169,17 @@ struct iPadHomeContent: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 24)
             } else {
-                VStack(spacing: 0) {
-                    ForEach(Array(recentResults.prefix(3).enumerated()), id: \.element.id) { index, match in
+                VStack(spacing: 6) {
+                    ForEach(Array(recentResults.prefix(5)), id: \.id) { match in
                         Button {
                             onSelectMatch(match)
                         } label: {
                             MatchCardCompact(game: match)
                         }
                         .buttonStyle(.plain)
-
-                        if index < min(recentResults.count, 3) - 1 {
-                            Divider()
-                                .padding(.horizontal, 12)
-                                .opacity(0.3)
-                        }
                     }
                 }
-                .padding(.vertical, 4)
+                .padding(8)
             }
         }
         .background(.ultraThinMaterial)
