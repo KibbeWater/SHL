@@ -44,6 +44,8 @@ struct Root: View {
     @StateObject private var homeViewModel = HomeViewModel()
     @StateObject private var scheduleViewModel = MatchListViewModel()
 
+    @AppStorage("tabViewCustomization") private var tabCustomization: TabViewCustomization = .init()
+
     private var isIPad: Bool {
         UIDevice.current.userInterfaceIdiom == .pad
     }
@@ -52,7 +54,7 @@ struct Root: View {
         ZStack {
             if #available(iOS 18.0, *) {
                 TabView(selection: $selectedTab) {
-                    Tab("Home", systemImage: "house", value: .home) {
+                    Tab("Home", systemImage: "house", value: RootTabs.home) {
                         NavigationStack {
                             if isIPad {
                                 iPadHomeContent(
@@ -73,6 +75,7 @@ struct Root: View {
                             }
                         }
                     }
+                    .customizationBehavior(.disabled, for: .sidebar, .tabBar)
 
                     Tab("Schedule", systemImage: "calendar", value: RootTabs.calendar) {
                         NavigationStack {
@@ -90,12 +93,14 @@ struct Root: View {
                             }
                         }
                     }
+                    .customizationBehavior(.disabled, for: .sidebar, .tabBar)
 
                     Tab("Settings", systemImage: "gearshape", value: RootTabs.settings) {
                         NavigationStack {
                             SettingsView()
                         }
                     }
+                    .customizationBehavior(.disabled, for: .sidebar, .tabBar)
 
                     #if DEBUG
                     if #available(iOS 26.0, *) {
@@ -105,8 +110,46 @@ struct Root: View {
                     }
                     #endif
 
+                    if isIPad {
+                        Tab("Standings", systemImage: "list.number", value: RootTabs.standings) {
+                            NavigationStack {
+                                iPadStandingsContent(
+                                    viewModel: homeViewModel,
+                                    onSelectTeam: { _ in }
+                                )
+                                .navigationTitle("Standings")
+                            }
+                        }
+                        .customizationID("shl.standings")
+                        .defaultVisibility(.hidden, for: .tabBar)
+
+                        TabSection("Teams") {
+                            ForEach(teams, id: \.id) { team in
+                                Tab(value: RootTabs.team(team)) {
+                                    NavigationStack {
+                                        TeamView(team: team)
+                                    }
+                                } label: {
+                                    HStack {
+                                        if let img = svgToImage(named: "Team/\(team.code.uppercased())", width: 22) {
+                                            img
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                                .frame(width: 22, height: 22)
+                                        }
+                                        Text(team.name)
+                                    }
+                                }
+                                .customizationID("shl.team.\(team.id)")
+                                .defaultVisibility(.hidden, for: .tabBar)
+                            }
+                        }
+                        .customizationID("shl.teams")
+                        .defaultVisibility(.hidden, for: .tabBar)
+                    }
                 }
                 .tabViewStyle(.sidebarAdaptable)
+                .tabViewCustomization($tabCustomization)
             } else {
                 TabView(selection: $selectedTab) {
                     NavigationStack {
