@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		800119F12F8A56590017E45B /* iPadNavDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119F02F8A56590017E45B /* iPadNavDestination.swift */; };
+		800119F32F8A56660017E45B /* iPadRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119F22F8A56660017E45B /* iPadRoot.swift */; };
+		800119F52F8A56710017E45B /* iPadHomeContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119F42F8A56710017E45B /* iPadHomeContent.swift */; };
+		800119F72F8A567B0017E45B /* iPadScheduleContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119F62F8A567B0017E45B /* iPadScheduleContent.swift */; };
+		800119F92F8A567E0017E45B /* iPadStandingsContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119F82F8A567E0017E45B /* iPadStandingsContent.swift */; };
+		800119FB2F8A56890017E45B /* iPadTeamContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119FA2F8A56890017E45B /* iPadTeamContent.swift */; };
 		8008FC7E2C9DCC4E00B23669 /* ReminderContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8008FC7D2C9DCC4E00B23669 /* ReminderContext.swift */; };
 		800F320E2C00D1300069E436 /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F320D2C00D1300069E436 /* Sequence.swift */; };
 		801A95EE2EBF7F5300530970 /* TeamLogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 801A95ED2EBF7F5300530970 /* TeamLogoView.swift */; };
@@ -187,6 +193,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		800119F02F8A56590017E45B /* iPadNavDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadNavDestination.swift; sourceTree = "<group>"; };
+		800119F22F8A56660017E45B /* iPadRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadRoot.swift; sourceTree = "<group>"; };
+		800119F42F8A56710017E45B /* iPadHomeContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadHomeContent.swift; sourceTree = "<group>"; };
+		800119F62F8A567B0017E45B /* iPadScheduleContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadScheduleContent.swift; sourceTree = "<group>"; };
+		800119F82F8A567E0017E45B /* iPadStandingsContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadStandingsContent.swift; sourceTree = "<group>"; };
+		800119FA2F8A56890017E45B /* iPadTeamContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadTeamContent.swift; sourceTree = "<group>"; };
 		8008FC7D2C9DCC4E00B23669 /* ReminderContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderContext.swift; sourceTree = "<group>"; };
 		800F320D2C00D1300069E436 /* Sequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequence.swift; sourceTree = "<group>"; };
 		801A95ED2EBF7F5300530970 /* TeamLogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamLogoView.swift; sourceTree = "<group>"; };
@@ -368,6 +380,19 @@
 				BC425E462B4706CC00D82CFB /* SwiftUI.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		800119EF2F8A55580017E45B /* iPad */ = {
+			isa = PBXGroup;
+			children = (
+				800119F02F8A56590017E45B /* iPadNavDestination.swift */,
+				800119F22F8A56660017E45B /* iPadRoot.swift */,
+				800119F42F8A56710017E45B /* iPadHomeContent.swift */,
+				800119F62F8A567B0017E45B /* iPadScheduleContent.swift */,
+				800119F82F8A567E0017E45B /* iPadStandingsContent.swift */,
+				800119FA2F8A56890017E45B /* iPadTeamContent.swift */,
+			);
+			path = iPad;
 			sourceTree = "<group>";
 		};
 		8008FC7C2C9DCC3A00B23669 /* Context */ = {
@@ -741,6 +766,7 @@
 				804375A92CAA09FC0041F46D /* PlayerView.swift */,
 				806BEB142CB0500700CC4565 /* SettingsView.swift */,
 				802AD9702EB1834900916E9F /* SearchView.swift */,
+				800119EF2F8A55580017E45B /* iPad */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -974,9 +1000,13 @@
 				806796CF2CA864C100E9D95D /* TeamView.swift in Sources */,
 				806DBE0F2EA401FA00E07695 /* Season.swift in Sources */,
 				806DBE102EA401FA00E07695 /* Team.swift in Sources */,
+				800119F92F8A567E0017E45B /* iPadStandingsContent.swift in Sources */,
 				802AD96C2EB17BB300916E9F /* PromptSeason.swift in Sources */,
+				800119F12F8A56590017E45B /* iPadNavDestination.swift in Sources */,
 				806DBE112EA401FA00E07695 /* LiveMatchListener.swift in Sources */,
 				806DBE122EA401FA00E07695 /* MatchStats.swift in Sources */,
+				800119FB2F8A56890017E45B /* iPadTeamContent.swift in Sources */,
+				800119F32F8A56660017E45B /* iPadRoot.swift in Sources */,
 				806DBE132EA401FA00E07695 /* SHLAPIService.swift in Sources */,
 				806DBE152EA401FA00E07695 /* Match+Mock.swift in Sources */,
 				802AD96A2EB17BB100916E9F /* PromptTeam.swift in Sources */,
@@ -994,12 +1024,14 @@
 				806DBE1B2EA401FA00E07695 /* SHLAPIClient.swift in Sources */,
 				801A96312ED30D8900530970 /* SHLAPIDebug.swift in Sources */,
 				806DBE1C2EA401FA00E07695 /* Match.swift in Sources */,
+				800119F72F8A567B0017E45B /* iPadScheduleContent.swift in Sources */,
 				806DFA322EE239FE00065FD2 /* OnboardingContainerView.swift in Sources */,
 				806DFA332EE239FE00065FD2 /* FavoriteTeamPageView.swift in Sources */,
 				806DFA342EE239FE00065FD2 /* TeamSelectionPageView.swift in Sources */,
 				806DFA352EE239FE00065FD2 /* WelcomePageView.swift in Sources */,
 				806DFA362EE239FE00065FD2 /* OnlineFeaturesPageView.swift in Sources */,
 				806DBE1D2EA401FA00E07695 /* SHLAPIError.swift in Sources */,
+				800119F52F8A56710017E45B /* iPadHomeContent.swift in Sources */,
 				802AD9712EB1834900916E9F /* SearchView.swift in Sources */,
 				806DBE1E2EA401FA00E07695 /* NetworkLoggerPlugin.swift in Sources */,
 				806DBE202EA401FA00E07695 /* Standings.swift in Sources */,

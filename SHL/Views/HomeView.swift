@@ -46,24 +46,11 @@ struct HomeView: View {
     @State private var center: CGPoint = .zero
     
     func renderFeaturedGame(_ featured: Match) -> some View {
-        let content: some View = {
-            if UIDevice.current.userInterfaceIdiom == .pad {
-                return AnyView(
-                    LargeOverview(
-                        game: featured,
-                        liveGame: viewModel.liveGame
-                    )
-                )
-            } else {
-                return AnyView(
-                    MatchOverview(
-                        game: featured,
-                        liveGame: viewModel.liveGame
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                )
-            }
-        }()
+        let content: some View = MatchOverview(
+            game: featured,
+            liveGame: viewModel.liveGame
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12.0))
         
         return NavigationLink(destination: {
             MatchView(featured, referrer: "home_featured")
@@ -110,11 +97,7 @@ struct HomeView: View {
     
     func getTimeLoop() -> Double {
         let precision: Double = 10000
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            return Double(Int((date.timeIntervalSinceNow * -1)*precision)%(4*Int(precision))) / precision
-        } else {
-            return Double(Int((date.timeIntervalSinceNow * -1)*precision)%(3*Int(precision))) / precision
-        }
+        return Double(Int((date.timeIntervalSinceNow * -1)*precision)%(3*Int(precision))) / precision
     }
     
     private var upcomingMatches: [Match] {
@@ -194,24 +177,20 @@ struct HomeView: View {
     var body: some View {
         ScrollView {
             if let featured = viewModel.featuredGame {
-                if UIDevice.current.userInterfaceIdiom == .pad {
-                    renderFeaturedGame(featured)
-                } else {
-                    if #available(iOS 17.0, *) {
-                        if featured.isLive() || viewModel.liveGame?.gameState == .ongoing || viewModel.liveGame?.gameState == .paused {
-                            TimelineView(.animation) { _ in
-                                renderFeaturedGame(featured)
-                                    .pulseShader(time: getTimeLoop(), center: center, speed: 150.0, amplitude: 0.1, decay: 5.0)
-                                    .padding(.horizontal)
-                            }
-                        } else {
+                if #available(iOS 17.0, *) {
+                    if featured.isLive() || viewModel.liveGame?.gameState == .ongoing || viewModel.liveGame?.gameState == .paused {
+                        TimelineView(.animation) { _ in
                             renderFeaturedGame(featured)
+                                .pulseShader(time: getTimeLoop(), center: center, speed: 150.0, amplitude: 0.1, decay: 5.0)
                                 .padding(.horizontal)
                         }
                     } else {
                         renderFeaturedGame(featured)
                             .padding(.horizontal)
                     }
+                } else {
+                    renderFeaturedGame(featured)
+                        .padding(.horizontal)
                 }
             } else {
                 HStack {}
@@ -247,10 +226,7 @@ struct HomeView: View {
                 print("HomeView: Error refreshing: ", err)
             }
          }
-        .ignoresSafeArea(
-            .container,
-            edges: UIDevice.current.userInterfaceIdiom == .pad ? .all : .horizontal
-        )
+        .ignoresSafeArea(.container, edges: .horizontal)
     }
     
     func remainingTimeUntil(_ targetDate: Date) -> String {

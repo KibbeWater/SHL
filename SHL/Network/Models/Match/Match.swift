@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Match: Codable, Identifiable, Equatable {
+struct Match: Codable, Identifiable, Equatable, Hashable {
     let id: String
     let date: Date
     let venue: String?
@@ -39,7 +39,7 @@ struct Match: Codable, Identifiable, Equatable {
     }
 }
 
-public struct TeamBasic: Codable, Equatable {
+public struct TeamBasic: Codable, Equatable, Hashable {
     let id: String?
     let name: String
     let code: String

@@ -42,7 +42,9 @@ struct Root: View {
 
     var body: some View {
         ZStack {
-            if #available(iOS 18.0, *) {
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                iPadRoot()
+            } else if #available(iOS 18.0, *) {
                 TabView(selection: $selectedTab) {
                     Tab("Home", systemImage: "house", value: .home) {
                         NavigationStack {
@@ -52,19 +54,19 @@ struct Root: View {
                                 }
                         }
                     }
-                    
+
                     Tab("Schedule", systemImage: "calendar", value: RootTabs.calendar) {
                         NavigationStack {
                             MatchListView()
                         }
                     }
-                    
+
                     Tab("Settings", systemImage: "gearshape", value: RootTabs.settings) {
                         NavigationStack {
                             SettingsView()
                         }
                     }
-                    
+
                     #if DEBUG
                     if #available(iOS 26.0, *) {
                         Tab(value: RootTabs.search, role: .search) {
@@ -72,29 +74,6 @@ struct Root: View {
                         }
                     }
                     #endif
-                    
-                    if UIDevice.current.userInterfaceIdiom == .pad {
-                        TabSection("Teams") {
-                            ForEach(teams, id: \.id) { team in
-                                Tab(value: RootTabs.team(team)) {
-                                    TeamView(team: team)
-                                } label: {
-                                    HStack {
-                                        if let img = svgToImage(named: "Team/\(team.code.uppercased())", width: 28) {
-                                            img
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                            Text(team.name)
-                                        } else {
-                                            EmptyView()
-                                        }
-                                    }
-                                    .frame(height: 32)
-                                }
-                            }
-                        }
-                        .defaultVisibility(.hidden, for: .tabBar)
-                    }
                 }
                 .tabViewStyle(.sidebarAdaptable)
             } else {
@@ -108,14 +87,14 @@ struct Root: View {
                     .tabItem {
                         Label("Home", systemImage: "house")
                     }
-                    
+
                     NavigationStack {
                         MatchListView()
                     }
                     .tabItem {
                         Label("Schedule", systemImage: "calendar")
                     }
-                    
+
                     SettingsView()
                         .tabItem {
                             Label("Settings", systemImage: "gearshape")

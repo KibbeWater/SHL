@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Player: Codable, Identifiable {
+struct Player: Codable, Identifiable, Hashable {
     let id: String
     let externalUUID: String
     let firstName: String

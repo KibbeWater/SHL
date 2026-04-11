@@ -82,6 +82,8 @@ struct MatchView: View {
 
                     contentSection
                 }
+                .frame(maxWidth: 700)
+                .frame(maxWidth: .infinity)
                 .padding(.bottom, 32)
             }
             .refreshable {
