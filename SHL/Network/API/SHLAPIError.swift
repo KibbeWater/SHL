@@ -60,8 +60,6 @@ extension SHLAPIError {
             return .unknown
         case 401:
             return .unauthorized
-        case 404:
-            return .notFound
         case 500..<600:
             return .serverError
         default:

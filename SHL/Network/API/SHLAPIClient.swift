@@ -499,6 +499,28 @@ class SHLAPIClient {
         )
     }
 
+    // MARK: - Admin Linking
+
+    /// Fetch a non-consuming preview of a pending admin link code.
+    func getAdminLinkPreview(code: String) async throws -> AdminPreview {
+        try await request(
+            endpoint: "/auth/link-admin/preview?code=\(code)",
+            method: .get,
+            requiresAuth: true
+        )
+    }
+
+    /// Link this device to the admin account associated with `code`.
+    /// Pass `force: true` to replace an existing link on this device.
+    func linkAdmin(code: String, force: Bool = false) async throws {
+        let _: EmptyResponse = try await request(
+            endpoint: "/auth/link-admin",
+            method: .post,
+            body: LinkAdminRequest(code: code, force: force ? true : nil),
+            requiresAuth: true
+        )
+    }
+
     // MARK: - Private Helper Methods
 
     private func request<T: Decodable>(_ target: SHLAPIService) async throws -> T {

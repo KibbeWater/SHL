@@ -41,6 +41,7 @@ struct Root: View {
     @State private var teams: [Team] = []
 
     @StateObject private var navigationCoordinator = NavigationCoordinator.shared
+    @StateObject private var adminPairingCoordinator = AdminPairingCoordinator.shared
     @StateObject private var homeViewModel = HomeViewModel()
     @StateObject private var scheduleViewModel = MatchListViewModel()
 
@@ -248,6 +249,10 @@ struct Root: View {
         .fullScreenCover(isPresented: $showOnboarding) {
             OnboardingContainerView()
         }
+        .sheet(isPresented: $adminPairingCoordinator.isPresented) {
+            AdminPairingSheet()
+                .environmentObject(adminPairingCoordinator)
+        }
     }
 
     private func handlePendingNavigation(matchId: String) {
@@ -276,27 +281,39 @@ struct Root: View {
             print("Invalid URL")
             return
         }
-        
-        guard let action = components.host, action == "open-game" else {
+
+        switch components.host {
+        case "open-game":
+            handleOpenGame(components: components)
+        case "link":
+            handleAdminLink(components: components)
+        default:
             print("Unknown URL, we can't handle this one!")
-            return
         }
-        
+    }
+
+    private func handleOpenGame(components: URLComponents) {
         guard let gameId = components.queryItems?.first(where: { $0.name == "id" })?.value else {
             return
         }
-        
-        // TODO: Find Games based on ID and display it
-        Task { // shltracker:open-game?id=0BC4115B-A6F8-49E4-A9A4-57C0120ECDA9
+
+        Task { // shltracker://open-game?id=0BC4115B-A6F8-49E4-A9A4-57C0120ECDA9
             guard let game = try? await api.getMatchDetail(id: gameId) else {
                 print("Unable to find game")
                 return
             }
-            
+
             selectedTab = .home
             openedGame = MatchView(game, referrer: "url-schema")
             isGameOpen = true
         }
+    }
+
+    private func handleAdminLink(components: URLComponents) {
+        guard let raw = components.queryItems?.first(where: { $0.name == "code" })?.value else {
+            return
+        }
+        AdminPairingCoordinator.shared.start(rawCode: raw)
     }
 }
 

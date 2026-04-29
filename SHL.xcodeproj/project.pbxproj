@@ -130,6 +130,11 @@
 		80A16D912EEDC1BB003F9911 /* SharedTeamColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D8F2EEDC1BB003F9911 /* SharedTeamColorCache.swift */; };
 		80A16D932EEDC213003F9911 /* WidgetSharedColorCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D922EEDC213003F9911 /* WidgetSharedColorCache.swift */; };
 		80A16D952EEDCD44003F9911 /* WidgetUserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A16D942EEDCD44003F9911 /* WidgetUserPreferences.swift */; };
+		80C847CA2FA28B9D004B1D50 /* AdminPairingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C847C92FA28B9D004B1D50 /* AdminPairingModels.swift */; };
+		80C847CB2FA28B9D004B1D50 /* AdminPairingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C847C92FA28B9D004B1D50 /* AdminPairingModels.swift */; };
+		80C847CD2FA28BC8004B1D50 /* AdminPairingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C847CC2FA28BC8004B1D50 /* AdminPairingCoordinator.swift */; };
+		80C847CE2FA28BC8004B1D50 /* AdminPairingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C847CC2FA28BC8004B1D50 /* AdminPairingCoordinator.swift */; };
+		80C847D02FA28BEE004B1D50 /* AdminPairingSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C847CF2FA28BEE004B1D50 /* AdminPairingSheet.swift */; };
 		80DAAC8E2EE37D3D001E7506 /* NotificationReminderSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DAAC8D2EE37D3D001E7506 /* NotificationReminderSheet.swift */; };
 		80DAAC902EE45200001E7506 /* NavigationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DAAC8F2EE451FF001E7506 /* NavigationCoordinator.swift */; };
 		80DBB7A92EA3FD530051C807 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 80DBB7A82EA3FD530051C807 /* CombineMoya */; };
@@ -278,6 +283,9 @@
 		80A16D8F2EEDC1BB003F9911 /* SharedTeamColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedTeamColorCache.swift; sourceTree = "<group>"; };
 		80A16D922EEDC213003F9911 /* WidgetSharedColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSharedColorCache.swift; sourceTree = "<group>"; };
 		80A16D942EEDCD44003F9911 /* WidgetUserPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetUserPreferences.swift; sourceTree = "<group>"; };
+		80C847C92FA28B9D004B1D50 /* AdminPairingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminPairingModels.swift; sourceTree = "<group>"; };
+		80C847CC2FA28BC8004B1D50 /* AdminPairingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminPairingCoordinator.swift; sourceTree = "<group>"; };
+		80C847CF2FA28BEE004B1D50 /* AdminPairingSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminPairingSheet.swift; sourceTree = "<group>"; };
 		80DAAC8D2EE37D3D001E7506 /* NotificationReminderSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationReminderSheet.swift; sourceTree = "<group>"; };
 		80DAAC8F2EE451FF001E7506 /* NavigationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCoordinator.swift; sourceTree = "<group>"; };
 		80DCA05D2C9DBC3B0058B6F2 /* ColorCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCache.swift; sourceTree = "<group>"; };
@@ -412,6 +420,7 @@
 				801A95FB2ED1ECFA00530970 /* AuthenticationManager.swift */,
 				801A95FC2ED1ECFA00530970 /* iCloudSyncManager.swift */,
 				801A95FD2ED1ECFA00530970 /* PushNotificationManager.swift */,
+				80C847CC2FA28BC8004B1D50 /* AdminPairingCoordinator.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -429,6 +438,7 @@
 			children = (
 				801A96292ED30D1300530970 /* TestNotificationModels.swift */,
 				801A96052ED1ED2800530970 /* UserModels.swift */,
+				80C847C92FA28B9D004B1D50 /* AdminPairingModels.swift */,
 			);
 			path = User;
 			sourceTree = "<group>";
@@ -770,6 +780,7 @@
 				806BEB142CB0500700CC4565 /* SettingsView.swift */,
 				802AD9702EB1834900916E9F /* SearchView.swift */,
 				800119EF2F8A55580017E45B /* iPad */,
+				80C847CF2FA28BEE004B1D50 /* AdminPairingSheet.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -952,7 +963,9 @@
 				805C8AA52CAF32FA00CF7F7D /* CacheAsyncImage.swift in Sources */,
 				80A16D8D2EEDBF8D003F9911 /* BackgroundSessionManager.swift in Sources */,
 				80A16D8E2EEDBF8D003F9911 /* WidgetDataCache.swift in Sources */,
+				80C847CD2FA28BC8004B1D50 /* AdminPairingCoordinator.swift in Sources */,
 				8020C25D2D7644D500F1FB5E /* ScrollPosition.swift in Sources */,
+				80C847CB2FA28B9D004B1D50 /* AdminPairingModels.swift in Sources */,
 				806DBE552EA4041500E07695 /* WidgetFeaturedGame.swift in Sources */,
 				801A96142ED1EE3600530970 /* UserModels.swift in Sources */,
 				801A961E2ED1EE8500530970 /* MatchStats.swift in Sources */,
@@ -979,6 +992,7 @@
 				BCAFE2D02B4095170044225A /* HomeView.swift in Sources */,
 				802AD9482EAE656C00916E9F /* PBPEventRowView.swift in Sources */,
 				802AD9432EAE654500916E9F /* PBPSupporting.swift in Sources */,
+				80C847CA2FA28B9D004B1D50 /* AdminPairingModels.swift in Sources */,
 				802AD9442EAE654500916E9F /* PBPEventDTO.swift in Sources */,
 				802AD9452EAE654500916E9F /* PBPEventData.swift in Sources */,
 				802AD9462EAE654500916E9F /* PBPController.swift in Sources */,
@@ -992,6 +1006,7 @@
 				802AD9682EB176E200916E9F /* SeasonInfoResponse.swift in Sources */,
 				8020C2622D7651A500F1FB5E /* GameTime.swift in Sources */,
 				802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */,
+				80C847CE2FA28BC8004B1D50 /* AdminPairingCoordinator.swift in Sources */,
 				8075FBB82CA6A1AE004C6438 /* LargeOverview.swift in Sources */,
 				801A95F72EC8A79A00530970 /* LiveGameUpdate.swift in Sources */,
 				808F89BD2CC96C5F00452D6E /* FeaturedGameAlgo.swift in Sources */,
@@ -1012,6 +1027,7 @@
 				800119F32F8A56660017E45B /* iPadRoot.swift in Sources */,
 				806DBE132EA401FA00E07695 /* SHLAPIService.swift in Sources */,
 				806DBE152EA401FA00E07695 /* Match+Mock.swift in Sources */,
+				80C847D02FA28BEE004B1D50 /* AdminPairingSheet.swift in Sources */,
 				802AD96A2EB17BB100916E9F /* PromptTeam.swift in Sources */,
 				806DBE162EA401FA00E07695 /* PlayerGameLog.swift in Sources */,
 				806DBE172EA401FA00E07695 /* Player.swift in Sources */,
