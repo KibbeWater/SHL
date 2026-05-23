@@ -13,6 +13,7 @@ struct MatchOverview: View {
 
     @State private var homeColor: Color = .gray
     @State private var awayColor: Color = .gray
+    @State private var pulse = false
 
     private var homeScore: Int {
         liveGame?.homeScore ?? game.homeScore
@@ -46,14 +47,12 @@ struct MatchOverview: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Status bar (only for live/upcoming)
             if showStatusBar {
                 statusBar
             }
 
             // Main content
             HStack(spacing: 0) {
-                // Home team
                 teamView(
                     code: game.homeTeam.code,
                     score: homeScore,
@@ -61,10 +60,8 @@ struct MatchOverview: View {
                     isWinning: homeScore > awayScore
                 )
 
-                // Center divider with VS or score indicator
                 centerDivider
 
-                // Away team
                 teamView(
                     code: game.awayTeam.code,
                     score: awayScore,
@@ -76,24 +73,37 @@ struct MatchOverview: View {
             .padding(.vertical, 12)
         }
         .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(.rect(cornerRadius: 16, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(.white.opacity(0.1), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(liveBorderColor, lineWidth: isLive ? 1.5 : 1)
         )
         .overlay(alignment: .top) {
             if let resultText = gameResultText, !isLive && !isUpcoming && !isCancelled {
                 Text(resultText)
-                    .font(.caption2)
-                    .fontWeight(.medium)
+                    .font(.caption2.weight(.medium))
                     .foregroundStyle(.tertiary)
                     .padding(.top, 6)
             }
         }
         .saturation(isCancelled ? 0 : 1)
         .opacity(isCancelled ? 0.65 : 1)
-        .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
-        .onAppear(perform: loadTeamColors)
+        .shadow(color: .black.opacity(isLive ? 0.18 : 0.1), radius: isLive ? 14 : 8, y: 4)
+        .scaleEffect(isLive && pulse ? 1.005 : 1)
+        .animation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true), value: pulse)
+        .onAppear {
+            loadTeamColors()
+            if isLive { pulse = true }
+        }
+        .onChange(of: isLive) { _, nowLive in
+            pulse = nowLive
+        }
+        .sensoryFeedback(.impact(weight: .medium), trigger: homeScore)
+        .sensoryFeedback(.impact(weight: .medium), trigger: awayScore)
+    }
+
+    private var liveBorderColor: Color {
+        isLive ? .red.opacity(0.35) : .white.opacity(0.1)
     }
 
     @ViewBuilder
@@ -101,26 +111,21 @@ struct MatchOverview: View {
         HStack {
             if isLive {
                 HStack(spacing: 6) {
-                    Circle()
-                        .fill(.red)
-                        .frame(width: 8, height: 8)
-                        .overlay(
-                            Circle()
-                                .fill(.red.opacity(0.5))
-                                .frame(width: 16, height: 16)
-                        )
+                    Image(systemName: "circle.fill")
+                        .font(.system(size: 8))
+                        .foregroundStyle(.red)
+                        .symbolEffect(.pulse.byLayer, options: .repeating)
                     Text("LIVE")
-                        .font(.caption)
-                        .fontWeight(.heavy)
+                        .font(.caption.weight(.heavy))
                         .foregroundStyle(.red)
 
                     if let live = liveGame {
                         Text("•")
                             .foregroundStyle(.secondary)
                         Text(periodText(for: live))
-                            .font(.caption)
-                            .fontWeight(.medium)
+                            .font(.caption.weight(.medium))
                             .foregroundStyle(.secondary)
+                            .contentTransition(.numericText())
                     }
                 }
             } else if isUpcoming {
@@ -129,8 +134,7 @@ struct MatchOverview: View {
                         .font(.caption)
                         .foregroundStyle(game.isToday ? .accent : .secondary)
                     Text(game.formatDate())
-                        .font(.caption)
-                        .fontWeight(game.isToday ? .bold : .medium)
+                        .font(.caption.weight(game.isToday ? .bold : .medium))
                         .foregroundStyle(game.isToday ? .accent : .primary)
                     Text("•")
                         .foregroundStyle(.secondary)
@@ -144,8 +148,7 @@ struct MatchOverview: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     Text("CANCELLED")
-                        .font(.caption)
-                        .fontWeight(.heavy)
+                        .font(.caption.weight(.heavy))
                         .foregroundStyle(.secondary)
                         .textCase(.uppercase)
                 }
@@ -177,13 +180,11 @@ struct MatchOverview: View {
                     .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
 
                 Text(code)
-                    .font(.subheadline)
-                    .fontWeight(.bold)
+                    .font(.subheadline.weight(.bold))
                     .foregroundStyle(.primary)
             } else {
                 Text(code)
-                    .font(.subheadline)
-                    .fontWeight(.bold)
+                    .font(.subheadline.weight(.bold))
                     .foregroundStyle(.primary)
 
                 TeamLogoView(teamCode: code, size: .custom(44))
@@ -201,21 +202,28 @@ struct MatchOverview: View {
     private var centerDivider: some View {
         if isCancelled {
             Text("—")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .font(.title.weight(.bold))
                 .foregroundStyle(.tertiary)
                 .frame(width: 90)
         } else if isUpcoming {
             Text("VS")
-                .font(.system(size: 22, weight: .semibold, design: .rounded))
+                .font(.title3.weight(.semibold))
                 .foregroundStyle(.secondary)
                 .frame(width: 50)
         } else {
-            Text("\(homeScore) - \(awayScore)")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(.primary)
-                .contentTransition(.numericText())
-                .frame(width: 90)
+            HStack(spacing: 6) {
+                Text("\(homeScore)")
+                    .foregroundStyle(homeScore >= awayScore ? .primary : .secondary)
+                    .contentTransition(.numericText(value: Double(homeScore)))
+                Text("–")
+                    .foregroundStyle(.tertiary)
+                Text("\(awayScore)")
+                    .foregroundStyle(awayScore >= homeScore ? .primary : .secondary)
+                    .contentTransition(.numericText(value: Double(awayScore)))
+            }
+            .font(.title.weight(.bold))
+            .monospacedDigit()
+            .frame(width: 90)
         }
     }
 
@@ -241,7 +249,6 @@ struct MatchOverview: View {
 
     private var cardBackground: some View {
         ZStack {
-            // Base gradient with team colors
             LinearGradient(
                 stops: [
                     .init(color: homeColor.opacity(0.35), location: 0),
@@ -254,14 +261,13 @@ struct MatchOverview: View {
                 endPoint: .trailing
             )
 
-            // Subtle top highlight
+            // Top highlight
             LinearGradient(
-                colors: [.white.opacity(0.1), .clear],
+                colors: [.white.opacity(0.12), .clear],
                 startPoint: .top,
                 endPoint: .center
             )
 
-            // Material overlay for depth
             Rectangle()
                 .fill(.ultraThinMaterial)
         }
@@ -270,10 +276,10 @@ struct MatchOverview: View {
     private func loadTeamColors() {
         Task(priority: .low) {
             game.homeTeam.getTeamColor { color in
-                withAnimation(.easeInOut(duration: 0.3)) { self.homeColor = color }
+                withAnimation(.smooth(duration: 0.35)) { self.homeColor = color }
             }
             game.awayTeam.getTeamColor { color in
-                withAnimation(.easeInOut(duration: 0.3)) { self.awayColor = color }
+                withAnimation(.smooth(duration: 0.35)) { self.awayColor = color }
             }
         }
     }
@@ -347,4 +353,10 @@ struct MatchOverview: View {
         )
     )
     .padding(.horizontal)
+}
+
+#Preview("Dark") {
+    MatchOverview(game: Match.fakeData())
+        .padding(.horizontal)
+        .preferredColorScheme(.dark)
 }

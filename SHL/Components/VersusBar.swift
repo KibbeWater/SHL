@@ -11,98 +11,111 @@ struct VersusBar: View {
     var title: String
     var homeSide: Float
     var awaySide: Float
-    
+
     var homeColor: Color
     var awayColor: Color
-    
+
     private var isPercent: Bool
-    
+
     init(_ title: String, homeSide: Int, awaySide: Int, homeColor: Color, awayColor: Color) {
         self.title = title
         self.homeSide = Float(homeSide)
         self.awaySide = Float(awaySide)
-        
         self.homeColor = homeColor
         self.awayColor = awayColor
-        
         self.isPercent = false
     }
-    
+
     init(_ title: String, homePercent: Float, awayPercent: Float, homeColor: Color, awayColor: Color) {
         self.title = title
         self.homeSide = homePercent
         self.awaySide = awayPercent
-        
         self.homeColor = homeColor
         self.awayColor = awayColor
-        
         self.isPercent = true
     }
-    
+
+    private var homeText: String {
+        isPercent ? "\(floor(homeSide * 1000) / 10)%" : String(format: "%.0f", homeSide)
+    }
+
+    private var awayText: String {
+        isPercent ? "\(floor(awaySide * 1000) / 10)%" : String(format: "%.0f", awaySide)
+    }
+
+    private var fraction: CGFloat {
+        let total = CGFloat(homeSide + awaySide)
+        guard total > 0 else { return 0.5 }
+        return CGFloat(homeSide) / total
+    }
+
     var body: some View {
-        VStack {
+        VStack(spacing: 4) {
             HStack {
-                Text("\(isPercent ? String("\(floor(homeSide * 1000) / 10)%") : String(format: "%.0f", homeSide))")
-                    .font(.title2)
+                Text(homeText)
+                    .font(.title2.weight(.bold))
                     .fontWidth(.compressed)
-                    .fontWeight(.bold)
-                    .padding(2)
+                    .monospacedDigit()
+                    .contentTransition(.numericText(value: Double(homeSide)))
                 Spacer()
-                Text("\(isPercent ? String("\(floor(awaySide * 1000) / 10)%") : String(format: "%.0f", awaySide))")
-                    .font(.title2)
-                    .fontWidth(.compressed)
-                    .fontWeight(.bold)
-                    .padding(2)
-            }
-            .overlay(alignment: .bottom) {
                 Text(title)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
+                    .kerning(0.5)
+                Spacer()
+                Text(awayText)
+                    .font(.title2.weight(.bold))
+                    .fontWidth(.compressed)
+                    .monospacedDigit()
+                    .contentTransition(.numericText(value: Double(awaySide)))
             }
+
             GeometryReader { geo in
-                let geoW = geo.size.width - 4
-                if homeSide+awaySide == 0 {
-                    Color.secondary
-                        .frame(width: geo.size.width, height: 8)
-                        .clipShape(RoundedRectangle(cornerRadius: .infinity))
-                } else if homeSide == 0 {
-                    awayColor
-                        .frame(width: geo.size.width, height: 8)
-                        .clipShape(RoundedRectangle(cornerRadius: .infinity))
-                } else if awaySide == 0 {
-                    homeColor
-                        .frame(width: geo.size.width, height: 8)
-                        .clipShape(RoundedRectangle(cornerRadius: .infinity))
-                } else {
-                    HStack(spacing: 0) {
-                        HStack{}
-                            .frame(width: (CGFloat(homeSide) / CGFloat(homeSide+awaySide)) * geoW, height: 8)
-                            .background(homeColor)
-                            .clipShape(RoundedRectangle(cornerRadius: .infinity))
-                        Spacer()
-                        HStack{}
-                            .frame(width: (CGFloat(awaySide) / CGFloat(homeSide+awaySide)) * geoW, height: 8)
-                            .background(awayColor)
-                            .clipShape(RoundedRectangle(cornerRadius: .infinity))
+                ZStack(alignment: .leading) {
+                    // Track
+                    Capsule()
+                        .fill(.quaternary)
+
+                    // Filled portion(s)
+                    if homeSide + awaySide == 0 {
+                        EmptyView()
+                    } else {
+                        HStack(spacing: 2) {
+                            Capsule()
+                                .fill(homeColor)
+                                .frame(width: max(0, (geo.size.width - 2) * fraction))
+                            Capsule()
+                                .fill(awayColor)
+                                .frame(width: max(0, (geo.size.width - 2) * (1 - fraction)))
+                        }
                     }
                 }
             }
             .frame(height: 8)
+            .animation(.smooth(duration: 0.5), value: homeSide)
+            .animation(.smooth(duration: 0.5), value: awaySide)
         }
     }
 }
 
 #Preview {
-    VStack {
+    VStack(spacing: 16) {
         VersusBar("Penalties", homeSide: 3, awaySide: 7, homeColor: .red, awayColor: .blue)
         VersusBar("Shots on goal", homeSide: 37, awaySide: 24, homeColor: .red, awayColor: .blue)
-            .padding(.bottom, 64)
-        
-        VersusBar("Penalties %", homePercent: 0.3, awayPercent: 0.7, homeColor: .red, awayColor: .blue)
-        VersusBar("Shots %", homePercent: 0.60655, awayPercent: 0.39344, homeColor: .red, awayColor: .blue)
-            .padding(.bottom, 64)
-
-        VersusBar("Penalties", homeSide: 0, awaySide: 7, homeColor: .red, awayColor: .blue)
-        VersusBar("Penalties", homeSide: 3, awaySide: 0, homeColor: .red, awayColor: .blue)
+        VersusBar("Save %", homePercent: 0.92, awayPercent: 0.88, homeColor: .red, awayColor: .blue)
+        VersusBar("Faceoffs", homeSide: 28, awaySide: 22, homeColor: .red, awayColor: .blue)
         VersusBar("Penalties", homeSide: 0, awaySide: 0, homeColor: .red, awayColor: .blue)
     }
-    .padding(.horizontal)
+    .padding()
+}
+
+#Preview("Dark") {
+    VStack(spacing: 16) {
+        VersusBar("Penalties", homeSide: 3, awaySide: 7, homeColor: .red, awayColor: .blue)
+        VersusBar("Shots on goal", homeSide: 37, awaySide: 24, homeColor: .red, awayColor: .blue)
+        VersusBar("Save %", homePercent: 0.92, awayPercent: 0.88, homeColor: .red, awayColor: .blue)
+    }
+    .padding()
+    .preferredColorScheme(.dark)
 }

@@ -72,6 +72,26 @@ extension Player {
     }
 }
 
+// MARK: - Design System
+
+/// Card-like press feedback used throughout the app.
+/// Scales down slightly and dims while pressed — feels native and tactile.
+struct ScalePressStyle: ButtonStyle {
+    var scale: CGFloat = 0.97
+    var dim: Double = 0.92
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? scale : 1)
+            .opacity(configuration.isPressed ? dim : 1)
+            .animation(.spring(response: 0.35, dampingFraction: 0.7), value: configuration.isPressed)
+    }
+}
+
+extension ButtonStyle where Self == ScalePressStyle {
+    static var scalePress: ScalePressStyle { ScalePressStyle() }
+}
+
 extension Match {
     var isToday: Bool {
         Calendar.current.isDateInToday(date)

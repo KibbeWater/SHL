@@ -33,7 +33,6 @@ struct MatchView: View {
 
     @State var hasLogged = false
     @State private var showNotificationReminder = false
-    @State private var pulseAnimation: Bool = false
     private var referrer: String
 
     init(_ match: Match, referrer: String) {
@@ -115,11 +114,14 @@ struct MatchView: View {
                 startTimer()
             }
         }
+        .sensoryFeedback(.impact(weight: .heavy), trigger: homeScore)
+        .sensoryFeedback(.impact(weight: .heavy), trigger: awayScore)
+        .sensoryFeedback(.selection, trigger: selectedTab)
+        .sensoryFeedback(.success, trigger: activityRunning)
         .sheet(isPresented: $showNotificationReminder) {
             NotificationReminderSheet(
                 onEnable: {
                     Task {
-                        // Only enable user management if not already enabled
                         if !Settings.shared.userManagementEnabled {
                             Settings.shared.userManagementEnabled = true
                         }
@@ -141,13 +143,11 @@ struct MatchView: View {
     private func trackMatchViewInteraction() {
         Settings.shared.incrementMatchViewCount()
 
-        // Check if we should show the notification reminder
         Task {
             let status = await PushNotificationManager.shared.checkNotificationPermission()
             await MainActor.run {
                 if Settings.shared.shouldShowNotificationReminder() &&
                    (status == .notDetermined || status == .denied) {
-                    // Small delay to not interrupt the initial view load
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                         showNotificationReminder = true
                     }
@@ -165,6 +165,20 @@ struct MatchView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
+
+            // Dark scrim to guarantee white-text contrast against bright team colors
+            // (e.g. yellow/light-blue teams would otherwise fail WCAG).
+            LinearGradient(
+                stops: [
+                    .init(color: .black.opacity(0.55), location: 0),
+                    .init(color: .black.opacity(0.4), location: 0.25),
+                    .init(color: .black.opacity(0.15), location: 0.55),
+                    .init(color: .clear, location: 1)
+                ],
+                startPoint: .top,
+                endPoint: .center
+            )
+
             LinearGradient(
                 colors: [.clear, Color(uiColor: .systemBackground)],
                 startPoint: .top,
@@ -172,12 +186,14 @@ struct MatchView: View {
             )
         }
         .ignoresSafeArea()
+        .animation(.smooth(duration: 0.5), value: homeColor)
+        .animation(.smooth(duration: 0.5), value: awayColor)
     }
 
     // MARK: - Header Section
 
     private var headerSection: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 18) {
             if let liveGame = viewModel.liveGame,
                liveGame.gameState == .ongoing || liveGame.gameState == .paused {
                 liveHeaderSection(liveGame)
@@ -186,13 +202,13 @@ struct MatchView: View {
             }
         }
         .padding(.top, 16)
+        .shadow(color: .black.opacity(0.25), radius: 10, y: 4)
     }
 
     // MARK: - Standard Header
 
     private var standardHeaderSection: some View {
         Group {
-            // Status badge above score (for live/final/cancelled states)
             if isCancelled {
                 cancelledBadge
             } else if let liveGame = viewModel.liveGame {
@@ -201,9 +217,7 @@ struct MatchView: View {
                 finalBadge
             }
 
-            // Teams and Score
             HStack(alignment: .center, spacing: 16) {
-                // Home Team
                 teamLogo(
                     code: currentMatch.homeTeam.code,
                     team: viewModel.home
@@ -211,12 +225,10 @@ struct MatchView: View {
 
                 Spacer()
 
-                // Score / Time Center
                 scoreCenterView
 
                 Spacer()
 
-                // Away Team
                 teamLogo(
                     code: currentMatch.awayTeam.code,
                     team: viewModel.away
@@ -224,12 +236,10 @@ struct MatchView: View {
             }
             .padding(.horizontal, 24)
 
-            // Countdown badge for upcoming games
             if !hasStarted && viewModel.liveGame == nil {
                 countdownBadge
             }
 
-            // Date & venue
             headerMetadata
         }
     }
@@ -238,12 +248,9 @@ struct MatchView: View {
 
     private func liveHeaderSection(_ liveGame: LiveMatch) -> some View {
         Group {
-            // Live / Intermission badge with period
             liveIndicatorBadge(liveGame)
 
-            // Teams with center timer
             HStack(alignment: .center, spacing: 16) {
-                // Home team column
                 liveTeamColumn(
                     code: currentMatch.homeTeam.code,
                     team: viewModel.home,
@@ -253,12 +260,10 @@ struct MatchView: View {
 
                 Spacer()
 
-                // Center timer
                 liveCenterTimer(liveGame)
 
                 Spacer()
 
-                // Away team column
                 liveTeamColumn(
                     code: currentMatch.awayTeam.code,
                     team: viewModel.away,
@@ -268,7 +273,6 @@ struct MatchView: View {
             }
             .padding(.horizontal, 24)
 
-            // Date & venue
             headerMetadata
         }
     }
@@ -277,57 +281,48 @@ struct MatchView: View {
     private func liveIndicatorBadge(_ liveGame: LiveMatch) -> some View {
         if liveGame.gameState == .ongoing {
             HStack(spacing: 6) {
-                Circle()
-                    .fill(.red)
-                    .frame(width: 8, height: 8)
-                    .overlay(
-                        Circle()
-                            .fill(.red.opacity(0.4))
-                            .frame(width: 16, height: 16)
-                            .scaleEffect(pulseAnimation ? 1.5 : 1.0)
-                            .opacity(pulseAnimation ? 0 : 1)
-                    )
-                    .onAppear {
-                        withAnimation(.easeOut(duration: 1.2).repeatForever(autoreverses: false)) {
-                            pulseAnimation = true
-                        }
-                    }
+                Image(systemName: "circle.fill")
+                    .font(.system(size: 8))
+                    .foregroundStyle(.red)
+                    .symbolEffect(.pulse.byLayer, options: .repeating)
 
                 Text("LIVE")
-                    .font(.caption)
-                    .fontWeight(.heavy)
+                    .font(.caption.weight(.heavy))
 
                 Text("•")
                     .foregroundStyle(.white.opacity(0.4))
 
                 Text("P\(liveGame.period)")
-                    .font(.caption)
-                    .fontWeight(.bold)
+                    .font(.caption.weight(.bold))
+                    .contentTransition(.numericText())
             }
             .foregroundStyle(.white)
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
-            .background(.red.opacity(0.25))
-            .background(.ultraThinMaterial)
-            .clipShape(Capsule())
+            .background {
+                Capsule().fill(.red.opacity(0.4))
+                    .background(.ultraThinMaterial, in: .capsule)
+            }
+            .overlay(
+                Capsule().strokeBorder(.white.opacity(0.15), lineWidth: 0.5)
+            )
         } else {
             HStack(spacing: 6) {
+                Image(systemName: "pause.fill")
+                    .font(.system(size: 9))
                 Text("BREAK")
-                    .font(.caption)
-                    .fontWeight(.bold)
+                    .font(.caption.weight(.bold))
 
                 Text("•")
                     .foregroundStyle(.white.opacity(0.4))
 
                 Text("P\(liveGame.period)")
-                    .font(.caption)
-                    .fontWeight(.bold)
+                    .font(.caption.weight(.bold))
             }
             .foregroundStyle(.white)
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
-            .background(.ultraThinMaterial)
-            .clipShape(Capsule())
+            .background(.ultraThinMaterial, in: .capsule)
         }
     }
 
@@ -339,7 +334,7 @@ struct MatchView: View {
                 } label: {
                     liveTeamColumnContent(code: code, score: score, isWinning: isWinning)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.scalePress)
             } else {
                 liveTeamColumnContent(code: code, score: score, isWinning: isWinning)
             }
@@ -349,17 +344,19 @@ struct MatchView: View {
     private func liveTeamColumnContent(code: String, score: Int, isWinning: Bool) -> some View {
         VStack(spacing: 8) {
             TeamLogoView(teamCode: code, size: .extraLarge)
+                .shadow(color: .black.opacity(0.25), radius: 8, y: 3)
 
             Text(code)
-                .font(.caption)
-                .fontWeight(.bold)
-                .foregroundStyle(.white.opacity(0.8))
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.white.opacity(0.85))
 
             Text("\(score)")
-                .font(.system(size: 36, weight: .bold, design: .rounded))
+                .font(.system(size: 44, weight: .bold, design: .rounded))
                 .fontWidth(.compressed)
                 .foregroundStyle(isWinning ? .white : .white.opacity(0.5))
-                .contentTransition(.numericText())
+                .monospacedDigit()
+                .contentTransition(.numericText(value: Double(score)))
+                .animation(.snappy, value: score)
         }
     }
 
@@ -372,13 +369,18 @@ struct MatchView: View {
                 countsDown: true,
                 showsHours: false
             )
-            .font(.system(size: 48, weight: .bold, design: .rounded))
+            .font(.system(size: 44, weight: .bold, design: .rounded))
             .monospacedDigit()
             .foregroundStyle(.white)
         } else {
-            Text("Break")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.7))
+            VStack(spacing: 4) {
+                Image(systemName: "pause.circle.fill")
+                    .font(.title)
+                    .foregroundStyle(.white.opacity(0.6))
+                Text("Break")
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(.white.opacity(0.8))
+            }
         }
     }
 
@@ -390,7 +392,7 @@ struct MatchView: View {
                 } label: {
                     teamLogoContent(code: code)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.scalePress)
             } else {
                 teamLogoContent(code: code)
             }
@@ -400,11 +402,11 @@ struct MatchView: View {
     private func teamLogoContent(code: String) -> some View {
         VStack(spacing: 8) {
             TeamLogoView(teamCode: code, size: .extraLarge)
+                .shadow(color: .black.opacity(0.25), radius: 8, y: 3)
 
             Text(code)
-                .font(.caption)
-                .fontWeight(.bold)
-                .foregroundStyle(.white.opacity(0.8))
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.white.opacity(0.85))
         }
     }
 
@@ -423,15 +425,20 @@ struct MatchView: View {
                 HStack(spacing: 12) {
                     Text("\(homeScore)")
                         .foregroundStyle(homeScore >= awayScore ? .white : .white.opacity(0.5))
+                        .contentTransition(.numericText(value: Double(homeScore)))
 
-                    Text("-")
+                    Text("–")
                         .foregroundStyle(.white.opacity(0.4))
 
                     Text("\(awayScore)")
                         .foregroundStyle(awayScore >= homeScore ? .white : .white.opacity(0.5))
+                        .contentTransition(.numericText(value: Double(awayScore)))
                 }
                 .font(.system(size: 48, weight: .bold, design: .rounded))
                 .fontWidth(.compressed)
+                .monospacedDigit()
+                .animation(.snappy, value: homeScore)
+                .animation(.snappy, value: awayScore)
             } else {
                 // Future game - show date and time prominently
                 VStack(spacing: 6) {
@@ -441,10 +448,10 @@ struct MatchView: View {
                             .foregroundStyle(.white)
                     } else {
                         Text(match.date.formatted(.dateTime.weekday(.wide)))
-                            .font(.caption)
-                            .fontWeight(.medium)
+                            .font(.caption.weight(.medium))
                             .foregroundStyle(.white.opacity(0.7))
                             .textCase(.uppercase)
+                            .kerning(1.5)
 
                         Text(match.formatDate())
                             .font(.system(size: 28, weight: .bold, design: .rounded))
@@ -452,9 +459,9 @@ struct MatchView: View {
                     }
 
                     Text(match.date.formatted(date: .omitted, time: .shortened))
-                        .font(.title3)
-                        .fontWeight(.semibold)
+                        .font(.title3.weight(.semibold))
                         .foregroundStyle(.white.opacity(0.9))
+                        .monospacedDigit()
                 }
             }
         }
@@ -463,20 +470,19 @@ struct MatchView: View {
     private func gameStatusBadge(_ liveGame: LiveMatch) -> some View {
         HStack(spacing: 6) {
             if liveGame.gameState == .ongoing {
-                Circle()
-                    .fill(.red)
-                    .frame(width: 8, height: 8)
+                Image(systemName: "circle.fill")
+                    .font(.system(size: 8))
+                    .foregroundStyle(.red)
+                    .symbolEffect(.pulse, options: .repeating)
             }
 
             Text(statusText(for: liveGame))
-                .font(.caption)
-                .fontWeight(.bold)
+                .font(.caption.weight(.bold))
         }
         .foregroundStyle(.white)
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
-        .background(.ultraThinMaterial)
-        .clipShape(Capsule())
+        .background(.ultraThinMaterial, in: .capsule)
     }
 
     private func statusText(for liveGame: LiveMatch) -> String {
@@ -502,37 +508,38 @@ struct MatchView: View {
         return HStack(spacing: 6) {
             Image(systemName: "clock.fill")
                 .font(.caption)
+                .symbolRenderingMode(.hierarchical)
 
             if days > 0 {
                 Text("\(days)d \(hours)h until puck drop")
-                    .font(.caption)
-                    .fontWeight(.semibold)
+                    .font(.caption.weight(.semibold))
             } else if hours > 0 {
                 Text("\(hours)h until puck drop")
-                    .font(.caption)
-                    .fontWeight(.semibold)
+                    .font(.caption.weight(.semibold))
             } else {
                 Text("Starting soon")
-                    .font(.caption)
-                    .fontWeight(.semibold)
+                    .font(.caption.weight(.semibold))
             }
         }
         .foregroundStyle(.white)
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
-        .background(.ultraThinMaterial)
-        .clipShape(Capsule())
+        .background(.ultraThinMaterial, in: .capsule)
+        .overlay(Capsule().strokeBorder(.white.opacity(0.1), lineWidth: 0.5))
     }
 
     private var finalBadge: some View {
-        Text("FINAL")
-            .font(.caption)
-            .fontWeight(.bold)
-            .foregroundStyle(.white)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 8)
-            .background(.ultraThinMaterial)
-            .clipShape(Capsule())
+        HStack(spacing: 6) {
+            Image(systemName: "flag.checkered")
+                .font(.caption)
+            Text("FINAL")
+                .font(.caption.weight(.bold))
+                .kerning(0.8)
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(.ultraThinMaterial, in: .capsule)
     }
 
     private var cancelledBadge: some View {
@@ -540,14 +547,13 @@ struct MatchView: View {
             Image(systemName: "xmark.circle.fill")
                 .font(.caption)
             Text("CANCELLED")
-                .font(.caption)
-                .fontWeight(.bold)
+                .font(.caption.weight(.bold))
+                .kerning(0.8)
         }
         .foregroundStyle(.white)
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
-        .background(.ultraThinMaterial)
-        .clipShape(Capsule())
+        .background(.ultraThinMaterial, in: .capsule)
     }
 
     private var cancelledNoticeCard: some View {
@@ -555,6 +561,7 @@ struct MatchView: View {
             Image(systemName: "xmark.circle.fill")
                 .font(.system(size: 40))
                 .foregroundStyle(.secondary)
+                .symbolRenderingMode(.hierarchical)
             Text("Match Cancelled")
                 .font(.headline)
             Text("This game was cancelled and will not be played.")
@@ -565,8 +572,7 @@ struct MatchView: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 32)
         .padding(.horizontal)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(.ultraThinMaterial, in: .rect(cornerRadius: 16, style: .continuous))
     }
 
     private var dateLabel: some View {
@@ -575,16 +581,16 @@ struct MatchView: View {
         } icon: {
             Image(systemName: "calendar")
         }
-        .font(.subheadline)
-        .foregroundStyle(.white.opacity(0.7))
+        .font(.subheadline.weight(.medium))
+        .foregroundStyle(.white.opacity(0.95))
     }
 
     @ViewBuilder
     private var venueLabel: some View {
         if let venue = match.venue {
-            Label(venue, systemImage: "mappin.circle.fill")
-                .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.7))
+            Label(venue, systemImage: "mappin.and.ellipse")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.white.opacity(0.95))
         }
     }
 
@@ -593,6 +599,7 @@ struct MatchView: View {
             dateLabel
             venueLabel
         }
+        .shadow(color: .black.opacity(0.4), radius: 6, x: 0, y: 1)
     }
 
     // MARK: - Tab Picker
@@ -614,8 +621,10 @@ struct MatchView: View {
         switch selectedTab {
         case .summary:
             summaryContent
+                .transition(.opacity.combined(with: .move(edge: .leading)))
         case .pbp:
             pbpContent
+                .transition(.opacity.combined(with: .move(edge: .trailing)))
         }
     }
 
@@ -634,7 +643,6 @@ struct MatchView: View {
                     statsCard
                 }
 
-                // Future game content
                 if !hasStarted {
                     upcomingGameInfoCard
                 }
@@ -653,87 +661,66 @@ struct MatchView: View {
         VStack(spacing: 16) {
             HStack {
                 Label("Game Info", systemImage: "hockey.puck.fill")
-                    .font(.headline)
-                    .fontWeight(.semibold)
+                    .font(.headline.weight(.semibold))
                 Spacer()
             }
 
             VStack(spacing: 12) {
-                // Date & Time Row
-                HStack {
-                    HStack(spacing: 10) {
-                        Image(systemName: "calendar")
-                            .font(.body)
-                            .foregroundStyle(.secondary)
-                            .frame(width: 24)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Date & Time")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Text("\(match.formatDate()), \(match.formatTime())")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                        }
-                    }
-                    Spacer()
+                infoRow(icon: "calendar", title: "Date & Time", value: "\(match.formatDate()), \(match.formatTime())")
+
+                if let venue = match.venue {
+                    Divider()
+                    infoRow(icon: "mappin.and.ellipse", title: "Venue", value: venue)
                 }
 
                 Divider()
-
-                // Venue Row
-                if let venue = match.venue {
-                    HStack {
-                        HStack(spacing: 10) {
-                            Image(systemName: "mappin.and.ellipse")
-                                .font(.body)
-                                .foregroundStyle(.secondary)
-                                .frame(width: 24)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Venue")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Text(venue)
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                            }
-                        }
-                        Spacer()
-                    }
-
-                    Divider()
-                }
-
-                // Matchup Row
-                HStack {
-                    HStack(spacing: 10) {
-                        Image(systemName: "sportscourt.fill")
-                            .font(.body)
-                            .foregroundStyle(.secondary)
-                            .frame(width: 24)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Matchup")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Text("\(currentMatch.homeTeam.name) vs \(currentMatch.awayTeam.name)")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                        }
-                    }
-                    Spacer()
-                }
+                infoRow(
+                    icon: "sportscourt.fill",
+                    title: "Matchup",
+                    value: "\(currentMatch.homeTeam.name) vs \(currentMatch.awayTeam.name)"
+                )
             }
         }
         .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(.ultraThinMaterial, in: .rect(cornerRadius: 16, style: .continuous))
+    }
+
+    private func infoRow(icon: String, title: String, value: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.body)
+                .foregroundStyle(.tint)
+                .symbolRenderingMode(.hierarchical)
+                .frame(width: 24)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(value)
+                    .font(.subheadline.weight(.medium))
+            }
+
+            Spacer()
+        }
     }
 
     private var liveActivityCard: some View {
         HStack(spacing: 16) {
-            VStack(alignment: .leading, spacing: 4) {
+            ZStack {
+                Circle()
+                    .fill(.tint.opacity(0.18))
+                    .frame(width: 44, height: 44)
+                Image(systemName: activityRunning ? "bell.badge.fill" : "bell.fill")
+                    .font(.title3)
+                    .foregroundStyle(.tint)
+                    .symbolRenderingMode(.hierarchical)
+                    .contentTransition(.symbolEffect(.replace))
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
                 Text(activityRunning ? "Following Game" : "Follow Live")
-                    .font(.headline)
-                    .fontWeight(.semibold)
+                    .font(.headline.weight(.semibold))
 
                 Text(activityRunning ?
                      "Live updates on your Lock Screen" :
@@ -751,19 +738,17 @@ struct MatchView: View {
                     .fontWeight(.semibold)
             }
             .buttonStyle(.borderedProminent)
-            .tint(activityRunning ? .red : .blue)
+            .tint(activityRunning ? .red : .accentColor)
         }
         .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(.ultraThinMaterial, in: .rect(cornerRadius: 16, style: .continuous))
     }
 
     private var statsCard: some View {
         VStack(spacing: 16) {
             HStack {
-                Text("Game Stats")
-                    .font(.headline)
-                    .fontWeight(.bold)
+                Label("Game Stats", systemImage: "chart.bar.xaxis")
+                    .font(.headline.weight(.bold))
                 Spacer()
             }
 
@@ -800,23 +785,21 @@ struct MatchView: View {
             }
         }
         .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(.ultraThinMaterial, in: .rect(cornerRadius: 16, style: .continuous))
     }
 
     private var venueMapCard: some View {
         VStack(spacing: 12) {
             HStack {
-                Text("Venue")
-                    .font(.headline)
-                    .fontWeight(.bold)
+                Label("Venue", systemImage: "map.fill")
+                    .font(.headline.weight(.bold))
                 Spacer()
 
                 Button {
                     openInMaps()
                 } label: {
                     Label("Directions", systemImage: "arrow.triangle.turn.up.right.diamond")
-                        .font(.caption)
+                        .font(.caption.weight(.semibold))
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
@@ -833,19 +816,20 @@ struct MatchView: View {
                             openInMaps()
                         }
                 } else {
-                    ProgressView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .onAppear {
-                            loadMap(size: geo.size)
-                        }
+                    ZStack {
+                        Color(uiColor: .tertiarySystemFill)
+                        ProgressView()
+                    }
+                    .onAppear {
+                        loadMap(size: geo.size)
+                    }
                 }
             }
             .frame(height: 200)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(.rect(cornerRadius: 12, style: .continuous))
         }
         .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(.ultraThinMaterial, in: .rect(cornerRadius: 16, style: .continuous))
     }
 
     // MARK: - PBP Content
@@ -878,6 +862,7 @@ struct MatchView: View {
             Image(systemName: icon)
                 .font(.system(size: 40))
                 .foregroundStyle(.secondary)
+                .symbolRenderingMode(.hierarchical)
 
             Text(title)
                 .font(.headline)
@@ -889,8 +874,7 @@ struct MatchView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 48)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(.ultraThinMaterial, in: .rect(cornerRadius: 16, style: .continuous))
     }
 
     // MARK: - Actions
@@ -969,10 +953,10 @@ struct MatchView: View {
 
     private func loadTeamColors() {
         match.awayTeam.getTeamColor { color in
-            withAnimation { awayColor = color }
+            withAnimation(.smooth(duration: 0.5)) { awayColor = color }
         }
         match.homeTeam.getTeamColor { color in
-            withAnimation { homeColor = color }
+            withAnimation(.smooth(duration: 0.5)) { homeColor = color }
         }
     }
 
@@ -1022,47 +1006,77 @@ struct MatchView: View {
 // MARK: - Previews
 
 #Preview("Previous") {
-    MatchView(Match.fakeData(), referrer: "PREVIEW")
+    NavigationStack { MatchView(Match.fakeData(), referrer: "PREVIEW") }
 }
 
 #Preview("Upcoming") {
-    MatchView(Match.fakeData(), referrer: "PREVIEW")
+    NavigationStack {
+        MatchView(
+            Match(
+                id: "upcoming-preview",
+                date: Date().addingTimeInterval(3600 * 26),
+                venue: "Avicii Arena",
+                homeTeam: TeamBasic(id: "team-1", name: "Djurgårdens IF", code: "DIF"),
+                awayTeam: TeamBasic(id: "team-2", name: "Frölunda HC", code: "FHC"),
+                homeScore: 0,
+                awayScore: 0,
+                state: .scheduled,
+                overtime: false,
+                shootout: false,
+                externalUUID: ""
+            ),
+            referrer: "PREVIEW"
+        )
+    }
 }
 
 #Preview("Cancelled") {
-    MatchView(
-        Match(
-            id: "cancelled-preview",
-            date: Date().addingTimeInterval(-3600),
-            venue: "Be-Ge Hockey Center",
-            homeTeam: TeamBasic(id: "team-1", name: "IK Oskarshamn", code: "IKO"),
-            awayTeam: TeamBasic(id: "team-2", name: "Frölunda HC", code: "FHC"),
-            homeScore: 0,
-            awayScore: 0,
-            state: .cancelled,
-            overtime: false,
-            shootout: false,
-            externalUUID: ""
-        ),
-        referrer: "PREVIEW"
-    )
+    NavigationStack {
+        MatchView(
+            Match(
+                id: "cancelled-preview",
+                date: Date().addingTimeInterval(-3600),
+                venue: "Be-Ge Hockey Center",
+                homeTeam: TeamBasic(id: "team-1", name: "IK Oskarshamn", code: "IKO"),
+                awayTeam: TeamBasic(id: "team-2", name: "Frölunda HC", code: "FHC"),
+                homeScore: 0,
+                awayScore: 0,
+                state: .cancelled,
+                overtime: false,
+                shootout: false,
+                externalUUID: ""
+            ),
+            referrer: "PREVIEW"
+        )
+    }
 }
 
 #Preview("Live") {
-    MatchView(
-        Match(
-            id: "v2cb2bt9i8",
-            date: .now,
-            venue: "Coop Norbotten Arena",
-            homeTeam: TeamBasic(id: "team-1", name: "Brynäs", code: "BIF"),
-            awayTeam: TeamBasic(id: "team-2", name: "Luleå Hockey", code: "LHF"),
-            homeScore: 1,
-            awayScore: 2,
-            state: .ongoing,
-            overtime: false,
-            shootout: false,
-            externalUUID: ""
-        ),
-        referrer: "PREVIEW"
-    )
+    NavigationStack {
+        MatchView(
+            Match(
+                id: "v2cb2bt9i8",
+                date: .now,
+                venue: "Coop Norbotten Arena",
+                homeTeam: TeamBasic(id: "team-1", name: "Brynäs", code: "BIF"),
+                awayTeam: TeamBasic(id: "team-2", name: "Luleå Hockey", code: "LHF"),
+                homeScore: 1,
+                awayScore: 2,
+                state: .ongoing,
+                overtime: false,
+                shootout: false,
+                externalUUID: ""
+            ),
+            referrer: "PREVIEW"
+        )
+    }
+}
+
+#Preview("Dark") {
+    NavigationStack { MatchView(Match.fakeData(), referrer: "PREVIEW") }
+        .preferredColorScheme(.dark)
+}
+
+#Preview("iPad", traits: .landscapeLeft) {
+    NavigationStack { MatchView(Match.fakeData(), referrer: "PREVIEW") }
 }

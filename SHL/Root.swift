@@ -30,6 +30,9 @@ enum RootTabs: Equatable, Hashable, Identifiable {
 struct Root: View {
     @State private var loggedIn = false
     @State private var showOnboarding = false
+    @State private var splashIconScale: CGFloat = 0.6
+    @State private var splashIconRotation: Double = -8
+    @State private var splashOpacity: Double = 0
 
     private let api = SHLAPIClient.shared
 
@@ -178,44 +181,45 @@ struct Root: View {
             }
             
             if !loggedIn {
-                VStack {
-                    Spacer()
-                    
-                    Text("SHL")
-                        .font(.system(size: 72, weight: .heavy))
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-                .background(Color(uiColor: .systemBackground))
-                .zIndex(10)
-                .transition(
-                    .move(edge: .bottom)
-                        .animation(.easeInOut(duration: 300))
-                )
-                .task {
-                    do {
-                        let _ = try? await api.getCurrentStandings()
-                    } catch let _err {
-                        print(_err)
-                    }
+                splashView
+                    .zIndex(10)
+                    .transition(.opacity.combined(with: .scale(scale: 1.08, anchor: .center)))
+                    .task {
+                        // Animate entrance
+                        withAnimation(.spring(response: 0.7, dampingFraction: 0.65)) {
+                            splashIconScale = 1
+                            splashIconRotation = 0
+                            splashOpacity = 1
+                        }
 
-                    do {
-                        let _ = try await api.getLatestMatches()
-                    } catch let _err {
-                        print(_err)
-                    }
+                        do {
+                            let _ = try? await api.getCurrentStandings()
+                        } catch let _err {
+                            print(_err)
+                        }
 
-                    withAnimation {
-                        loggedIn = true
-                    }
+                        do {
+                            let _ = try await api.getLatestMatches()
+                        } catch let _err {
+                            print(_err)
+                        }
 
-                    // Check if onboarding needed (after splash)
-                    if !Settings.shared.hasCompletedOnboarding {
-                        showOnboarding = true
+                        // Give the splash a beat to breathe before dismissing
+                        try? await Task.sleep(nanoseconds: 250_000_000)
+
+                        withAnimation(.smooth(duration: 0.45)) {
+                            loggedIn = true
+                        }
+
+                        // Check if onboarding needed (after splash)
+                        if !Settings.shared.hasCompletedOnboarding {
+                            showOnboarding = true
+                        }
                     }
-                }
             }
         }
+        .tint(.accentColor)
+        .sensoryFeedback(.success, trigger: loggedIn) { _, new in new }
         .task {
             do {
                 // Get basic teams, then fetch details for each
@@ -253,6 +257,55 @@ struct Root: View {
             AdminPairingSheet()
                 .environmentObject(adminPairingCoordinator)
         }
+    }
+
+    // MARK: - Splash
+
+    private var splashView: some View {
+        ZStack {
+            // Subtle radial backdrop so the icon feels lit from behind
+            RadialGradient(
+                colors: [Color.accentColor.opacity(0.22), Color(uiColor: .systemBackground)],
+                center: .center,
+                startRadius: 8,
+                endRadius: 360
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 24) {
+                Spacer()
+
+                Image(systemName: "hockey.puck.fill")
+                    .font(.system(size: 96))
+                    .foregroundStyle(.primary)
+                    .symbolRenderingMode(.hierarchical)
+                    .rotationEffect(.degrees(splashIconRotation))
+                    .scaleEffect(splashIconScale)
+                    .shadow(color: .black.opacity(0.15), radius: 18, y: 8)
+
+                VStack(spacing: 4) {
+                    Text("SHL")
+                        .font(.system(.largeTitle, design: .rounded).weight(.heavy))
+                        .kerning(2)
+                    Text("Tracker")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
+                        .kerning(3)
+                }
+                .opacity(splashOpacity)
+
+                Spacer()
+
+                ProgressView()
+                    .controlSize(.small)
+                    .tint(.secondary)
+                    .opacity(splashOpacity * 0.6)
+                    .padding(.bottom, 32)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(uiColor: .systemBackground))
     }
 
     private func handlePendingNavigation(matchId: String) {

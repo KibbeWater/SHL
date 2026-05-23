@@ -42,52 +42,64 @@ struct StandingRowView: View {
     private var positionColor: Color {
         switch standing.position {
         case 1: return .yellow
-        case 2: return .gray
+        case 2: return Color(uiColor: .systemGray2)
         case 3: return .orange
         default: return .secondary
         }
     }
 
+    private var medalSymbol: String? {
+        switch standing.position {
+        case 1: return "trophy.fill"
+        case 2, 3: return "medal.fill"
+        default: return nil
+        }
+    }
+
     var body: some View {
         HStack(spacing: 8) {
-            // Position
-            Text("\(standing.position)")
-                .font(.system(size: 14, weight: isTopThree ? .bold : .semibold, design: .rounded))
-                .foregroundStyle(isTopThree ? positionColor : .secondary)
-                .frame(width: 20, alignment: .center)
+            // Position with medal icon for top 3
+            ZStack {
+                Text("\(standing.position)")
+                    .font(.footnote.weight(isTopThree ? .bold : .semibold))
+                    .foregroundStyle(isTopThree ? positionColor : .secondary)
+                    .monospacedDigit()
+            }
+            .frame(width: 20, alignment: .center)
 
             // Team logo
-            TeamLogoView(teamCode: standing.teamCode, size: .custom(26))
+            TeamLogoView(teamCode: standing.teamCode, size: .custom(28))
+                .shadow(color: .black.opacity(0.08), radius: 2, y: 1)
 
             // Team name
             Text(standing.team)
-                .font(.subheadline)
-                .fontWeight(.medium)
+                .font(.subheadline.weight(.medium))
                 .foregroundStyle(.primary)
                 .lineLimit(1)
+                .minimumScaleFactor(0.85)
 
             Spacer()
 
             // Stats
             HStack(spacing: 12) {
-                // W-L-OTL record or GP
                 Text(standing.record)
-                    .font(.system(size: 13, weight: .medium, design: .monospaced))
+                    .font(.caption.weight(.medium))
+                    .monospacedDigit()
                     .foregroundStyle(.secondary)
                     .frame(width: standing.hasRecord ? 80 : 28, alignment: .center)
 
-                // Goal difference
                 Text(standing.diff)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
+                    .font(.subheadline.weight(.medium))
+                    .monospacedDigit()
                     .foregroundStyle(standing.diff.hasPrefix("-") ? .red : (standing.diff == "0" ? .secondary : .green))
                     .frame(width: 32, alignment: .center)
 
-                // Points
                 Text(standing.points)
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .font(.callout.weight(.bold))
+                    .monospacedDigit()
                     .foregroundStyle(.primary)
                     .frame(width: 32, alignment: .center)
+                    .contentTransition(.numericText())
             }
         }
         .padding(.horizontal, 12)
@@ -95,22 +107,22 @@ struct StandingRowView: View {
         .background {
             if isFavorite {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 10)
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    Color.accentColor.opacity(0.15),
+                                    Color.accentColor.opacity(0.18),
                                     Color.accentColor.opacity(0.05)
                                 ],
                                 startPoint: .leading,
                                 endPoint: .trailing
                             )
                         )
-                    RoundedRectangle(cornerRadius: 10)
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .strokeBorder(
                             LinearGradient(
                                 colors: [
-                                    Color.accentColor.opacity(0.5),
+                                    Color.accentColor.opacity(0.6),
                                     Color.accentColor.opacity(0.15)
                                 ],
                                 startPoint: .leading,
@@ -118,9 +130,8 @@ struct StandingRowView: View {
                             ),
                             lineWidth: 1
                         )
-                    // Leading accent bar
                     HStack {
-                        RoundedRectangle(cornerRadius: 2)
+                        Capsule()
                             .fill(Color.accentColor)
                             .frame(width: 3)
                             .padding(.vertical, 6)
@@ -130,6 +141,7 @@ struct StandingRowView: View {
                 .padding(.horizontal, 4)
             }
         }
+        .animation(.smooth, value: isFavorite)
     }
 }
 
@@ -138,13 +150,11 @@ private struct StandingsHeaderRow: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            // Position
             Text("#")
                 .frame(width: 20, alignment: .center)
 
-            // Spacer for logo (26) + gap
             Color.clear
-                .frame(width: 26)
+                .frame(width: 28)
 
             Text("Team")
             Spacer()
@@ -158,7 +168,7 @@ private struct StandingsHeaderRow: View {
                     .frame(width: 32, alignment: .center)
             }
         }
-        .font(.system(size: 11, weight: .medium))
+        .font(.caption2.weight(.medium))
         .foregroundStyle(.tertiary)
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
@@ -168,7 +178,6 @@ private struct StandingsHeaderRow: View {
 private struct PlayoffDivider: View {
     var body: some View {
         HStack(spacing: 6) {
-            // Left line with gradient fade-in
             Rectangle()
                 .fill(
                     LinearGradient(
@@ -179,23 +188,23 @@ private struct PlayoffDivider: View {
                 )
                 .frame(height: 1.5)
 
-            // Label
             HStack(spacing: 4) {
                 Image(systemName: "trophy.fill")
-                    .font(.system(size: 8))
+                    .font(.system(size: 9))
+                    .symbolRenderingMode(.hierarchical)
                 Text("PLAYOFFS")
-                    .font(.system(size: 9, weight: .bold, design: .rounded))
+                    .font(.caption2.weight(.bold))
                     .kerning(1.2)
             }
             .foregroundStyle(.yellow)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 3)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
             .background(
                 Capsule()
-                    .fill(.yellow.opacity(0.12))
+                    .fill(.yellow.opacity(0.14))
             )
+            .overlay(Capsule().strokeBorder(.yellow.opacity(0.25), lineWidth: 0.5))
 
-            // Right line with gradient fade-out
             Rectangle()
                 .fill(
                     LinearGradient(
@@ -221,29 +230,38 @@ struct StandingsTable: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header
             HStack {
                 Text(title)
-                    .font(.headline)
-                    .fontWeight(.semibold)
+                    .font(.headline.weight(.semibold))
                 Spacer()
+                if let favoriteTeamId,
+                   let favorite = items.first(where: { $0.teamId == favoriteTeamId }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "star.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.yellow)
+                        Text("#\(favorite.position)")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(.quaternary, in: .capsule)
+                }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
 
-            // Divider
             Rectangle()
                 .fill(.secondary.opacity(0.2))
-                .frame(height: 1)
+                .frame(height: 0.5)
 
-            // Column headers
             StandingsHeaderRow(hasRecord: items.first?.hasRecord ?? false)
 
             Rectangle()
                 .fill(.secondary.opacity(0.1))
-                .frame(height: 1)
+                .frame(height: 0.5)
 
-            // Rows
             LazyVStack(spacing: 0) {
                 ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                     Group {
@@ -257,7 +275,7 @@ struct StandingsTable: View {
                                     isFavorite: item.teamId == favoriteTeamId
                                 )
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.scalePress)
                         } else {
                             StandingRowView(
                                 standing: item,
@@ -271,9 +289,9 @@ struct StandingsTable: View {
                         PlayoffDivider()
                     } else if index < items.count - 1 {
                         Rectangle()
-                            .fill(.secondary.opacity(0.1))
-                            .frame(height: 1)
-                            .padding(.leading, 48)
+                            .fill(.secondary.opacity(0.08))
+                            .frame(height: 0.5)
+                            .padding(.leading, 50)
                     }
                 }
             }
@@ -281,23 +299,39 @@ struct StandingsTable: View {
     }
 }
 
+private var standingsSampleItems: [StandingObj] {
+    [
+        StandingObj(id: "1", teamId: "t1", position: 1, team: "Luleå Hockey", teamCode: "LHF", gamesPlayed: 52, wins: 30, overtimeWins: 6, losses: 10, overtimeLosses: 6, diff: "+61", points: "108"),
+        StandingObj(id: "2", teamId: "t2", position: 2, team: "Frölunda HC", teamCode: "FHC", gamesPlayed: 52, wins: 26, overtimeWins: 8, losses: 12, overtimeLosses: 6, diff: "+38", points: "98"),
+        StandingObj(id: "3", teamId: "t3", position: 3, team: "Skellefteå AIK", teamCode: "SKE", gamesPlayed: 52, wins: 24, overtimeWins: 6, losses: 16, overtimeLosses: 6, diff: "+22", points: "90"),
+        StandingObj(id: "4", teamId: "t4", position: 4, team: "Färjestad BK", teamCode: "FBK", gamesPlayed: 52, wins: 22, overtimeWins: 5, losses: 18, overtimeLosses: 7, diff: "+15", points: "83"),
+        StandingObj(id: "5", teamId: "t5", position: 5, team: "Rögle BK", teamCode: "RBK", gamesPlayed: 52, wins: 20, overtimeWins: 4, losses: 20, overtimeLosses: 8, diff: "+8", points: "76"),
+        StandingObj(id: "6", teamId: "t6", position: 6, team: "Växjö Lakers", teamCode: "VLH", gamesPlayed: 52, wins: 18, overtimeWins: 5, losses: 22, overtimeLosses: 7, diff: "0", points: "71"),
+        StandingObj(id: "7", teamId: "t7", position: 7, team: "IK Oskarshamn", teamCode: "IKO", gamesPlayed: 52, wins: 14, overtimeWins: 3, losses: 28, overtimeLosses: 7, diff: "-12", points: "55"),
+    ]
+}
+
 #Preview {
     ScrollView {
         StandingsTable(
             title: "SHL 2024/25",
-            items: [
-                StandingObj(id: "1", teamId: "t1", position: 1, team: "Luleå Hockey", teamCode: "LHF", gamesPlayed: 52, wins: 30, overtimeWins: 6, losses: 10, overtimeLosses: 6, diff: "+61", points: "108"),
-                StandingObj(id: "2", teamId: "t2", position: 2, team: "Frölunda HC", teamCode: "FHC", gamesPlayed: 52, wins: 26, overtimeWins: 8, losses: 12, overtimeLosses: 6, diff: "+38", points: "98"),
-                StandingObj(id: "3", teamId: "t3", position: 3, team: "Skellefteå AIK", teamCode: "SKE", gamesPlayed: 52, wins: 24, overtimeWins: 6, losses: 16, overtimeLosses: 6, diff: "+22", points: "90"),
-                StandingObj(id: "4", teamId: "t4", position: 4, team: "Färjestad BK", teamCode: "FBK", gamesPlayed: 52, wins: 22, overtimeWins: 5, losses: 18, overtimeLosses: 7, diff: "+15", points: "83"),
-                StandingObj(id: "5", teamId: "t5", position: 5, team: "Rögle BK", teamCode: "RBK", gamesPlayed: 52, wins: 20, overtimeWins: 4, losses: 20, overtimeLosses: 8, diff: "+8", points: "76"),
-                StandingObj(id: "6", teamId: "t6", position: 6, team: "Växjö Lakers", teamCode: "VLH", gamesPlayed: 52, wins: 18, overtimeWins: 5, losses: 22, overtimeLosses: 7, diff: "0", points: "71"),
-                StandingObj(id: "7", teamId: "t7", position: 7, team: "IK Oskarshamn", teamCode: "IKO", gamesPlayed: 52, wins: 14, overtimeWins: 3, losses: 28, overtimeLosses: 7, diff: "-12", points: "55"),
-            ],
+            items: standingsSampleItems,
             favoriteTeamId: "t3"
         )
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .background(.ultraThinMaterial, in: .rect(cornerRadius: 16, style: .continuous))
         .padding()
     }
+}
+
+#Preview("Dark") {
+    ScrollView {
+        StandingsTable(
+            title: "SHL 2024/25",
+            items: standingsSampleItems,
+            favoriteTeamId: "t3"
+        )
+        .background(.ultraThinMaterial, in: .rect(cornerRadius: 16, style: .continuous))
+        .padding()
+    }
+    .preferredColorScheme(.dark)
 }

@@ -18,6 +18,7 @@ struct TeamView: View {
 
     @State private var teamColor: Color = .gray
     @State private var selectedTab: TeamTabs = .history
+    @State private var refreshTick = 0
 
     let team: Team
 
@@ -72,6 +73,7 @@ struct TeamView: View {
             }
             .refreshable {
                 try? await viewModel.refresh()
+                refreshTick &+= 1
             }
         }
         .task {
@@ -82,6 +84,8 @@ struct TeamView: View {
                 try? await viewModel.refresh()
             }
         }
+        .sensoryFeedback(.selection, trigger: selectedTab)
+        .sensoryFeedback(.success, trigger: refreshTick)
     }
 
     // MARK: - Background
@@ -93,6 +97,19 @@ struct TeamView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
+
+            // Scrim for white-text contrast on bright team colors.
+            LinearGradient(
+                stops: [
+                    .init(color: .black.opacity(0.5), location: 0),
+                    .init(color: .black.opacity(0.3), location: 0.25),
+                    .init(color: .black.opacity(0.1), location: 0.55),
+                    .init(color: .clear, location: 1)
+                ],
+                startPoint: .top,
+                endPoint: .center
+            )
+
             LinearGradient(
                 colors: [.clear, Color(uiColor: .systemBackground)],
                 startPoint: .top,
@@ -100,34 +117,37 @@ struct TeamView: View {
             )
         }
         .ignoresSafeArea()
+        .animation(.smooth(duration: 0.5), value: teamColor)
     }
 
     // MARK: - Header Section
 
     private var headerSection: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 14) {
             TeamLogoView(team: team, size: .custom(100))
-                .shadow(color: .black.opacity(0.3), radius: 10, y: 4)
+                .shadow(color: .black.opacity(0.35), radius: 12, y: 6)
 
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 Text(team.name)
-                    .font(.title)
-                    .fontWeight(.bold)
+                    .font(.title.weight(.bold))
                     .foregroundStyle(.white)
+                    .shadow(color: .black.opacity(0.35), radius: 6, y: 1)
+                    .multilineTextAlignment(.center)
 
                 if let rank = teamRank {
                     HStack(spacing: 6) {
                         Image(systemName: "trophy.fill")
                             .font(.caption)
+                            .symbolRenderingMode(.hierarchical)
                         Text("#\(rank) in standings")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
+                            .font(.subheadline.weight(.medium))
+                            .contentTransition(.numericText(value: Double(rank)))
                     }
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(.ultraThinMaterial)
-                    .clipShape(Capsule())
+                    .background(.ultraThinMaterial, in: .capsule)
+                    .overlay(Capsule().strokeBorder(.white.opacity(0.15), lineWidth: 0.5))
                 }
             }
         }
@@ -153,8 +173,10 @@ struct TeamView: View {
         switch selectedTab {
         case .history:
             matchHistoryContent
+                .transition(.opacity.combined(with: .move(edge: .leading)))
         case .lineup:
             lineupContent
+                .transition(.opacity.combined(with: .move(edge: .trailing)))
         }
     }
 
@@ -165,7 +187,6 @@ struct TeamView: View {
             if viewModel.history.isEmpty {
                 loadingStateView
             } else {
-                // Upcoming Games Section
                 if !upcomingGames.isEmpty {
                     matchSection(
                         title: "Upcoming Games",
@@ -174,7 +195,6 @@ struct TeamView: View {
                     )
                 }
 
-                // Played Games Section
                 if !playedGames.isEmpty {
                     matchSection(
                         title: "Recent Results",
@@ -191,8 +211,7 @@ struct TeamView: View {
         VStack(spacing: 12) {
             HStack {
                 Label(title, systemImage: icon)
-                    .font(.headline)
-                    .fontWeight(.semibold)
+                    .font(.headline.weight(.semibold))
                 Spacer()
             }
 
@@ -203,13 +222,12 @@ struct TeamView: View {
                     } label: {
                         MatchOverview(game: match)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.scalePress)
                 }
             }
         }
         .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(.ultraThinMaterial, in: .rect(cornerRadius: 16, style: .continuous))
     }
 
     // MARK: - Lineup Content
@@ -219,7 +237,6 @@ struct TeamView: View {
             if viewModel.lineup.isEmpty {
                 loadingStateView
             } else {
-                // Goalkeepers
                 if !goalkeepers.isEmpty {
                     playerSection(
                         title: "Goalkeepers",
@@ -228,7 +245,6 @@ struct TeamView: View {
                     )
                 }
 
-                // Defenders
                 if !defenders.isEmpty {
                     playerSection(
                         title: "Defenders",
@@ -237,7 +253,6 @@ struct TeamView: View {
                     )
                 }
 
-                // Forwards
                 if !forwards.isEmpty {
                     playerSection(
                         title: "Forwards",
@@ -254,12 +269,15 @@ struct TeamView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Label(title, systemImage: icon)
-                    .font(.headline)
-                    .fontWeight(.semibold)
+                    .font(.headline.weight(.semibold))
                 Spacer()
                 Text("\(players.count)")
-                    .font(.subheadline)
+                    .font(.subheadline.weight(.medium))
                     .foregroundStyle(.secondary)
+                    .monospacedDigit()
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(.quaternary, in: .capsule)
             }
             .padding(.horizontal, 4)
 
@@ -274,8 +292,7 @@ struct TeamView: View {
             }
         }
         .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(.ultraThinMaterial, in: .rect(cornerRadius: 16, style: .continuous))
     }
 
     private func playerCard(_ player: Player) -> some View {
@@ -283,7 +300,6 @@ struct TeamView: View {
             PlayerView(player, teamColor: $teamColor)
         } label: {
             VStack(spacing: 0) {
-                // Player Image
                 if let url = player.portraitURL, let imageURL = URL(string: url) {
                     KFImage(imageURL)
                         .placeholder {
@@ -300,11 +316,9 @@ struct TeamView: View {
                         .frame(width: 120, height: 150)
                 }
 
-                // Player Info
                 VStack(spacing: 4) {
                     Text(player.fullName)
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
+                        .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.primary)
                         .lineLimit(1)
 
@@ -312,6 +326,7 @@ struct TeamView: View {
                         Text("#\(number)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
+                            .monospacedDigit()
                     }
                 }
                 .padding(.horizontal, 8)
@@ -319,10 +334,10 @@ struct TeamView: View {
                 .frame(width: 120)
             }
             .background(Color(uiColor: .secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
+            .clipShape(.rect(cornerRadius: 12, style: .continuous))
+            .shadow(color: .black.opacity(0.12), radius: 6, y: 2)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.scalePress)
     }
 
     private var playerPlaceholder: some View {
@@ -358,21 +373,20 @@ struct TeamView: View {
             ProgressView()
                 .scaleEffect(1.2)
 
-            Text("Loading...")
+            Text("Loading…")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 48)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(.ultraThinMaterial, in: .rect(cornerRadius: 16, style: .continuous))
     }
 
     // MARK: - Actions
 
     private func loadTeamColors() {
         team.getTeamColor { color in
-            withAnimation(.easeInOut(duration: 0.3)) {
+            withAnimation(.smooth(duration: 0.4)) {
                 teamColor = color
             }
         }
@@ -382,6 +396,19 @@ struct TeamView: View {
 // MARK: - Preview
 
 #Preview {
+    NavigationStack {
+        TeamView(team: .fakeData())
+    }
+}
+
+#Preview("Dark") {
+    NavigationStack {
+        TeamView(team: .fakeData())
+    }
+    .preferredColorScheme(.dark)
+}
+
+#Preview("iPad", traits: .landscapeLeft) {
     NavigationStack {
         TeamView(team: .fakeData())
     }

@@ -39,27 +39,24 @@ struct HomeView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     @StateObject private var viewModel: HomeViewModel = .init()
-    
+
     @State private var sortOrder = [KeyPathComparator(\StandingObj.position)]
-    
     @State private var date: Date = .init()
     @State private var center: CGPoint = .zero
-    
+    @State private var refreshTick = 0
+
     func renderFeaturedGame(_ featured: Match) -> some View {
-        let content: some View = MatchOverview(
-            game: featured,
-            liveGame: viewModel.liveGame
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 12.0))
-        
-        return NavigationLink(destination: {
+        NavigationLink {
             MatchView(featured, referrer: "home_featured")
-        }, label: {
-            content
-        })
-        .buttonStyle(PlainButtonStyle())
+        } label: {
+            MatchOverview(
+                game: featured,
+                liveGame: viewModel.liveGame
+            )
+        }
+        .buttonStyle(.scalePress)
         .background(GeometryReader { geo in
-            Color(uiColor: .systemBackground)
+            Color.clear
                 .onAppear {
                     center = .init(x: geo.size.width / 2, y: geo.size.height / 2)
                 }
@@ -79,7 +76,7 @@ struct HomeView: View {
             }
         })
     }
-    
+
     func FeaturedGameContainsInterestedTeam() async -> Bool {
         let interestedTeams = Settings.shared.getInterestedTeams()
         guard !interestedTeams.isEmpty else {
@@ -94,120 +91,158 @@ struct HomeView: View {
         return interestedCodes.contains(featuredGame.homeTeam.code.lowercased()) ||
                interestedCodes.contains(featuredGame.awayTeam.code.lowercased())
     }
-    
+
     func getTimeLoop() -> Double {
         let precision: Double = 10000
         return Double(Int((date.timeIntervalSinceNow * -1)*precision)%(3*Int(precision))) / precision
     }
-    
+
     private var upcomingMatches: [Match] {
         viewModel.latestMatches
             .filter { !$0.concluded }
             .sorted(by: { $0.date < $1.date })
     }
 
-    var matchCalendar: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Text("Match Calendar")
-                    .font(.title)
-                    .fontWeight(.semibold)
-                    .padding(.horizontal)
-                Spacer()
+    // MARK: - Section Headers
+
+    private func sectionHeader(_ title: String, systemImage: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: systemImage)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.tint)
+                .symbolRenderingMode(.hierarchical)
+            Text(title)
+                .font(.title2.weight(.bold))
+            Spacer()
+        }
+        .padding(.horizontal)
+    }
+
+    // MARK: - Featured Game Header
+
+    private var featuredHeader: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Featured")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tint)
+                    .textCase(.uppercase)
+                    .kerning(1.2)
+                Text("Today's Spotlight")
+                    .font(.title2.weight(.bold))
             }
+            Spacer()
+        }
+        .padding(.horizontal)
+    }
+
+    // MARK: - Calendar
+
+    var matchCalendar: some View {
+        VStack(spacing: 12) {
+            sectionHeader("Match Calendar", systemImage: "calendar")
 
             if upcomingMatches.isEmpty {
-                VStack(spacing: 8) {
-                    Image(systemName: "calendar")
-                        .font(.title2)
-                        .foregroundStyle(.secondary)
-                    Text("No upcoming matches")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
+                ContentUnavailableView(
+                    "No upcoming matches",
+                    systemImage: "calendar",
+                    description: Text("Future games will appear here as they are scheduled.")
+                )
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 24)
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .padding(.vertical, 16)
+                .background(.ultraThinMaterial, in: .rect(cornerRadius: 16, style: .continuous))
                 .padding(.horizontal)
             } else {
-                VStack(spacing: 12) {
+                VStack(spacing: 10) {
                     MatchCalendar(
                         matches: Array(upcomingMatches.prefix(5)),
                         liveMatches: viewModel.calendarLiveMatches
                     )
                 }
                 .padding(.horizontal)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
             }
         }
     }
-    
+
+    // MARK: - Leaderboard
+
     var leaderboard: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Text("Leaderboard")
-                    .font(.title)
-                    .fontWeight(.semibold)
-                    .padding(.horizontal)
-                Spacer()
-            }
-            
+        VStack(spacing: 12) {
+            sectionHeader("Standings", systemImage: "list.number")
+
             if viewModel.standingsDisabled {
-                HStack {
-                    Text("Standings are temporarily unavailable\nWe apologize for the inconvenience")
+                HStack(spacing: 10) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                    Text("Standings are temporarily unavailable.")
                         .font(.callout)
-                    Spacer()
+                        .foregroundStyle(.secondary)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .background(.ultraThinMaterial, in: .rect(cornerRadius: 16, style: .continuous))
+                .padding(.horizontal)
+            } else if let standings = viewModel.standings {
+                StandingsTable(
+                    title: "Table",
+                    items: standings,
+                    favoriteTeamId: Settings.shared.getFavoriteTeamId()
+                )
+                .frame(maxWidth: .infinity)
+                .background(.ultraThinMaterial, in: .rect(cornerRadius: 16, style: .continuous))
                 .padding(.horizontal)
             } else {
-                if let standings = viewModel.standings {
-                    StandingsTable(title: "Table", items: standings, favoriteTeamId: Settings.shared.getFavoriteTeamId())
-                        .frame(maxWidth: .infinity)
-                        .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .padding(.horizontal)
-                } else {
-                    ProgressView()
-                }
+                ProgressView()
+                    .frame(maxWidth: .infinity, minHeight: 160)
             }
         }
     }
-    
+
+    // MARK: - Body
+
     var body: some View {
         ScrollView {
-            if let featured = viewModel.featuredGame {
-                if #available(iOS 17.0, *) {
-                    if featured.isLive() || viewModel.liveGame?.gameState == .ongoing || viewModel.liveGame?.gameState == .paused {
-                        TimelineView(.animation) { _ in
+            VStack(spacing: 22) {
+                // Featured game
+                VStack(spacing: 12) {
+                    featuredHeader
+
+                    if let featured = viewModel.featuredGame {
+                        if #available(iOS 17.0, *) {
+                            if featured.isLive() || viewModel.liveGame?.gameState == .ongoing || viewModel.liveGame?.gameState == .paused {
+                                TimelineView(.animation) { _ in
+                                    renderFeaturedGame(featured)
+                                        .pulseShader(time: getTimeLoop(), center: center, speed: 150.0, amplitude: 0.1, decay: 5.0)
+                                        .padding(.horizontal)
+                                }
+                            } else {
+                                renderFeaturedGame(featured)
+                                    .padding(.horizontal)
+                            }
+                        } else {
                             renderFeaturedGame(featured)
-                                .pulseShader(time: getTimeLoop(), center: center, speed: 150.0, amplitude: 0.1, decay: 5.0)
                                 .padding(.horizontal)
                         }
                     } else {
-                        renderFeaturedGame(featured)
+                        // Skeleton placeholder
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(.ultraThinMaterial)
+                            .frame(height: 110)
+                            .overlay {
+                                ProgressView()
+                            }
                             .padding(.horizontal)
                     }
-                } else {
-                    renderFeaturedGame(featured)
-                        .padding(.horizontal)
                 }
-            } else {
-                HStack {}
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 96)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                    .padding(.horizontal)
-            }
-            
-            VStack(spacing: 24) {
+                .padding(.top, 4)
+
                 matchCalendar
 
                 leaderboard
             }
-            .padding(.top)
+            .padding(.bottom, 24)
         }
+        .scrollContentBackground(.hidden)
         .onChange(of: viewModel.featuredGame) { _, _ in
             guard let featured = viewModel.featuredGame else { return }
             viewModel.selectListenedGame(featured)
@@ -222,17 +257,19 @@ struct HomeView: View {
         .refreshable {
             do {
                 try await viewModel.refresh(hard: true)
+                refreshTick &+= 1
             } catch let err {
                 print("HomeView: Error refreshing: ", err)
             }
-         }
+        }
+        .sensoryFeedback(.success, trigger: refreshTick)
         .ignoresSafeArea(.container, edges: .horizontal)
     }
-    
+
     func remainingTimeUntil(_ targetDate: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss"
-        
+
         let estimatedEndTimeString = formatter.string(from: targetDate)
         return estimatedEndTimeString
     }
@@ -247,4 +284,9 @@ extension HomeView {
 
 #Preview {
     HomeView()
+}
+
+#Preview("Dark") {
+    HomeView()
+        .preferredColorScheme(.dark)
 }

@@ -2,29 +2,39 @@ import SwiftUI
 import PostHog
 import ActivityKit
 
-private enum Tabs: String, CaseIterable {
+private enum Tabs: String, CaseIterable, Identifiable {
     case previous = "Previous"
     case today = "Today"
     case upcoming = "Upcoming"
+
+    var id: Self { self }
+
+    var systemImage: String {
+        switch self {
+        case .previous: return "clock.arrow.circlepath"
+        case .today: return "calendar.badge.clock"
+        case .upcoming: return "calendar"
+        }
+    }
 }
 
 struct MatchListView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     @State private var selectedTab: Tabs = .today
-
-    @State private var openDates: [String:Bool] = [:]
+    @State private var openDates: [String: Bool] = [:]
+    @State private var refreshTick = 0
 
     @StateObject private var viewModel = MatchListViewModel()
-    
+
     private func getLiveMatch(match: Match) -> LiveMatch? {
         return viewModel.matchListeners[match.externalUUID]
     }
-    
+
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             tabSelectionView
-            
+
             TabView(selection: $selectedTab) {
                 matchesScrollView(for: viewModel.previousMatches, tab: .previous)
                     .id(Tabs.previous)
@@ -38,7 +48,7 @@ struct MatchListView: View {
                     .id(Tabs.upcoming)
                     .tag(Tabs.upcoming)
             }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+            .tabViewStyle(.page(indexDisplayMode: .never))
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
@@ -47,25 +57,24 @@ struct MatchListView: View {
                 }
             }
         }
+        .sensoryFeedback(.selection, trigger: selectedTab)
+        .sensoryFeedback(.success, trigger: refreshTick)
     }
-    
+
+    // MARK: - Tab selector (native segmented control)
+
     private var tabSelectionView: some View {
-        HStack {
-            Spacer()
-            ForEach(Tabs.allCases, id: \.self) { tab in
-                Button(action: {
-                    selectedTab = tab
-                }, label: {
-                    Text(tab.rawValue)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(selectedTab == tab ? .primary : .secondary)
-                })
-                .buttonStyle(PlainButtonStyle())
-                Spacer()
+        Picker("Filter", selection: $selectedTab) {
+            ForEach(Tabs.allCases) { tab in
+                Text(tab.rawValue).tag(tab)
             }
         }
+        .pickerStyle(.segmented)
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(.bar)
     }
-    
+
     private func matchItem(_ match: Match) -> some View {
         HStack {
             if match.date < Date.now {
@@ -75,7 +84,6 @@ struct MatchListView: View {
                     if #available(iOS 17.2, *) {
                         MatchOverview(game: match, liveGame: getLiveMatch(match: match))
                             .id("pm-\(match.id)")
-                            .clipShape(RoundedRectangle(cornerRadius: 12.0))
                             .contextMenu {
                                 #if !APPCLIP
                                 Button("Start Activity", systemImage: "plus") {
@@ -83,12 +91,8 @@ struct MatchListView: View {
                                         do {
                                             PostHogSDK.shared.capture(
                                                 "started_live_activity",
-                                                properties: [
-                                                    "join_type": "match_list_ctx"
-                                                ],
-                                                userProperties: [
-                                                    "activity_id": KeychainManager.shared.getDeviceId()
-                                                ]
+                                                properties: ["join_type": "match_list_ctx"],
+                                                userProperties: ["activity_id": KeychainManager.shared.getDeviceId()]
                                             )
                                             try ActivityUpdater.shared.start(match: live)
                                         } catch {
@@ -102,42 +106,40 @@ struct MatchListView: View {
                     } else {
                         MatchOverview(game: match, liveGame: getLiveMatch(match: match))
                             .id("pm-\(match.id)")
-                            .clipShape(RoundedRectangle(cornerRadius: 12.0))
                             .padding(.horizontal)
                     }
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(.scalePress)
             } else {
                 NavigationLink {
                     MatchView(match, referrer: "match_list")
                 } label: {
                     MatchOverview(game: match, liveGame: getLiveMatch(match: match))
                         .id("pm-\(match.id)")
-                        .clipShape(RoundedRectangle(cornerRadius: 12.0))
                         .contextMenu {
                             ReminderContext(game: match)
                         }
                         .padding(.horizontal)
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(.scalePress)
             }
         }
     }
-    
+
     private func getDate(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         return dateFormatter.string(from: date)
     }
-    
+
     private func getGroupDate(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = Calendar.current.isDate(Date.now, equalTo: date, toGranularity: .year) 
+        dateFormatter.dateFormat = Calendar.current.isDate(Date.now, equalTo: date, toGranularity: .year)
             ? "EEEE, d MMM"
             : "EEEE, d MMM yyyy"
         return dateFormatter.string(from: date)
     }
-    
+
     private func matchesScrollView(for matches: [Match], tab: Tabs) -> some View {
         VStack {
             ScrollView {
@@ -146,44 +148,54 @@ struct MatchListView: View {
                     ForEach(matchGroups.keys.sorted(), id: \.self) { key in
                         let matchList = matchGroups[key]!
                         let isFirst = matchGroups.keys.sorted().first == key
-                        VStack {
-                            HStack {
+                        let isOpen = openDates[key] == true || isFirst
+
+                        VStack(spacing: 8) {
+                            HStack(spacing: 6) {
                                 Text(getGroupDate(matchList.first?.date ?? Date.now))
-                                    .font(.footnote)
-                                    .foregroundColor(.secondary)
-                                    .fontWeight(.bold)
+                                    .font(.footnote.weight(.bold))
+                                    .foregroundStyle(.secondary)
+                                    .textCase(.uppercase)
+                                    .kerning(0.5)
                                 Spacer()
                                 if !isFirst {
-                                    Button(openDates[key] == true ? "Show less" : "Show more", systemImage: openDates[key] == true ? "chevron.up" : "chevron.down") {
-                                        let isOpen = openDates[key] ?? false
-                                        withAnimation {
-                                            if isOpen {
-                                                openDates[key] = false
-                                            } else {
-                                                openDates[key] = true
-                                            }
+                                    Button {
+                                        withAnimation(.snappy) {
+                                            openDates[key] = !isOpen
                                         }
+                                    } label: {
+                                        HStack(spacing: 4) {
+                                            Text(isOpen ? "Show less" : "Show more")
+                                            Image(systemName: "chevron.down")
+                                                .rotationEffect(.degrees(isOpen ? 180 : 0))
+                                                .animation(.snappy, value: isOpen)
+                                        }
+                                        .font(.footnote.weight(.medium))
+                                        .foregroundStyle(.tint)
                                     }
-                                    .buttonStyle(PlainButtonStyle())
-                                    .font(.footnote)
-                                    .foregroundColor(.secondary)
+                                    .buttonStyle(.plain)
                                 }
                             }
                             .padding(.horizontal)
-                            if openDates[key] == true || isFirst {
-                                LazyVStack {
+
+                            if isOpen {
+                                LazyVStack(spacing: 10) {
                                     ForEach(matchList, id: \.id) { match in
                                         matchItem(match)
                                     }
                                 }
+                                .transition(.opacity.combined(with: .move(edge: .top)))
                             }
                         }
-                        .padding(.bottom)
+                        .padding(.bottom, 12)
                     }
                 } else {
-                    ForEach(matches, id: \.id) { match in
-                        matchItem(match)
+                    LazyVStack(spacing: 10) {
+                        ForEach(matches, id: \.id) { match in
+                            matchItem(match)
+                        }
                     }
+                    .padding(.top, 8)
                 }
             }
             Spacer()
@@ -196,52 +208,25 @@ struct MatchListView: View {
         }
         .refreshable {
             try? await viewModel.refresh(hard: true)
+            refreshTick &+= 1
         }
     }
 
     // MARK: - Empty State
 
     private func emptyStateView(for tab: Tabs) -> some View {
-        VStack(spacing: 16) {
-            Image(systemName: emptyStateIcon(for: tab))
-                .font(.system(size: 48))
-                .foregroundStyle(.secondary)
-
-            VStack(spacing: 6) {
-                Text(emptyStateTitle(for: tab))
-                    .font(.headline)
-                    .fontWeight(.semibold)
-
-                Text(emptyStateMessage(for: tab))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 48)
-    }
-
-    private func emptyStateIcon(for tab: Tabs) -> String {
-        switch tab {
-        case .previous:
-            return "clock.arrow.circlepath"
-        case .today:
-            return "calendar.badge.clock"
-        case .upcoming:
-            return "calendar"
+        ContentUnavailableView {
+            Label(emptyStateTitle(for: tab), systemImage: tab.systemImage)
+        } description: {
+            Text(emptyStateMessage(for: tab))
         }
     }
 
     private func emptyStateTitle(for tab: Tabs) -> String {
         switch tab {
-        case .previous:
-            return "No Previous Matches"
-        case .today:
-            return "No Games Today"
-        case .upcoming:
-            return "No Upcoming Matches"
+        case .previous: return "No Previous Matches"
+        case .today: return "No Games Today"
+        case .upcoming: return "No Upcoming Matches"
         }
     }
 
@@ -255,4 +240,17 @@ struct MatchListView: View {
             return "No upcoming games scheduled at the moment. Pull to refresh for updates."
         }
     }
+}
+
+#Preview {
+    NavigationStack { MatchListView() }
+}
+
+#Preview("Dark") {
+    NavigationStack { MatchListView() }
+        .preferredColorScheme(.dark)
+}
+
+#Preview("iPad", traits: .landscapeLeft) {
+    NavigationStack { MatchListView() }
 }
