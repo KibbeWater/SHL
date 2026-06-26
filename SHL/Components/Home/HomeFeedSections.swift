@@ -420,7 +420,205 @@ struct LeaderBoardCard: View {
     }
 }
 
+// MARK: - Pre-season hero
+
+/// Counts down to opening night — the focal point of the pre-season home. Cool,
+/// anticipatory brand wash with an oversized puck watermark, matching the favorite
+/// and featured heroes so all three home variants feel like one family.
+struct PreseasonHeroCard: View {
+    let openingDate: Date
+    var seasonName: String? = nil
+
+    private var daysAway: Int {
+        let cal = Calendar.current
+        let from = cal.startOfDay(for: Date())
+        let to = cal.startOfDay(for: openingDate)
+        return max(0, cal.dateComponents([.day], from: from, to: to).day ?? 0)
+    }
+
+    private var bigLine: String {
+        switch daysAway {
+        case 0: return String(localized: "Tonight")
+        case 1: return String(localized: "Tomorrow")
+        default: return "\(daysAway)"
+        }
+    }
+
+    private var subLine: String {
+        daysAway <= 1 ? String(localized: "Opening night")
+                      : String(localized: "days until opening night")
+    }
+
+    private var dateText: String {
+        openingDate.formatted(.dateTime.weekday(.wide).month(.abbreviated).day())
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: .RinkSpace.sm) {
+            HStack {
+                Label("Season Starts", systemImage: "sparkles")
+                    .labelStyle(.titleAndIcon)
+                    .font(.caption2.weight(.bold)).textCase(.uppercase).tracking(1.1)
+                    .foregroundStyle(.white.opacity(0.85))
+                Spacer()
+                if let seasonName {
+                    Text(seasonName)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+            }
+            .padding(.bottom, .RinkSpace.xs)
+
+            Text(bigLine)
+                .font(.rinkDisplay)
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+            Text(subLine)
+                .font(.headline)
+                .foregroundStyle(.white.opacity(0.9))
+            Label(dateText, systemImage: "calendar")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.white.opacity(0.8))
+                .padding(.top, .RinkSpace.xs)
+        }
+        .padding(.RinkSpace.xl)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background { preseasonBackground }
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .rinkCardLift(radius: 16)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var preseasonBackground: some View {
+        ZStack {
+            LinearGradient(colors: [Rink.ice.darkened(by: 0.18), Rink.glacier.darkened(by: 0.52)],
+                           startPoint: .topLeading, endPoint: .bottomTrailing)
+            Image(systemName: "hockey.puck.fill")
+                .font(.system(size: 190))
+                .foregroundStyle(.white.opacity(0.07))
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .offset(x: 50, y: 10)
+                .allowsHitTesting(false)
+        }
+    }
+}
+
+// MARK: - Champion hero
+
+/// Crowns the season's champion in a gold-accented, team-color celebration — the
+/// anchor of the concluded-season home.
+struct ChampionHeroCard: View {
+    let champion: ChampionInfo
+    var seasonName: String? = nil
+
+    @State private var teamColor: Color = Rink.gold
+
+    private var kicker: String {
+        seasonName.map { "\($0) · \(champion.label)" } ?? champion.label
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: .RinkSpace.lg) {
+            HStack(spacing: .RinkSpace.xs) {
+                Image(systemName: "trophy.fill")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Rink.gold)
+                Text(kicker)
+                    .font(.caption2.weight(.bold)).textCase(.uppercase).tracking(1.1)
+                    .foregroundStyle(.white.opacity(0.9))
+                    .lineLimit(1).minimumScaleFactor(0.7)
+                Spacer(minLength: 0)
+            }
+
+            HStack(alignment: .center, spacing: .RinkSpace.md) {
+                TeamLogoView(teamCode: champion.team.code, size: .custom(56))
+                    .padding(8)
+                    .background(.white.opacity(0.18), in: Circle())
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(champion.team.name)
+                        .font(.title.weight(.heavy))
+                        .foregroundStyle(.white)
+                        .lineLimit(2).minimumScaleFactor(0.7)
+                    Text("Champions")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Rink.gold)
+                }
+                Spacer(minLength: 0)
+            }
+        }
+        .padding(.RinkSpace.xl)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background { championBackground }
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .rinkCardLift(radius: 18)
+        .onAppear {
+            getCodeColor(teamKey: "Team/\(champion.team.code.uppercased())") { teamColor = $0 }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(champion.team.name), \(champion.label)")
+    }
+
+    private var championBackground: some View {
+        ZStack {
+            LinearGradient(colors: [teamColor.darkened(by: 0.14), teamColor.darkened(by: 0.56)],
+                           startPoint: .topLeading, endPoint: .bottomTrailing)
+            RadialGradient(colors: [Rink.gold.opacity(0.32), .clear],
+                           center: .topTrailing, startRadius: 0, endRadius: 280)
+            TeamLogoView(teamCode: champion.team.code, size: .custom(210))
+                .opacity(0.10)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .offset(x: 64)
+                .allowsHitTesting(false)
+        }
+    }
+}
+
+/// The quiet "see you next season" note that closes the concluded-season home.
+struct SeasonClosedNote: View {
+    var body: some View {
+        VStack(spacing: .RinkSpace.xs) {
+            Image(systemName: "calendar.badge.clock")
+                .font(.title2)
+                .foregroundStyle(Rink.ice)
+            Text("Season Complete")
+                .font(.headline)
+            Text("Next season's schedule arrives soon — check back then.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, .RinkSpace.xl)
+        .accessibilityElement(children: .combine)
+    }
+}
+
 // MARK: - Previews
+
+#Preview("Season heroes · Dark") {
+    ScrollView {
+        VStack(spacing: 16) {
+            PreseasonHeroCard(
+                openingDate: Calendar.current.date(byAdding: .day, value: 84, to: Date()) ?? Date(),
+                seasonName: "2026/27"
+            )
+            ChampionHeroCard(
+                champion: ChampionInfo(
+                    team: Team(id: "t-LHF", name: "Luleå HF", code: "LHF", city: nil, founded: nil,
+                               venue: nil, golds: nil, goldYears: nil, finals: nil, finalYears: nil,
+                               iconURL: nil, isActive: true),
+                    label: "Champions"
+                ),
+                seasonName: "2025/26"
+            )
+            SeasonClosedNote()
+        }
+        .padding()
+    }
+    .background(RinkAmbientBackground(.arena))
+    .preferredColorScheme(.dark)
+}
 
 #Preview("Favorite hero") {
     NavigationStack {

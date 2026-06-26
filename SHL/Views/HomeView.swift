@@ -18,6 +18,7 @@ struct HomeView: View {
     @State private var viewModel: HomeFeedViewModel
     @State private var gamesTab: Int = 0
     @State private var favoriteGlow: Color? = nil
+    @State private var championGlow: Color? = nil
 
     @MainActor
     init(viewModel: HomeFeedViewModel? = nil) {
@@ -35,25 +36,34 @@ struct HomeView: View {
         .toolbarBackground(.hidden, for: .navigationBar)
         .task {
             if viewModel.summary == nil { await viewModel.load() }
-            resolveFavoriteGlow()
+            resolveGlows()
         }
-        .onChange(of: viewModel.summary?.favorite?.team.code) { _, _ in
-            resolveFavoriteGlow()
-        }
+        .onChange(of: viewModel.summary?.favorite?.team.code) { _, _ in resolveGlows() }
+        .onChange(of: viewModel.summary?.champion?.team.code) { _, _ in resolveGlows() }
         .onDisappear { viewModel.stop() }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { Task { await viewModel.refresh() } }
         }
     }
 
-    /// A faint team-tinted glow when there's a favorite; cool arena otherwise.
+    /// Phase-aware backdrop: aurora during the build-up to a new season, the
+    /// champion's colors over a concluded season, the favorite's tint (or cool
+    /// arena) in-season.
     private var ambientTheme: RinkAmbientBackground.Theme {
-        favoriteGlow.map { .team($0) } ?? .arena
+        switch viewModel.phase {
+        case .preseason: return .aurora
+        case .concluded: return championGlow.map { .team($0) } ?? .arena
+        case .regular:   return favoriteGlow.map { .team($0) } ?? .arena
+        }
     }
 
-    private func resolveFavoriteGlow() {
-        guard let code = viewModel.summary?.favorite?.team.code else { return }
-        getCodeColor(teamKey: "Team/\(code.uppercased())") { favoriteGlow = $0 }
+    private func resolveGlows() {
+        if let code = viewModel.summary?.favorite?.team.code {
+            getCodeColor(teamKey: "Team/\(code.uppercased())") { favoriteGlow = $0 }
+        }
+        if let code = viewModel.summary?.champion?.team.code {
+            getCodeColor(teamKey: "Team/\(code.uppercased())") { championGlow = $0 }
+        }
     }
 
     // MARK: - Top-level state
@@ -63,10 +73,17 @@ struct HomeView: View {
         if let summary = viewModel.summary {
             ScrollView {
                 Group {
-                    if hSizeClass == .regular {
-                        regularLayout(summary)
-                    } else {
-                        compactLayout(summary)
+                    switch summary.phase {
+                    case .preseason:
+                        preseasonLayout(summary)
+                    case .concluded:
+                        concludedLayout(summary)
+                    case .regular:
+                        if hSizeClass == .regular {
+                            regularLayout(summary)
+                        } else {
+                            compactLayout(summary)
+                        }
                     }
                 }
             }
@@ -159,6 +176,125 @@ struct HomeView: View {
         } else if let featured = summary.featured {
             featuredHero(featured)
         }
+    }
+
+    // MARK: - Pre-season variant
+
+    /// The opener date: the season's official start, else the first scheduled game.
+    private func openingDate(_ summary: HomeSummary) -> Date? {
+        summary.season?.startDate ?? summary.upcoming.first?.date ?? summary.favorite?.nextMatch?.date
+    }
+
+    /// Anticipation home: a countdown to opening night, the user's opener, the
+    /// opening fixtures, and a recap of last season's final table.
+    private func preseasonLayout(_ summary: HomeSummary) -> some View {
+        VStack(spacing: .RinkSpace.section) {
+            HomeGreetingHeader()
+
+            if let opening = openingDate(summary) {
+                PreseasonHeroCard(openingDate: opening,
+                                  seasonName: summary.season?.name ?? summary.season?.code)
+            }
+
+            // The user's first game (or the league opener when there's no favorite).
+            if let opener = summary.favorite?.nextMatch ?? summary.featured {
+                VStack(alignment: .leading, spacing: .RinkSpace.md) {
+                    RinkSectionHeader(summary.favorite != nil ? "Your Opener" : "Opening Game",
+                                      icon: "flag.checkered")
+                    matchLink(opener, referrer: "home_preseason_opener") {
+                        FeaturedHeroCard(match: opener, live: nil)
+                    }
+                }
+            }
+
+            if !summary.upcoming.isEmpty {
+                VStack(alignment: .leading, spacing: .RinkSpace.md) {
+                    RinkSectionHeader("Opening Fixtures", icon: "calendar") {
+                        seeAll { MatchListView() }
+                    }
+                    VStack(spacing: .RinkSpace.sm) {
+                        ForEach(summary.upcoming.prefix(6), id: \.id) { match in
+                            matchLink(match, referrer: "home_preseason_fixtures") {
+                                MatchCardCompact(game: match, liveGame: nil)
+                            }
+                        }
+                    }
+                }
+            }
+
+            if !viewModel.previousStandings.isEmpty {
+                VStack(alignment: .leading, spacing: .RinkSpace.md) {
+                    RinkSectionHeader("Last Season", subtitle: "Final standings",
+                                      icon: "clock.arrow.circlepath")
+                    RinkCard(.plain, padding: 0) {
+                        StandingsTable(
+                            title: "",
+                            items: Array(viewModel.previousStandings.prefix(8)),
+                            favoriteTeamId: favoriteId,
+                            showsHeader: false
+                        )
+                        .padding(.vertical, .RinkSpace.sm)
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                }
+            }
+        }
+        .padding(.horizontal)
+        .padding(.top, .RinkSpace.sm)
+        .padding(.bottom, 32)
+        .frame(maxWidth: 700)
+        .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Concluded variant
+
+    /// Wrap-up home: crowns the champion, recaps the user's season, and shows the
+    /// final table + season-total leaders.
+    private func concludedLayout(_ summary: HomeSummary) -> some View {
+        VStack(spacing: .RinkSpace.section) {
+            HomeGreetingHeader()
+
+            if let champ = summary.champion {
+                ChampionHeroCard(champion: champ,
+                                 seasonName: summary.season?.name ?? summary.season?.code)
+            }
+
+            if let fav = summary.favorite {
+                VStack(alignment: .leading, spacing: .RinkSpace.md) {
+                    RinkSectionHeader("Your Season", icon: "star.fill", iconTint: Rink.gold)
+                    FavoriteSpotlightCard(favorite: fav, team: viewModel.favoriteTeam)
+                }
+            }
+
+            if !viewModel.standings.isEmpty {
+                VStack(alignment: .leading, spacing: .RinkSpace.md) {
+                    RinkSectionHeader("Final Standings", icon: "list.number") {
+                        seeAll { AllStandingsView(items: viewModel.standings, favoriteId: favoriteId) }
+                    }
+                    RinkCard(.plain, padding: 0) {
+                        StandingsTable(
+                            title: "",
+                            items: viewModel.standingsSnapshot(favoriteId: favoriteId),
+                            favoriteTeamId: favoriteId,
+                            showsHeader: false
+                        )
+                        .padding(.vertical, .RinkSpace.sm)
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                }
+            }
+
+            if let leaders = summary.leaders, !leaders.boards.isEmpty {
+                leadersSection(leaders)
+            }
+
+            SeasonClosedNote()
+        }
+        .padding(.horizontal)
+        .padding(.top, .RinkSpace.sm)
+        .padding(.bottom, 32)
+        .frame(maxWidth: 700)
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Sections
@@ -372,4 +508,26 @@ private struct AllStandingsView: View {
         HomeUnavailableView(retry: {})
     }
     .preferredColorScheme(.dark)
+}
+
+#Preview("Home · Pre-season") {
+    NavigationStack { HomeView(viewModel: .preview(.mockPreseason)) }
+}
+
+#Preview("Home · Pre-season · Dark") {
+    NavigationStack { HomeView(viewModel: .preview(.mockPreseason)) }
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Home · Concluded") {
+    NavigationStack { HomeView(viewModel: .preview(.mockConcluded)) }
+}
+
+#Preview("Home · Concluded · Dark") {
+    NavigationStack { HomeView(viewModel: .preview(.mockConcluded)) }
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Home · Pre-season · iPad", traits: .landscapeLeft) {
+    NavigationStack { HomeView(viewModel: .preview(.mockPreseason)) }
 }

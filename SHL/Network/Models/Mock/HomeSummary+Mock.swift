@@ -42,6 +42,38 @@ extension HomeSummary {
             standings: MockHome.standings, leaders: MockHome.leaders, favorite: nil
         )
     }
+
+    /// Pre-season: schedule published, nothing played yet — countdown, opener,
+    /// opening fixtures, and last season's final table.
+    static var mockPreseason: HomeSummary {
+        HomeSummary(
+            generatedAt: Date(),
+            phase: .preseason,
+            season: SeasonMeta(
+                code: "2026/27", name: "2026/27",
+                startDate: Calendar.current.date(byAdding: .day, value: 84, to: Date())
+            ),
+            featured: MockHome.upcoming.first,
+            live: [], upcoming: MockHome.upcoming, recent: [], standings: [],
+            leaders: nil, favorite: MockHome.preseasonFavorite,
+            champion: nil, previousStandings: MockHome.standings
+        )
+    }
+
+    /// Concluded: finals done, next schedule not out — champion, season recap,
+    /// final table, and season-total leaders.
+    static var mockConcluded: HomeSummary {
+        HomeSummary(
+            generatedAt: Date(),
+            phase: .concluded,
+            season: SeasonMeta(code: "2025/26", name: "2025/26", startDate: nil),
+            featured: nil, live: [], upcoming: [], recent: MockHome.recent,
+            standings: MockHome.standings, leaders: MockHome.leaders,
+            favorite: MockHome.concludedFavorite,
+            champion: ChampionInfo(team: MockHome.team("LHF", "Luleå HF", "Luleå"), label: "Champions"),
+            previousStandings: []
+        )
+    }
 }
 
 private enum MockHome {
@@ -152,5 +184,20 @@ private enum MockHome {
         form: [.win, .loss, .otWin, .win, .win],
         nextMatch: upcoming.first,
         lastMatch: recent.first
+    )
+
+    /// Pre-season favorite: no standing yet, just the opener.
+    static let preseasonFavorite = FavoriteTeamSummary(
+        team: basic("FHC", "Frölunda HC"), teamId: "team-FHC",
+        rank: nil, points: nil, gamesPlayed: nil, form: [],
+        nextMatch: upcoming.first, lastMatch: nil
+    )
+
+    /// Concluded favorite: final standing + form, no upcoming game.
+    static let concludedFavorite = FavoriteTeamSummary(
+        team: basic("FHC", "Frölunda HC"), teamId: "team-FHC",
+        rank: 3, points: 98, gamesPlayed: 52,
+        form: [.win, .otWin, .win, .loss, .win],
+        nextMatch: nil, lastMatch: recent.first
     )
 }

@@ -41,8 +41,18 @@ final class HomeFeedViewModel {
     }
 
     /// The full table projected into the shared row model the table component uses.
-    var standings: [StandingObj] {
-        (summary?.standings ?? []).map { s in
+    var standings: [StandingObj] { mapStandings(summary?.standings ?? []) }
+
+    /// Last season's final table (the pre-season recap), same projection.
+    var previousStandings: [StandingObj] { mapStandings(summary?.previousStandings ?? []) }
+
+    /// Season lifecycle phase + its metadata, driving which home variant renders.
+    var phase: SeasonPhase { summary?.phase ?? .regular }
+    var seasonMeta: SeasonMeta? { summary?.season }
+    var champion: ChampionInfo? { summary?.champion }
+
+    private func mapStandings(_ rows: [Standings]) -> [StandingObj] {
+        rows.map { s in
             let gd = s.goalDifference
             return StandingObj(
                 id: s.id, teamId: s.team.id, position: s.rank, team: s.team.name,

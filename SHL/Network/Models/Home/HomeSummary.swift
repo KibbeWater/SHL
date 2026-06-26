@@ -35,8 +35,18 @@ struct HomeSummary: Decodable, Equatable {
     /// hasn't picked one.
     let favorite: FavoriteTeamSummary?
 
+    /// Which season-lifecycle variant the home should render.
+    let phase: SeasonPhase
+    /// Current season metadata — drives the pre-season countdown ("opening night").
+    let season: SeasonMeta?
+    /// The crowned team, set only in the `.concluded` phase.
+    let champion: ChampionInfo?
+    /// Last season's final table, set only in the `.preseason` phase (a recap).
+    let previousStandings: [Standings]
+
     enum CodingKeys: String, CodingKey {
         case generatedAt, featured, live, upcoming, recent, standings, leaders, favorite
+        case phase, season, champion, previousStandings
     }
 
     init(from decoder: Decoder) throws {
@@ -50,13 +60,27 @@ struct HomeSummary: Decodable, Equatable {
         standings = try c.decodeIfPresent([Standings].self, forKey: .standings) ?? []
         leaders = try c.decodeIfPresent(LeagueLeaders.self, forKey: .leaders)
         favorite = try c.decodeIfPresent(FavoriteTeamSummary.self, forKey: .favorite)
+        season = try c.decodeIfPresent(SeasonMeta.self, forKey: .season)
+        champion = try c.decodeIfPresent(ChampionInfo.self, forKey: .champion)
+        previousStandings = try c.decodeIfPresent([Standings].self, forKey: .previousStandings) ?? []
+        // Trust the server's phase; if it's absent (partial/older payload), infer it.
+        if let raw = try c.decodeIfPresent(String.self, forKey: .phase),
+           let parsed = SeasonPhase(rawValue: raw) {
+            phase = parsed
+        } else {
+            phase = SeasonPhase.infer(live: live, upcoming: upcoming, recent: recent)
+        }
     }
 
     /// Memberwise init for mocks / previews.
-    init(generatedAt: Date?, featured: Match?, live: [Match], upcoming: [Match],
+    init(generatedAt: Date?, phase: SeasonPhase = .regular, season: SeasonMeta? = nil,
+         featured: Match?, live: [Match], upcoming: [Match],
          recent: [Match], standings: [Standings], leaders: LeagueLeaders?,
-         favorite: FavoriteTeamSummary?) {
+         favorite: FavoriteTeamSummary?, champion: ChampionInfo? = nil,
+         previousStandings: [Standings] = []) {
         self.generatedAt = generatedAt
+        self.phase = phase
+        self.season = season
         self.featured = featured
         self.live = live
         self.upcoming = upcoming
@@ -64,7 +88,44 @@ struct HomeSummary: Decodable, Equatable {
         self.standings = standings
         self.leaders = leaders
         self.favorite = favorite
+        self.champion = champion
+        self.previousStandings = previousStandings
     }
+}
+
+// MARK: - Season phase
+
+/// The lifecycle state the home renders for. The server sends this; the client can
+/// also infer it from the slate as a fallback.
+enum SeasonPhase: String, Decodable, Equatable {
+    /// Schedule published, but no games played yet — countdown to opening night.
+    case preseason
+    /// Games being played (regular season or playoffs) — the standard home.
+    case regular
+    /// The schedule is exhausted (finals done), next season's slate not out yet.
+    case concluded
+
+    /// Fallback used only when the payload omits `phase`.
+    static func infer(live: [Match], upcoming: [Match], recent: [Match]) -> SeasonPhase {
+        if !live.isEmpty { return .regular }
+        if recent.isEmpty && !upcoming.isEmpty { return .preseason }
+        if upcoming.isEmpty && !recent.isEmpty { return .concluded }
+        return .regular
+    }
+}
+
+/// Lightweight current-season descriptor.
+struct SeasonMeta: Decodable, Equatable {
+    let code: String
+    let name: String
+    let startDate: Date?
+}
+
+/// The crowned team for a concluded season.
+struct ChampionInfo: Decodable, Equatable {
+    let team: Team
+    /// "Champions" (finals winner) or "Regular Season Winners" (fallback).
+    let label: String
 }
 
 // MARK: - League leaders
