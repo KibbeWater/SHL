@@ -867,11 +867,7 @@ struct MatchView: View {
     }
 
     private func startLiveActivity() throws {
-        PostHogSDK.shared.capture(
-            "started_live_activity",
-            properties: ["join_type": "match_cta"],
-            userProperties: ["activity_id": KeychainManager.shared.getDeviceId()]
-        )
+        Analytics.track(.liveActivityStarted(joinType: "match_cta"))
 
         if let liveMatch = viewModel.liveGame {
             try ActivityUpdater.shared.start(match: liveMatch)
@@ -937,16 +933,7 @@ struct MatchView: View {
 
     private func logAnalytics() {
         guard !hasLogged else { return }
-
-        PostHogSDK.shared.capture(
-            "match_view_interaction",
-            properties: ["referrer": referrer],
-            userProperties: ["match_id": match.id]
-        )
-
-        PostHogSDK.shared.capture("team_interaction", properties: ["team_code": match.homeTeam.code])
-        PostHogSDK.shared.capture("team_interaction", properties: ["team_code": match.awayTeam.code])
-
+        Analytics.track(.matchOpened(referrer: referrer))
         hasLogged = true
     }
 

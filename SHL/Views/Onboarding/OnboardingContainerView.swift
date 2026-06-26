@@ -7,7 +7,6 @@
 //  analytics) is unchanged.
 //
 
-import PostHog
 import SwiftUI
 
 struct OnboardingContainerView: View {
@@ -225,85 +224,35 @@ struct OnboardingContainerView: View {
     // MARK: - Analytics Tracking
 
     private func trackOnboardingStarted() {
-        #if !DEBUG
-        PostHogSDK.shared.capture(
-            "onboarding_started",
-            properties: [
-                "timestamp": ISO8601DateFormatter().string(from: Date())
-            ]
-        )
-        #endif
+        Analytics.track(.onboardingStarted)
     }
 
     private func trackPageView(page: Int, pageName: String) {
-        #if !DEBUG
-        PostHogSDK.shared.capture(
-            "onboarding_page_viewed",
-            properties: [
-                "page_number": page,
-                "page_name": pageName,
-                "timestamp": ISO8601DateFormatter().string(from: Date())
-            ]
-        )
-        #endif
+        Analytics.track(.onboardingPageViewed(page: page, name: pageName))
     }
 
     private func trackTeamSelection(skipped: Bool) {
-        #if !DEBUG
-        PostHogSDK.shared.capture(
-            "onboarding_team_selection",
-            properties: [
-                "skipped": skipped,
-                "teams_selected_count": selectedTeamIds.count,
-                "teams_selected": skipped ? [] : Array(selectedTeamIds)
-            ]
-        )
-        #endif
+        Analytics.track(.onboardingTeamSelection(skipped: skipped, count: selectedTeamIds.count))
     }
 
     private func trackFavoriteTeamSelection(skipped: Bool) {
-        #if !DEBUG
-        PostHogSDK.shared.capture(
-            "onboarding_favorite_team",
-            properties: [
-                "skipped": skipped,
-                "has_favorite": favoriteTeamId != nil,
-                "favorite_team_id": favoriteTeamId ?? ""
-            ]
-        )
-        #endif
+        Analytics.track(.onboardingFavoriteTeam(skipped: skipped, hasFavorite: favoriteTeamId != nil))
     }
 
     private func trackOnlineFeaturesSelection(enabled: Bool) {
-        #if !DEBUG
-        PostHogSDK.shared.capture(
-            "onboarding_online_features",
-            properties: [
-                "enabled": enabled,
-                "action": enabled ? "enable_now" : "not_now"
-            ]
-        )
-        #endif
+        Analytics.track(.onboardingOnlineFeatures(enabled: enabled))
     }
 
     private func trackOnboardingCompleted() {
-        let duration = Date().timeIntervalSince(onboardingStartTime)
-
-        #if !DEBUG
-        PostHogSDK.shared.capture(
-            "onboarding_completed",
-            properties: [
-                "duration_seconds": duration,
-                "teams_selected_count": selectedTeamIds.count,
-                "has_favorite_team": favoriteTeamId != nil,
-                "sync_enabled": true,
-                "skipped_team_selection": skippedTeamSelection,
-                "skipped_favorite_team": skippedFavoriteTeam,
-                "teams_selected": Array(selectedTeamIds),
-                "favorite_team_id": favoriteTeamId ?? ""
-            ]
-        )
-        #endif
+        Analytics.track(.onboardingCompleted(
+            durationSeconds: Date().timeIntervalSince(onboardingStartTime),
+            teamsCount: selectedTeamIds.count,
+            hasFavorite: favoriteTeamId != nil,
+            skippedTeams: skippedTeamSelection,
+            skippedFavorite: skippedFavoriteTeam
+        ))
+        // The user's teams are now set — refresh the cohort super properties.
+        Analytics.refreshUserContext()
     }
 }
 

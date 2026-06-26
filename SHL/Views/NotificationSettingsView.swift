@@ -86,6 +86,7 @@ struct NotificationSettingsView: View {
         }
         .navigationTitle("Notifications")
         .navigationBarTitleDisplayMode(.inline)
+        .trackScreen("Notifications")
         .task {
             await pushManager.checkAndUpdatePermissionStatus()
             await settings.hydrateInterestedTeamsFromBackend()
@@ -104,6 +105,8 @@ struct NotificationSettingsView: View {
                         isRequestingPermission = true
                         _ = await pushManager.requestPermissionsAndRegister()
                         await pushManager.checkAndUpdatePermissionStatus()
+                        Analytics.track(.notificationPermissionResult(
+                            granted: pushManager.permissionStatus == .authorized))
                         isRequestingPermission = false
                     }
                 } label: {
@@ -192,14 +195,20 @@ struct NotificationSettingsView: View {
     private func levelBinding(for team: InterestedTeam) -> Binding<TeamNotificationLevel> {
         Binding(
             get: { settings.notificationLevel(for: team.id) },
-            set: { settings.setNotificationLevel($0, for: team.id) }
+            set: {
+                Analytics.track(.teamNotificationLevelChanged(level: $0.rawValue))
+                settings.setNotificationLevel($0, for: team.id)
+            }
         )
     }
 
     private var autoStartLiveActivityBinding: Binding<Bool> {
         Binding(
             get: { settings.notificationSettings.autoStartLiveActivity },
-            set: { settings.notificationSettings = NotificationSettings(autoStartLiveActivity: $0) }
+            set: {
+                Analytics.track(.liveActivityAutoStartToggled(enabled: $0))
+                settings.notificationSettings = NotificationSettings(autoStartLiveActivity: $0)
+            }
         )
     }
 }

@@ -39,6 +39,7 @@ struct MatchListView: View {
         .navigationTitle("Schedule")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
+        .trackScreen("Schedule")
         .toolbar { toolbar }
         .task { await viewModel.loadInitial() }
         .onDisappear { viewModel.stop() }
@@ -57,7 +58,10 @@ struct MatchListView: View {
                 .tint(Rink.ice)
         }
         ToolbarItem(placement: .topBarTrailing) {
-            Button { showDatePicker = true } label: { Image(systemName: "calendar") }
+            Button {
+                Analytics.track(.scheduleJumpToDate)
+                showDatePicker = true
+            } label: { Image(systemName: "calendar") }
                 .tint(Rink.ice)
         }
         ToolbarItem(placement: .topBarTrailing) {
@@ -78,7 +82,10 @@ struct MatchListView: View {
     }
 
     private var teamBinding: Binding<String?> {
-        Binding(get: { viewModel.teamFilter }, set: { viewModel.setTeamFilter($0) })
+        Binding(get: { viewModel.teamFilter }, set: {
+            Analytics.track(.scheduleTeamFilterChanged(active: $0 != nil))
+            viewModel.setTeamFilter($0)
+        })
     }
 
     // MARK: - Week strip
@@ -86,13 +93,19 @@ struct MatchListView: View {
     private var weekStrip: some View {
         VStack(spacing: 10) {
             HStack {
-                Button { withAnimation(.snappy) { viewModel.changeWeek(by: -1) } } label: {
+                Button {
+                    Analytics.track(.scheduleWeekPaged(direction: "back"))
+                    withAnimation(.snappy) { viewModel.changeWeek(by: -1) }
+                } label: {
                     Image(systemName: "chevron.left")
                 }
                 Spacer()
                 Text(viewModel.monthYearLabel).font(.subheadline.weight(.semibold))
                 Spacer()
-                Button { withAnimation(.snappy) { viewModel.changeWeek(by: 1) } } label: {
+                Button {
+                    Analytics.track(.scheduleWeekPaged(direction: "forward"))
+                    withAnimation(.snappy) { viewModel.changeWeek(by: 1) }
+                } label: {
                     Image(systemName: "chevron.right")
                 }
             }
@@ -117,6 +130,10 @@ struct MatchListView: View {
         let today = viewModel.isToday(day)
         let hasGames = viewModel.hasGames(on: day)
         return Button {
+            let days = Calendar.current.dateComponents(
+                [.day], from: Calendar.current.startOfDay(for: Date()),
+                to: Calendar.current.startOfDay(for: day)).day ?? 0
+            Analytics.track(.scheduleDateSelected(daysFromToday: days))
             withAnimation(.snappy) { viewModel.select(day) }
         } label: {
             VStack(spacing: 4) {

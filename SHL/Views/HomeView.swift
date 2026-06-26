@@ -37,6 +37,10 @@ struct HomeView: View {
         .task {
             if viewModel.summary == nil { await viewModel.load() }
             resolveGlows()
+            if let summary = viewModel.summary {
+                Analytics.track(.homeViewed(phase: summary.phase.rawValue,
+                                            hasFavorite: summary.favorite != nil))
+            }
         }
         .onChange(of: viewModel.summary?.favorite?.team.code) { _, _ in resolveGlows() }
         .onChange(of: viewModel.summary?.champion?.team.code) { _, _ in resolveGlows() }
@@ -219,6 +223,9 @@ struct HomeView: View {
                                       seasonName: summary.season?.name ?? summary.season?.code)
                 }
                 .buttonStyle(.plain)
+                .simultaneousGesture(TapGesture().onEnded {
+                    Analytics.track(.homeSeasonCardTapped(phase: summary.phase.rawValue))
+                })
             }
 
             // The user's first game (or the league opener when there's no favorite).
@@ -376,6 +383,9 @@ struct HomeView: View {
                     Text("Results").tag(1)
                 }
                 .pickerStyle(.segmented)
+                .onChange(of: gamesTab) { _, new in
+                    Analytics.track(.homeGamesTabChanged(tab: new == 0 ? "upcoming" : "results"))
+                }
 
                 if matches.isEmpty {
                     Text(gamesTab == 0 ? "No upcoming games" : "No recent results")

@@ -56,6 +56,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                     // Pull per-team notification levels from the backend (source of truth).
                     await Settings.shared.hydrateInterestedTeamsFromBackend()
 
+                    // Tie analytics to this (device-scoped) user and set cohort super properties.
+                    if let userId = AuthenticationManager.shared.currentUserId {
+                        await MainActor.run {
+                            Analytics.identify(userId: userId)
+                            Analytics.refreshUserContext()
+                        }
+                    }
+
                     // Register for push notifications on launch
                     await PushNotificationManager.shared.registerForRemoteNotifications()
                 } catch {

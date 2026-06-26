@@ -311,6 +311,7 @@ struct SettingsView: View {
         .onAppear {
             loadTeams()
         }
+        .trackScreen("Settings")
         .sheet(isPresented: $showFeedback) {
             FeedbackSheet()
         }
@@ -473,6 +474,7 @@ struct FeedbackSheet: View {
                 }
             }
             .sensoryFeedback(.success, trigger: successTick)
+            .onAppear { Analytics.track(.feedbackOpened(source: "settings")) }
         }
     }
 
@@ -589,6 +591,7 @@ struct FeedbackSheet: View {
         Task {
             do {
                 try await SHLAPIClient.shared.submitFeedback(request)
+                Analytics.track(.feedbackSubmitted(category: request.category, length: request.message.count))
                 successTick += 1
                 withAnimation { phase = .success }
                 try? await Task.sleep(nanoseconds: 1_400_000_000)
