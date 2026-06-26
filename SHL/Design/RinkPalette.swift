@@ -119,6 +119,18 @@ extension Color {
         return Color(red: Double(r * k), green: Double(g * k), blue: Double(b * k), opacity: Double(a))
     }
 
+    /// Blend this color toward white by `amount` (0...1). Used for soft team-tinted
+    /// nodes in the light-mode mesh, where an opaque pale tint reads better than alpha.
+    func lightened(by amount: CGFloat = 0.5) -> Color {
+        let ui = UIColor(self)
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        guard ui.getRed(&r, green: &g, blue: &b, alpha: &a) else { return self }
+        return Color(red: Double(r + (1 - r) * amount),
+                     green: Double(g + (1 - g) * amount),
+                     blue: Double(b + (1 - b) * amount),
+                     opacity: Double(a))
+    }
+
     /// Build a color that resolves dynamically between light and dark mode — the
     /// backbone of the palette, so every decorative accent adapts without a second
     /// asset entry.
