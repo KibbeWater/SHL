@@ -236,48 +236,69 @@ struct StandingsTable: View {
                 .fill(.secondary.opacity(0.2))
                 .frame(height: 1)
 
-            // Column headers
-            StandingsHeaderRow(hasRecord: items.first?.hasRecord ?? false)
+            if items.isEmpty {
+                emptyState
+            } else {
+                // Column headers
+                StandingsHeaderRow(hasRecord: items.first?.hasRecord ?? false)
 
-            Rectangle()
-                .fill(.secondary.opacity(0.1))
-                .frame(height: 1)
+                Rectangle()
+                    .fill(.secondary.opacity(0.1))
+                    .frame(height: 1)
 
-            // Rows
-            LazyVStack(spacing: 0) {
-                ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                    Group {
-                        if let team = item.teamObj {
-                            NavigationLink {
-                                TeamView(team: team)
-                            } label: {
+                // Rows
+                LazyVStack(spacing: 0) {
+                    ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                        Group {
+                            if let team = item.teamObj {
+                                NavigationLink {
+                                    TeamView(team: team)
+                                } label: {
+                                    StandingRowView(
+                                        standing: item,
+                                        isTopThree: item.position <= 3,
+                                        isFavorite: item.teamId == favoriteTeamId
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                            } else {
                                 StandingRowView(
                                     standing: item,
                                     isTopThree: item.position <= 3,
                                     isFavorite: item.teamId == favoriteTeamId
                                 )
                             }
-                            .buttonStyle(.plain)
-                        } else {
-                            StandingRowView(
-                                standing: item,
-                                isTopThree: item.position <= 3,
-                                isFavorite: item.teamId == favoriteTeamId
-                            )
                         }
-                    }
 
-                    if item.position == playoffCutoff && index < items.count - 1 {
-                        PlayoffDivider()
-                    } else if index < items.count - 1 {
-                        Rectangle()
-                            .fill(.secondary.opacity(0.1))
-                            .frame(height: 1)
-                            .padding(.leading, 48)
+                        if item.position == playoffCutoff && index < items.count - 1 {
+                            PlayoffDivider()
+                        } else if index < items.count - 1 {
+                            Rectangle()
+                                .fill(.secondary.opacity(0.1))
+                                .frame(height: 1)
+                                .padding(.leading, 48)
+                        }
                     }
                 }
             }
         }
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "list.number")
+                .font(.title)
+                .foregroundStyle(.secondary)
+            Text("No Standings Yet")
+                .font(.subheadline.weight(.semibold))
+            Text("Standings will appear once the season gets underway.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 32)
     }
 }
 
@@ -299,5 +320,14 @@ struct StandingsTable: View {
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .padding()
+    }
+}
+
+#Preview("Empty") {
+    ScrollView {
+        StandingsTable(title: "SHL Standings", items: [])
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .padding()
     }
 }

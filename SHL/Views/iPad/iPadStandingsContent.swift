@@ -19,6 +19,12 @@ struct iPadStandingsContent: View {
                     systemImage: "exclamationmark.triangle",
                     description: Text("Standings are temporarily unavailable. We apologize for the inconvenience.")
                 )
+            } else if let standings = viewModel.standings, standings.isEmpty {
+                ContentUnavailableView(
+                    "No Standings Yet",
+                    systemImage: "list.number",
+                    description: Text("Standings will appear once the season gets underway.")
+                )
             } else if let standings = viewModel.standings {
                 StandingsTable(
                     title: "SHL Standings",

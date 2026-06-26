@@ -76,63 +76,66 @@ struct SettingsView: View {
             }
         }
     }
-    
+
+    /// Look up the full Team (for logo/city) backing a stored interested-team id.
+    private func fullTeam(_ id: String) -> Team? {
+        teams.first { $0.id == id }
+    }
+
+    private var interestedTeamsEmptyState: some View {
+        VStack(spacing: 6) {
+            Image(systemName: "person.2.slash")
+                .font(.title2)
+                .foregroundStyle(.secondary)
+            Text("No teams followed yet")
+                .font(.subheadline.weight(.medium))
+            Text("Add teams to get match alerts and a personalized home screen.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .listRowSeparator(.hidden)
+    }
+
     var body: some View {
         List {
             Section {
                 if teamsLoaded {
                     let interestedTeams = settings.getInterestedTeams()
                     let favoriteTeam = settings.getFavoriteTeam()
+                    let favoriteId = settings.getFavoriteTeamId()
 
-                    // Favorite team
-                    if let favoriteTeam = favoriteTeam {
-                        Button {
-                            showFavoriteTeamPicker = true
-                        } label: {
-                            HStack {
-                                Image(systemName: "star.fill")
-                                    .foregroundStyle(.yellow)
-                                    .font(.caption)
-
-                                Text(favoriteTeam.name)
-                                    .foregroundStyle(.primary)
-
-                                Spacer()
-
-                                Text(favoriteTeam.code)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-
-                                Image(systemName: "chevron.right")
-                                    .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                    if interestedTeams.isEmpty {
+                        interestedTeamsEmptyState
+                    } else {
+                        // Favorite team (hero)
+                        if let favoriteTeam {
+                            FavoriteTeamRow(
+                                name: favoriteTeam.name,
+                                code: favoriteTeam.code,
+                                city: favoriteTeam.city ?? fullTeam(favoriteTeam.id)?.city,
+                                iconURL: fullTeam(favoriteTeam.id)?.iconURL
+                            ) {
+                                showFavoriteTeamPicker = true
                             }
                         }
-                    }
 
-                    // Interested teams
-                    if interestedTeams.isEmpty {
-                        Text("No teams selected")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        ForEach(interestedTeams) { team in
-                            // Don't show favorite team twice
-                            if team.id != settings.getFavoriteTeamId() {
-                                HStack {
-                                    Text(team.name)
-                                    Spacer()
-                                    Text(team.code)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
+                        // Other followed teams
+                        ForEach(interestedTeams.filter { $0.id != favoriteId }) { team in
+                            InterestedTeamRow(
+                                name: team.name,
+                                code: team.code,
+                                iconURL: fullTeam(team.id)?.iconURL
+                            )
                         }
                     }
 
                     Button {
                         showTeamSelectionSheet = true
                     } label: {
-                        Label("Select Teams", systemImage: "person.2.fill")
+                        Label(interestedTeams.isEmpty ? "Select Teams" : "Edit Teams", systemImage: "person.2.fill")
                     }
 
                     if !interestedTeams.isEmpty && favoriteTeam == nil {
@@ -144,7 +147,7 @@ struct SettingsView: View {
                     }
                 } else {
                     HStack {
-                        Text("Loading teams...")
+                        Text("Loading teams…")
                         Spacer()
                         ProgressView()
                     }
@@ -453,19 +456,20 @@ struct SettingsView: View {
                                 settings.setFavoriteTeamId(team.id)
                                 showFavoriteTeamPicker = false
                             } label: {
-                                HStack {
+                                HStack(spacing: 12) {
+                                    TeamLogoView(teamCode: team.code, iconURL: fullTeam(team.id)?.iconURL, size: .custom(28))
+                                        .frame(width: 30, height: 30)
+
                                     Text(team.name)
                                         .foregroundStyle(.primary)
 
                                     Spacer()
 
-                                    Text(team.code)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-
                                     if currentFavorite == team.id {
                                         Image(systemName: "star.fill")
                                             .foregroundStyle(.yellow)
+                                    } else {
+                                        TeamCodeBadge(code: team.code)
                                     }
                                 }
                             }
