@@ -372,6 +372,18 @@ class SHLAPIClient {
         )
     }
 
+    // MARK: - Feedback
+
+    /// Submit user feedback (`POST /api/v1/feedback`, JWT-authenticated).
+    func submitFeedback(_ feedback: SendFeedbackRequest) async throws {
+        let _: EmptyResponse = try await request(
+            endpoint: "/feedback",
+            method: .post,
+            body: feedback,
+            requiresAuth: true
+        )
+    }
+
     // MARK: - Interested Teams
 
     /// Get user's interested teams (response includes per-team notification levels)

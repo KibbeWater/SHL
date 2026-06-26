@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct SettingsView: View {
     @Environment(\.openURL) var openURL
@@ -22,6 +23,7 @@ struct SettingsView: View {
     @State private var devices: [Device] = []
     @State private var isLoadingDevices = false
     @State private var showResetOnboardingAlert = false
+    @State private var showFeedback = false
 
     private let api = SHLAPIClient.shared
     
@@ -98,8 +100,49 @@ struct SettingsView: View {
         .listRowSeparator(.hidden)
     }
 
+    /// Prominent, brand-gradient call-to-action at the top of Settings.
+    private var feedbackPromoSection: some View {
+        Section {
+            Button {
+                showFeedback = true
+            } label: {
+                HStack(spacing: 14) {
+                    ZStack {
+                        Circle().fill(.white.opacity(0.22)).frame(width: 46, height: 46)
+                        Image(systemName: "lightbulb.fill")
+                            .font(.title2)
+                            .foregroundStyle(.white)
+                    }
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Share Feedback")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                        Text("Suggest a feature, report a bug, or tell us what you think.")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.92))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.85))
+                }
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Rink.iceGradient, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .shadow(color: Rink.ice.opacity(0.3), radius: 10, y: 5)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+        }
+    }
+
     var body: some View {
         List {
+            feedbackPromoSection
+
             Section {
                 if teamsLoaded {
                     let interestedTeams = settings.getInterestedTeams()
@@ -268,6 +311,9 @@ struct SettingsView: View {
         .onAppear {
             loadTeams()
         }
+        .sheet(isPresented: $showFeedback) {
+            FeedbackSheet()
+        }
         .sheet(isPresented: $showTeamSelectionSheet) {
             TeamSelectionSheet(
                 allTeams: teams,
@@ -351,4 +397,239 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView()
+}
+
+// MARK: - Feedback
+
+enum FeedbackCategory: String, CaseIterable, Identifiable {
+    case suggestion
+    case improvement
+    case bug
+    case general
+
+    var id: String { rawValue }
+
+    var shortName: String {
+        switch self {
+        case .suggestion: return String(localized: "Suggestion")
+        case .improvement: return String(localized: "Improvement")
+        case .bug: return String(localized: "Bug")
+        case .general: return String(localized: "General")
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .suggestion: return "lightbulb"
+        case .improvement: return "wand.and.stars"
+        case .bug: return "ladybug"
+        case .general: return "bubble.left.and.text.bubble"
+        }
+    }
+
+    var placeholder: String {
+        switch self {
+        case .suggestion: return String(localized: "What would you love to see in the app?")
+        case .improvement: return String(localized: "What could work better, and how?")
+        case .bug: return String(localized: "What happened, and what did you expect instead?")
+        case .general: return String(localized: "Anything you'd like to share with us…")
+        }
+    }
+}
+
+/// A lightweight feedback composer — pick a category, write a note, send. Diagnostic
+/// metadata (app/OS/device) is attached silently; the submitter is identified by the
+/// auth token on the backend.
+struct FeedbackSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var category: FeedbackCategory = .suggestion
+    @State private var message: String = ""
+    @State private var phase: Phase = .editing
+    @State private var errorMessage: String?
+    @State private var successTick = 0
+    @FocusState private var editorFocused: Bool
+
+    private enum Phase { case editing, sending, success }
+
+    private var trimmed: String { message.trimmingCharacters(in: .whitespacesAndNewlines) }
+    private var canSend: Bool { !trimmed.isEmpty && phase != .sending }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                RinkAmbientBackground(.arena)
+                if phase == .success {
+                    successView.transition(.scale.combined(with: .opacity))
+                } else {
+                    form
+                }
+            }
+            .navigationTitle("Feedback")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
+            .sensoryFeedback(.success, trigger: successTick)
+        }
+    }
+
+    private var form: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: .RinkSpace.lg) {
+                VStack(alignment: .leading, spacing: .RinkSpace.xs) {
+                    Text("What's on your mind?").font(.rinkTitle)
+                    Text("Tell us what to build, fix, or change — every note reaches the team.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                categoryPicker
+                messageEditor
+
+                if let errorMessage {
+                    Label(errorMessage, systemImage: "exclamationmark.triangle.fill")
+                        .font(.subheadline)
+                        .foregroundStyle(Rink.goal)
+                        .transition(.opacity)
+                }
+
+                RinkPrimaryButton(title: "Send Feedback", icon: "paperplane.fill",
+                                  isLoading: phase == .sending, isEnabled: canSend) {
+                    send()
+                }
+            }
+            .padding()
+            .frame(maxWidth: 600)
+            .frame(maxWidth: .infinity)
+        }
+        .scrollDismissesKeyboard(.interactively)
+    }
+
+    private var categoryPicker: some View {
+        LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+            ForEach(FeedbackCategory.allCases) { item in
+                categoryChip(item)
+            }
+        }
+        .sensoryFeedback(.selection, trigger: category)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Feedback type")
+    }
+
+    private func categoryChip(_ item: FeedbackCategory) -> some View {
+        let selected = category == item
+        return Button {
+            withAnimation(.snappy) { category = item }
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: item.iconName)
+                    .symbolVariant(selected ? .fill : .none)
+                Text(item.shortName)
+                    .font(.subheadline.weight(.semibold))
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .foregroundStyle(selected ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
+            .background {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(selected ? AnyShapeStyle(Rink.iceGradient) : AnyShapeStyle(.regularMaterial))
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+    }
+
+    private var messageEditor: some View {
+        ZStack(alignment: .topLeading) {
+            if message.isEmpty {
+                Text(category.placeholder)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 10)
+                    .padding(.leading, 6)
+                    .allowsHitTesting(false)
+            }
+            TextEditor(text: $message)
+                .frame(minHeight: 150)
+                .scrollContentBackground(.hidden)
+                .focused($editorFocused)
+        }
+        .padding(8)
+        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(.regularMaterial))
+    }
+
+    private var successView: some View {
+        VStack(spacing: .RinkSpace.md) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 60))
+                .foregroundStyle(Rink.ice)
+            Text("Thank you!").font(.rinkTitle)
+            Text("Your note is on its way to the team.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding()
+        .accessibilityElement(children: .combine)
+    }
+
+    private func send() {
+        editorFocused = false
+        withAnimation { errorMessage = nil; phase = .sending }
+        let request = SendFeedbackRequest(
+            category: category.rawValue,
+            message: trimmed,
+            appVersion: Self.appVersion,
+            osVersion: Self.osVersion,
+            deviceModel: Self.deviceModel
+        )
+        Task {
+            do {
+                try await SHLAPIClient.shared.submitFeedback(request)
+                successTick += 1
+                withAnimation { phase = .success }
+                try? await Task.sleep(nanoseconds: 1_400_000_000)
+                if phase == .success { dismiss() }
+            } catch {
+                withAnimation {
+                    phase = .editing
+                    errorMessage = String(localized: "Couldn't send. Please try again.")
+                }
+            }
+        }
+    }
+
+    // MARK: - Diagnostic metadata
+
+    private static var appVersion: String {
+        let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
+        return "\(short) (\(build))"
+    }
+
+    private static var osVersion: String {
+        "\(UIDevice.current.systemName) \(UIDevice.current.systemVersion)"
+    }
+
+    private static var deviceModel: String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let mirror = Mirror(reflecting: systemInfo.machine)
+        return mirror.children.reduce(into: "") { result, element in
+            guard let value = element.value as? Int8, value != 0 else { return }
+            result.append(Character(UnicodeScalar(UInt8(value))))
+        }
+    }
+}
+
+#Preview("Feedback") {
+    FeedbackSheet()
+}
+
+#Preview("Feedback · Dark") {
+    FeedbackSheet()
+        .preferredColorScheme(.dark)
 }

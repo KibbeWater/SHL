@@ -30,6 +30,18 @@ struct TokenRefreshResponse: Codable {
     let expiresAt: Date
 }
 
+// MARK: - Feedback
+
+/// Body for `POST /api/v1/feedback`. Lives here (shared across targets) because the
+/// API client references it; the feedback UI + category enum stay in the app target.
+struct SendFeedbackRequest: Codable {
+    let category: String
+    let message: String
+    let appVersion: String?
+    let osVersion: String?
+    let deviceModel: String?
+}
+
 // MARK: - User Profile
 
 struct UserProfile: Codable {
