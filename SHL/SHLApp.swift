@@ -6,21 +6,14 @@
 //
 
 import SwiftUI
-import PostHog
 
 @main
 struct LHFApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     init() {
-        let config = PostHogConfig(
-            apiKey: SharedPreferenceKeys.POSTHOG_API_KEY,
-            host: SharedPreferenceKeys.POSTHOG_HOST
-        )
-
-#if !DEBUG
-        PostHogSDK.shared.setup(config)
-#endif
+        Analytics.start()
+        Analytics.track(.appOpened(source: "cold_start"))
     }
 
     var body: some Scene {
