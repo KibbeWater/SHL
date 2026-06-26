@@ -50,6 +50,12 @@ class HomeViewModel: ObservableObject {
     /// Fetch initial live data from API for immediate display
     /// This provides instant data without waiting for SSE cache
     private func fetchInitialLiveData(for game: Match) async {
+        // Only in-progress games have a live endpoint; a scheduled/finished game just
+        // 404s. Skip those rather than firing (and re-polling) a doomed request.
+        guard game.isLive() else {
+            self.liveGame = nil
+            return
+        }
         do {
             let live = try await api.getLiveMatch(id: game.externalUUID)
             if live.gameState == .played || live.gameState == .cancelled {
@@ -69,7 +75,9 @@ class HomeViewModel: ObservableObject {
         pollingTimer?.invalidate()
         pollingTimer = nil
 
-        guard featuredGame != nil else { return }
+        // Only poll while the featured game is actually live — no point hammering a
+        // 404 every 30s for a scheduled/finished game.
+        guard featuredGame?.isLive() == true else { return }
 
         pollingTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
