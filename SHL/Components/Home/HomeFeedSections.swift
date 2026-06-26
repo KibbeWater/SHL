@@ -477,10 +477,16 @@ struct PreseasonHeroCard: View {
             Text(subLine)
                 .font(.headline)
                 .foregroundStyle(.white.opacity(0.9))
-            Label(dateText, systemImage: "calendar")
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.white.opacity(0.8))
-                .padding(.top, .RinkSpace.xs)
+            HStack {
+                Label(dateText, systemImage: "calendar")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.8))
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.white.opacity(0.6))
+            }
+            .padding(.top, .RinkSpace.xs)
         }
         .padding(.RinkSpace.xl)
         .frame(maxWidth: .infinity, alignment: .leading)

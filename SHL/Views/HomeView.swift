@@ -187,6 +187,24 @@ struct HomeView: View {
         summary.upcoming.first?.date ?? summary.favorite?.nextMatch?.date ?? summary.season?.startDate
     }
 
+    /// The opening slate in chronological order, but guaranteeing the favorite team's
+    /// first game is shown even when several games at the cut share a slot and it
+    /// would otherwise be dropped — it takes the last slot, then order is restored.
+    private func openingFixtures(_ summary: HomeSummary, limit: Int) -> [Match] {
+        let games = summary.upcoming
+        guard games.count > limit else { return games }
+        var shown = Array(games.prefix(limit))
+        guard let code = summary.favorite?.team.code else { return shown }
+        let involvesFavorite: (Match) -> Bool = {
+            $0.homeTeam.code.caseInsensitiveCompare(code) == .orderedSame ||
+            $0.awayTeam.code.caseInsensitiveCompare(code) == .orderedSame
+        }
+        guard !shown.contains(where: involvesFavorite),
+              let favoriteGame = games.first(where: involvesFavorite) else { return shown }
+        shown[shown.count - 1] = favoriteGame
+        return shown.sorted { $0.date < $1.date }
+    }
+
     /// Anticipation home: a countdown to opening night, the user's opener, the
     /// opening fixtures, and a recap of last season's final table.
     private func preseasonLayout(_ summary: HomeSummary) -> some View {
@@ -194,8 +212,13 @@ struct HomeView: View {
             HomeGreetingHeader()
 
             if let opening = openingDate(summary) {
-                PreseasonHeroCard(openingDate: opening,
-                                  seasonName: summary.season?.name ?? summary.season?.code)
+                NavigationLink {
+                    MatchListView()
+                } label: {
+                    PreseasonHeroCard(openingDate: opening,
+                                      seasonName: summary.season?.name ?? summary.season?.code)
+                }
+                .buttonStyle(.plain)
             }
 
             // The user's first game (or the league opener when there's no favorite).
@@ -215,7 +238,7 @@ struct HomeView: View {
                         seeAll { MatchListView() }
                     }
                     VStack(spacing: .RinkSpace.sm) {
-                        ForEach(summary.upcoming.prefix(6), id: \.id) { match in
+                        ForEach(openingFixtures(summary, limit: 6), id: \.id) { match in
                             matchLink(match, referrer: "home_preseason_fixtures") {
                                 MatchCardCompact(game: match, liveGame: nil)
                             }
