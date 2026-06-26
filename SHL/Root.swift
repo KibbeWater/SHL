@@ -44,7 +44,6 @@ struct Root: View {
     @StateObject private var navigationCoordinator = NavigationCoordinator.shared
     @StateObject private var adminPairingCoordinator = AdminPairingCoordinator.shared
     @StateObject private var homeViewModel = HomeViewModel()
-    @StateObject private var scheduleViewModel = MatchListViewModel()
 
     @AppStorage("tabViewCustomization") private var tabCustomization: TabViewCustomization = .init()
 
@@ -70,18 +69,9 @@ struct Root: View {
 
                     Tab("Schedule", systemImage: "calendar", value: RootTabs.calendar) {
                         NavigationStack {
-                            if isIPad {
-                                iPadScheduleContent(
-                                    viewModel: scheduleViewModel,
-                                    onSelectMatch: { match in
-                                        openedGame = MatchView(match, referrer: "schedule")
-                                        isGameOpen = true
-                                    }
-                                )
-                                .navigationTitle("Schedule")
-                            } else {
-                                MatchListView()
-                            }
+                            // MatchListView is adaptive — single column on iPhone, a wider
+                            // centered list on iPad.
+                            MatchListView()
                         }
                     }
                     .customizationBehavior(.disabled, for: .sidebar, .tabBar)

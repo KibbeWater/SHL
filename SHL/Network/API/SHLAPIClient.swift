@@ -172,6 +172,13 @@ class SHLAPIClient {
         try await request(.home)
     }
 
+    /// Fetch the schedule for a date range (`GET /api/v2/schedule?from=&to=&team=`),
+    /// optionally filtered to one team. Loads only the requested window, not the
+    /// whole season.
+    func getSchedule(from: String, to: String, team: String? = nil) async throws -> ScheduleSummary {
+        try await request(.schedule(from: from, to: to, team: team))
+    }
+
     // MARK: - User Management Endpoints
 
     /// Generic authenticated request with automatic token refresh

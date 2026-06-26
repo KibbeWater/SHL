@@ -23,7 +23,8 @@ class MatchListViewModel: ObservableObject {
     private var cancellable: AnyCancellable?
     private var pollingTimer: Timer?
 
-    init() {
+    init(autoLoad: Bool = true) {
+        guard autoLoad else { return }
         Task {
             try? await refresh()
             // Note: listenForLiveGame() is called at the end of refresh()
@@ -41,14 +42,10 @@ class MatchListViewModel: ObservableObject {
 
         if let season = try? await api.getCurrentSeason() {
             latestMatches = (try? await api.getSeasonMatches(seasonCode: season.code)) ?? []
-
             filterMatches()
             removeUnusedListeners()
-            // Fetch initial live data from API for immediate display
             await fetchInitialLiveData()
-            // Subscribe with updated todayMatches for live updates
             listenForLiveGame()
-            // Start polling as a fallback for when SSE is unavailable
             startPollingIfNeeded()
         }
     }
@@ -153,3 +150,37 @@ class MatchListViewModel: ObservableObject {
         upcomingMatches = latestMatches.filter { calendar.startOfDay(for: $0.date) >= calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now))! }.map { $0 }
     }
 }
+
+#if DEBUG
+extension MatchListViewModel {
+    /// A view model preloaded with mock matches for previews (no network).
+    static func preview() -> MatchListViewModel {
+        let vm = MatchListViewModel(autoLoad: false)
+        func mk(_ id: String, _ h: (String, String), _ a: (String, String),
+                _ hs: Int, _ aws: Int, _ state: MatchState, _ hours: Double) -> Match {
+            Match(id: id, date: Date().addingTimeInterval(hours * 3600), venue: "Arena",
+                  homeTeam: TeamBasic(id: "t-\(h.0)", name: h.1, code: h.0),
+                  awayTeam: TeamBasic(id: "t-\(a.0)", name: a.1, code: a.0),
+                  homeScore: hs, awayScore: aws, state: state, overtime: false, shootout: false,
+                  externalUUID: "x-\(id)")
+        }
+        vm.todayMatches = [
+            mk("t1", ("FHC", "Frölunda HC"), ("LHF", "Luleå HF"), 2, 1, .ongoing, -0.5),
+            mk("t2", ("SAIK", "Skellefteå AIK"), ("RBK", "Rögle BK"), 0, 0, .ongoing, -0.2),
+            mk("t3", ("FBK", "Färjestad BK"), ("VLH", "Växjö Lakers"), 0, 0, .scheduled, 3)
+        ]
+        vm.upcomingMatches = [
+            mk("u1", ("FHC", "Frölunda HC"), ("FBK", "Färjestad BK"), 0, 0, .scheduled, 26),
+            mk("u2", ("LHF", "Luleå HF"), ("MODO", "MoDo Hockey"), 0, 0, .scheduled, 27),
+            mk("u3", ("RBK", "Rögle BK"), ("LIF", "Leksands IF"), 0, 0, .scheduled, 50),
+            mk("u4", ("VLH", "Växjö Lakers"), ("SAIK", "Skellefteå AIK"), 0, 0, .scheduled, 74)
+        ]
+        vm.previousMatches = [
+            mk("p1", ("FHC", "Frölunda HC"), ("MODO", "MoDo Hockey"), 4, 2, .played, -22),
+            mk("p2", ("LHF", "Luleå HF"), ("VLH", "Växjö Lakers"), 1, 2, .played, -23),
+            mk("p3", ("SAIK", "Skellefteå AIK"), ("FBK", "Färjestad BK"), 3, 0, .played, -46)
+        ]
+        return vm
+    }
+}
+#endif

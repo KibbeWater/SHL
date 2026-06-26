@@ -1,258 +1,293 @@
-import SwiftUI
-import PostHog
-import ActivityKit
+//
+//  MatchListView.swift
+//  SHL
+//
+//  The redesigned Schedule — a date-navigated calendar rather than a flat dump of
+//  the whole season. A week strip (with dots on days that have games) drives the
+//  view; only the visible week is loaded. Filter by team, jump to any date, and
+//  see the selected day's games — with a bold Live Now highlight when today is in
+//  view. Adaptive for iPhone + iPad.
+//
 
-private enum Tabs: String, CaseIterable {
-    case previous = "Previous"
-    case today = "Today"
-    case upcoming = "Upcoming"
-}
+import SwiftUI
 
 struct MatchListView: View {
     @Environment(\.scenePhase) private var scenePhase
 
-    @State private var selectedTab: Tabs = .today
+    @State private var viewModel: ScheduleViewModel
+    @State private var showDatePicker = false
 
-    @State private var openDates: [String:Bool] = [:]
-
-    @StateObject private var viewModel = MatchListViewModel()
-    
-    private func getLiveMatch(match: Match) -> LiveMatch? {
-        return viewModel.matchListeners[match.externalUUID]
+    @MainActor
+    init(viewModel: ScheduleViewModel? = nil) {
+        _viewModel = State(initialValue: viewModel ?? ScheduleViewModel())
     }
-    
+
+    private var favoriteCode: String? { Settings.shared.getFavoriteTeam()?.code }
+
     var body: some View {
-        VStack {
-            tabSelectionView
-            
-            TabView(selection: $selectedTab) {
-                matchesScrollView(for: viewModel.previousMatches, tab: .previous)
-                    .id(Tabs.previous)
-                    .tag(Tabs.previous)
-
-                matchesScrollView(for: viewModel.todayMatches, tab: .today)
-                    .id(Tabs.today)
-                    .tag(Tabs.today)
-
-                matchesScrollView(for: viewModel.upcomingMatches, tab: .upcoming)
-                    .id(Tabs.upcoming)
-                    .tag(Tabs.upcoming)
+        ZStack {
+            RinkAmbientBackground(.arena)
+            VStack(spacing: 0) {
+                weekStrip
+                Divider().opacity(0.15)
+                dayContent
             }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
         }
-        .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .active {
-                Task {
-                    try? await viewModel.refresh(hard: true)
+        .navigationTitle("Schedule")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar { toolbar }
+        .task { await viewModel.loadInitial() }
+        .onDisappear { viewModel.stop() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { Task { await viewModel.loadWeek(force: true) } }
+        }
+        .sheet(isPresented: $showDatePicker) { datePickerSheet }
+    }
+
+    // MARK: - Toolbar
+
+    @ToolbarContentBuilder
+    private var toolbar: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            Button("Today") { withAnimation(.snappy) { viewModel.goToToday() } }
+                .tint(Rink.ice)
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+            Button { showDatePicker = true } label: { Image(systemName: "calendar") }
+                .tint(Rink.ice)
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                Picker("Team", selection: teamBinding) {
+                    Text("All Teams").tag(String?.none)
+                    ForEach(viewModel.teams) { team in
+                        Text(team.name).tag(Optional(team.code))
+                    }
                 }
+            } label: {
+                Image(systemName: viewModel.teamFilter == nil
+                      ? "line.3.horizontal.decrease.circle"
+                      : "line.3.horizontal.decrease.circle.fill")
             }
+            .tint(Rink.ice)
         }
     }
-    
-    private var tabSelectionView: some View {
-        HStack {
-            Spacer()
-            ForEach(Tabs.allCases, id: \.self) { tab in
-                Button(action: {
-                    selectedTab = tab
-                }, label: {
-                    Text(tab.rawValue)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(selectedTab == tab ? .primary : .secondary)
-                })
-                .buttonStyle(PlainButtonStyle())
+
+    private var teamBinding: Binding<String?> {
+        Binding(get: { viewModel.teamFilter }, set: { viewModel.setTeamFilter($0) })
+    }
+
+    // MARK: - Week strip
+
+    private var weekStrip: some View {
+        VStack(spacing: 10) {
+            HStack {
+                Button { withAnimation(.snappy) { viewModel.changeWeek(by: -1) } } label: {
+                    Image(systemName: "chevron.left")
+                }
                 Spacer()
-            }
-        }
-    }
-    
-    private func matchItem(_ match: Match) -> some View {
-        HStack {
-            if match.date < Date.now {
-                NavigationLink {
-                    MatchView(match, referrer: "match_list")
-                } label: {
-                    if #available(iOS 17.2, *) {
-                        MatchOverview(game: match, liveGame: getLiveMatch(match: match))
-                            .id("pm-\(match.id)")
-                            .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                            .contextMenu {
-                                #if !APPCLIP
-                                Button("Start Activity", systemImage: "plus") {
-                                    if let live = getLiveMatch(match: match) {
-                                        do {
-                                            PostHogSDK.shared.capture(
-                                                "started_live_activity",
-                                                properties: [
-                                                    "join_type": "match_list_ctx"
-                                                ],
-                                                userProperties: [
-                                                    "activity_id": KeychainManager.shared.getDeviceId()
-                                                ]
-                                            )
-                                            try ActivityUpdater.shared.start(match: live)
-                                        } catch {
-                                            print("Failed to start activity")
-                                        }
-                                    }
-                                }
-                                #endif
-                            }
-                            .padding(.horizontal)
-                    } else {
-                        MatchOverview(game: match, liveGame: getLiveMatch(match: match))
-                            .id("pm-\(match.id)")
-                            .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                            .padding(.horizontal)
-                    }
-                }
-                .buttonStyle(PlainButtonStyle())
-            } else {
-                NavigationLink {
-                    MatchView(match, referrer: "match_list")
-                } label: {
-                    MatchOverview(game: match, liveGame: getLiveMatch(match: match))
-                        .id("pm-\(match.id)")
-                        .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                        .contextMenu {
-                            ReminderContext(game: match)
-                        }
-                        .padding(.horizontal)
-                }
-                .buttonStyle(PlainButtonStyle())
-            }
-        }
-    }
-    
-    private func getDate(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        return dateFormatter.string(from: date)
-    }
-    
-    private func getGroupDate(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = Calendar.current.isDate(Date.now, equalTo: date, toGranularity: .year) 
-            ? "EEEE, d MMM"
-            : "EEEE, d MMM yyyy"
-        return dateFormatter.string(from: date)
-    }
-    
-    private func matchesScrollView(for matches: [Match], tab: Tabs) -> some View {
-        VStack {
-            ScrollView {
-                if matches.first?.date ?? Date.now > Date.now {
-                    let matchGroups = matches.groupBy(keySelector: { getDate($0.date) })
-                    ForEach(matchGroups.keys.sorted(), id: \.self) { key in
-                        let matchList = matchGroups[key]!
-                        let isFirst = matchGroups.keys.sorted().first == key
-                        VStack {
-                            HStack {
-                                Text(getGroupDate(matchList.first?.date ?? Date.now))
-                                    .font(.footnote)
-                                    .foregroundColor(.secondary)
-                                    .fontWeight(.bold)
-                                Spacer()
-                                if !isFirst {
-                                    Button(openDates[key] == true ? "Show less" : "Show more", systemImage: openDates[key] == true ? "chevron.up" : "chevron.down") {
-                                        let isOpen = openDates[key] ?? false
-                                        withAnimation {
-                                            if isOpen {
-                                                openDates[key] = false
-                                            } else {
-                                                openDates[key] = true
-                                            }
-                                        }
-                                    }
-                                    .buttonStyle(PlainButtonStyle())
-                                    .font(.footnote)
-                                    .foregroundColor(.secondary)
-                                }
-                            }
-                            .padding(.horizontal)
-                            if openDates[key] == true || isFirst {
-                                LazyVStack {
-                                    ForEach(matchList, id: \.id) { match in
-                                        matchItem(match)
-                                    }
-                                }
-                            }
-                        }
-                        .padding(.bottom)
-                    }
-                } else {
-                    ForEach(matches, id: \.id) { match in
-                        matchItem(match)
-                    }
+                Text(viewModel.monthYearLabel).font(.subheadline.weight(.semibold))
+                Spacer()
+                Button { withAnimation(.snappy) { viewModel.changeWeek(by: 1) } } label: {
+                    Image(systemName: "chevron.right")
                 }
             }
-            Spacer()
+            .font(.subheadline.weight(.semibold))
+            .tint(Rink.ice)
+
+            HStack(spacing: 6) {
+                ForEach(viewModel.weekDays, id: \.self) { day in
+                    dayCell(day)
+                }
+            }
         }
+        .padding(.horizontal)
+        .padding(.top, 4)
+        .padding(.bottom, 10)
+        .frame(maxWidth: 700)
         .frame(maxWidth: .infinity)
-        .overlay(alignment: .center) {
-            if matches.isEmpty {
-                emptyStateView(for: tab)
-            }
-        }
-        .refreshable {
-            try? await viewModel.refresh(hard: true)
-        }
     }
 
-    // MARK: - Empty State
+    private func dayCell(_ day: Date) -> some View {
+        let selected = viewModel.isSelected(day)
+        let today = viewModel.isToday(day)
+        let hasGames = viewModel.hasGames(on: day)
+        return Button {
+            withAnimation(.snappy) { viewModel.select(day) }
+        } label: {
+            VStack(spacing: 4) {
+                Text(Self.weekdayFmt.string(from: day).uppercased())
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(selected ? AnyShapeStyle(.white) : AnyShapeStyle(.secondary))
+                Text(Self.dayFmt.string(from: day))
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(selected ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
+                Circle()
+                    .fill(hasGames ? (selected ? Color.white : Rink.ice) : .clear)
+                    .frame(width: 5, height: 5)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .background {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(selected ? AnyShapeStyle(Rink.ice) : AnyShapeStyle(Color.clear))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(today && !selected ? Rink.ice.opacity(0.5) : .clear, lineWidth: 1.5)
+                    )
+            }
+        }
+        .buttonStyle(.plain)
+    }
 
-    private func emptyStateView(for tab: Tabs) -> some View {
-        VStack(spacing: 16) {
-            Image(systemName: emptyStateIcon(for: tab))
-                .font(.system(size: 48))
-                .foregroundStyle(.secondary)
+    // MARK: - Day content
 
-            VStack(spacing: 6) {
-                Text(emptyStateTitle(for: tab))
-                    .font(.headline)
-                    .fontWeight(.semibold)
+    private var dayContent: some View {
+        ScrollView {
+            let games = viewModel.selectedGames
+            let live = viewModel.liveSelectedGames
+            let rest = games.filter { g in !live.contains(where: { $0.id == g.id }) }
 
-                Text(emptyStateMessage(for: tab))
+            LazyVStack(alignment: .leading, spacing: .RinkSpace.lg) {
+                dayHeader(count: games.count)
+
+                if games.isEmpty {
+                    emptyState
+                } else {
+                    if !live.isEmpty { liveNowSection(live) }
+                    if !rest.isEmpty {
+                        VStack(spacing: .RinkSpace.sm) {
+                            ForEach(rest, id: \.id) { match in
+                                rowLink(match)
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, .RinkSpace.md)
+            .frame(maxWidth: 760)
+            .frame(maxWidth: .infinity)
+        }
+        .scrollIndicators(.hidden)
+        .refreshable { await viewModel.loadWeek(force: true) }
+    }
+
+    private func dayHeader(count: Int) -> some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(fullDateLabel(viewModel.selectedDate))
+                .font(.title3.weight(.bold))
+            Spacer()
+            if count > 0 {
+                Text("\(count) \(count == 1 ? "game" : "games")")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
             }
         }
+    }
+
+    private func liveNowSection(_ live: [Match]) -> some View {
+        VStack(alignment: .leading, spacing: .RinkSpace.md) {
+            RinkSectionHeader("Live Now",
+                              subtitle: live.count == 1 ? "1 game in progress" : "\(live.count) games in progress",
+                              icon: "dot.radiowaves.left.and.right",
+                              iconTint: Rink.goal)
+            if live.count == 1 {
+                liveCard(live[0])
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 165), spacing: .RinkSpace.md)],
+                          spacing: .RinkSpace.md) {
+                    ForEach(live, id: \.id) { liveCard($0) }
+                }
+            }
+        }
+    }
+
+    private func liveCard(_ match: Match) -> some View {
+        NavigationLink {
+            MatchView(match, referrer: "schedule_live")
+        } label: {
+            LiveGameCard(match: match, live: viewModel.live(for: match))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func rowLink(_ match: Match) -> some View {
+        NavigationLink {
+            MatchView(match, referrer: "schedule")
+        } label: {
+            ScheduleMatchRow(match: match, live: viewModel.live(for: match), favoriteCode: favoriteCode)
+        }
+        .buttonStyle(.plain)
+        .contextMenu {
+            if match.date > Date.now {
+                #if !APPCLIP
+                ReminderContext(game: match)
+                #endif
+            }
+        }
+    }
+
+    private var emptyState: some View {
+        ContentUnavailableView {
+            Label("No Games", systemImage: "calendar")
+        } description: {
+            Text("There are no games on \(fullDateLabel(viewModel.selectedDate)). Try another day — dots mark days with games.")
+        }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 48)
+        .padding(.top, 40)
     }
 
-    private func emptyStateIcon(for tab: Tabs) -> String {
-        switch tab {
-        case .previous:
-            return "clock.arrow.circlepath"
-        case .today:
-            return "calendar.badge.clock"
-        case .upcoming:
-            return "calendar"
+    // MARK: - Jump to date
+
+    private var datePickerSheet: some View {
+        NavigationStack {
+            DatePicker("Jump to date",
+                       selection: Binding(get: { viewModel.selectedDate },
+                                          set: { viewModel.select($0); showDatePicker = false }),
+                       displayedComponents: .date)
+                .datePickerStyle(.graphical)
+                .tint(Rink.ice)
+                .padding()
+                .navigationTitle("Jump to Date")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Done") { showDatePicker = false }
+                    }
+                }
         }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
 
-    private func emptyStateTitle(for tab: Tabs) -> String {
-        switch tab {
-        case .previous:
-            return "No Previous Matches"
-        case .today:
-            return "No Games Today"
-        case .upcoming:
-            return "No Upcoming Matches"
-        }
+    // MARK: - Date formatting
+
+    private func fullDateLabel(_ date: Date) -> String {
+        let cal = Calendar.current
+        if cal.isDateInToday(date) { return String(localized: "Today") }
+        if cal.isDateInTomorrow(date) { return String(localized: "Tomorrow") }
+        if cal.isDateInYesterday(date) { return String(localized: "Yesterday") }
+        return Self.fullDateFmt.string(from: date)
     }
 
-    private func emptyStateMessage(for tab: Tabs) -> String {
-        switch tab {
-        case .previous:
-            return "Past match results will appear here once games have been played."
-        case .today:
-            return "There are no games scheduled for today. Check the upcoming tab for future matches."
-        case .upcoming:
-            return "No upcoming games scheduled at the moment. Pull to refresh for updates."
-        }
-    }
+    private static let weekdayFmt: DateFormatter = {
+        let f = DateFormatter(); f.locale = .current; f.setLocalizedDateFormatFromTemplate("EEE"); return f
+    }()
+    private static let dayFmt: DateFormatter = {
+        let f = DateFormatter(); f.locale = .current; f.dateFormat = "d"; return f
+    }()
+    private static let fullDateFmt: DateFormatter = {
+        let f = DateFormatter(); f.locale = .current; f.setLocalizedDateFormatFromTemplate("EEEEdMMMM"); return f
+    }()
+}
+
+#Preview {
+    NavigationStack { MatchListView(viewModel: .preview()) }
+}
+
+#Preview("Dark") {
+    NavigationStack { MatchListView(viewModel: .preview()) }
+        .preferredColorScheme(.dark)
 }

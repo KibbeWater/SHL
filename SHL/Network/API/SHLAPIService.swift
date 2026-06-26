@@ -39,6 +39,8 @@ enum SHLAPIService {
 
     // Home (v2) — single compound "summary" response for the whole home screen
     case home
+    // Schedule (v2) — matches within a date range, optionally filtered by team
+    case schedule(from: String, to: String, team: String?)
 }
 
 extension SHLAPIService: TargetType {
@@ -95,6 +97,9 @@ extension SHLAPIService: TargetType {
         // Home (v2)
         case .home:
             return "/api/v2/home"
+        // Schedule (v2)
+        case .schedule:
+            return "/api/v2/schedule"
         }
     }
 
@@ -132,6 +137,10 @@ extension SHLAPIService: TargetType {
             )
         case let .recentMatches(limit):
             return .requestParameters(parameters: ["upcoming": limit], encoding: URLEncoding.queryString)
+        case let .schedule(from, to, team):
+            var parameters: [String: Any] = ["from": from, "to": to]
+            if let team = team { parameters["team"] = team }
+            return .requestParameters(parameters: parameters, encoding: URLEncoding.queryString)
         default:
             return .requestPlain
         }

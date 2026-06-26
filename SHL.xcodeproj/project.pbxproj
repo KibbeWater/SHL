@@ -96,6 +96,9 @@
 		8044AB822FEEDA370056D332 /* HomeSummary+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB812FEEDA370056D332 /* HomeSummary+Mock.swift */; };
 		8044AB832FEEDA370056D332 /* HomeSummary+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB812FEEDA370056D332 /* HomeSummary+Mock.swift */; };
 		8044AB882FEEDBA70056D332 /* HomeFeedSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB872FEEDBA70056D332 /* HomeFeedSections.swift */; };
+		8044AB8A2FEEF20C0056D332 /* ScheduleMatchRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB892FEEF20C0056D332 /* ScheduleMatchRow.swift */; };
+		8044AB8D2FEEF2C60056D332 /* ScheduleSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB8C2FEEF2C60056D332 /* ScheduleSummary.swift */; };
+		8044AB8E2FEEF2C60056D332 /* ScheduleSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB8C2FEEF2C60056D332 /* ScheduleSummary.swift */; };
 		804EC8232CFC02560096CA0D /* ActivityUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8212CFC02560096CA0D /* ActivityUpdater.swift */; };
 		804EC8242CFC02560096CA0D /* ActivityUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8212CFC02560096CA0D /* ActivityUpdater.swift */; };
 		8055E5172BD1739D0096DCBF /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8055E5162BD1739D0096DCBF /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -269,6 +272,8 @@
 		8044AB7E2FEEDA080056D332 /* HomeSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSummary.swift; sourceTree = "<group>"; };
 		8044AB812FEEDA370056D332 /* HomeSummary+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeSummary+Mock.swift"; sourceTree = "<group>"; };
 		8044AB872FEEDBA70056D332 /* HomeFeedSections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeFeedSections.swift; sourceTree = "<group>"; };
+		8044AB892FEEF20C0056D332 /* ScheduleMatchRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleMatchRow.swift; sourceTree = "<group>"; };
+		8044AB8C2FEEF2C60056D332 /* ScheduleSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleSummary.swift; sourceTree = "<group>"; };
 		804EC8212CFC02560096CA0D /* ActivityUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityUpdater.swift; sourceTree = "<group>"; };
 		8055E5162BD1739D0096DCBF /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
 		8055E51B2BD187670096DCBF /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
@@ -550,6 +555,14 @@
 			path = Home;
 			sourceTree = "<group>";
 		};
+		8044AB8B2FEEF2C60056D332 /* Schedule */ = {
+			isa = PBXGroup;
+			children = (
+				8044AB8C2FEEF2C60056D332 /* ScheduleSummary.swift */,
+			);
+			path = Schedule;
+			sourceTree = "<group>";
+		};
 		806DBDF62EA401FA00E07695 /* API */ = {
 			isa = PBXGroup;
 			children = (
@@ -631,6 +644,7 @@
 				806DBE062EA401FA00E07695 /* Season */,
 				806DBE0A2EA401FA00E07695 /* Team */,
 				8044AB7D2FEEDA080056D332 /* Home */,
+				8044AB8B2FEEF2C60056D332 /* Schedule */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -874,6 +888,7 @@
 				8020C2602D7651A500F1FB5E /* GameTime.swift */,
 				8044AB622FEE6EB40056D332 /* InterestedTeamRows.swift */,
 				8044AB862FEEDBA70056D332 /* Home */,
+				8044AB892FEEF20C0056D332 /* ScheduleMatchRow.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -1056,6 +1071,7 @@
 				80A16D8A2EED9018003F9911 /* TeamColorCache.swift in Sources */,
 				804316262BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift in Sources */,
 				801A96102ED1EE3200530970 /* PBPController.swift in Sources */,
+				8044AB8E2FEEF2C60056D332 /* ScheduleSummary.swift in Sources */,
 				801A96112ED1EE3200530970 /* PBPEventDTO.swift in Sources */,
 				801A96122ED1EE3200530970 /* PBPSupporting.swift in Sources */,
 				801A96132ED1EE3200530970 /* PBPEventData.swift in Sources */,
@@ -1100,6 +1116,7 @@
 				806796CF2CA864C100E9D95D /* TeamView.swift in Sources */,
 				806DBE0F2EA401FA00E07695 /* Season.swift in Sources */,
 				806DBE102EA401FA00E07695 /* Team.swift in Sources */,
+				8044AB8D2FEEF2C60056D332 /* ScheduleSummary.swift in Sources */,
 				800119F92F8A567E0017E45B /* iPadStandingsContent.swift in Sources */,
 				802AD96C2EB17BB300916E9F /* PromptSeason.swift in Sources */,
 				800119F12F8A56590017E45B /* iPadNavDestination.swift in Sources */,
@@ -1124,6 +1141,7 @@
 				806DBE1A2EA401FA00E07695 /* TeamDetail.swift in Sources */,
 				80DAAC902EE45200001E7506 /* NavigationCoordinator.swift in Sources */,
 				801A96042ED1ED0A00530970 /* KeychainManager.swift in Sources */,
+				8044AB8A2FEEF20C0056D332 /* ScheduleMatchRow.swift in Sources */,
 				801A962F2ED30D4400530970 /* NotificationTestView.swift in Sources */,
 				801A96092ED1ED3300530970 /* AppDelegate.swift in Sources */,
 				806DBE1B2EA401FA00E07695 /* SHLAPIClient.swift in Sources */,
