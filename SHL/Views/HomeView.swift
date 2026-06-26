@@ -1,250 +1,345 @@
 //
-//  ContentView.swift
-//  LHF
+//  HomeView.swift
+//  SHL
 //
-//  Created by KibbeWater on 12/30/23.
+//  The redesigned home — a personalized, sectioned feed driven by the single v2
+//  `HomeSummary`. It leads with the user's favorite team, then the featured
+//  matchup, a live rail, upcoming + recent games, a standings snapshot, and the
+//  league leaders. Adaptive: a single column on iPhone, a multi-column dashboard
+//  on iPad. Built entirely on the Rink design system.
 //
 
-import ActivityKit
-import PostHog
 import SwiftUI
 
-public struct LiveGame {
-    public var id: String
-    public var homeTeam: LiveTeam
-    public var awayTeam: LiveTeam
-    public var time: LiveTime
-
-    init(game: Match) {
-        self.id = game.id
-        self.homeTeam = LiveTeam(name: game.homeTeam.name, code: game.homeTeam.code, score: game.homeScore)
-        self.awayTeam = LiveTeam(name: game.awayTeam.name, code: game.awayTeam.code, score: game.awayScore)
-        self.time = LiveTime(period: 0, time: "00:00")
-    }
-
-    public struct LiveTeam {
-        public var name: String
-        public var code: String
-        public var score: Int
-    }
-
-    public struct LiveTime {
-        public var period: Int
-        public var time: String
-    }
-}
-
 struct HomeView: View {
-    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.horizontalSizeClass) private var hSizeClass
     @Environment(\.scenePhase) private var scenePhase
 
-    @StateObject private var viewModel: HomeViewModel = .init()
-    
-    @State private var sortOrder = [KeyPathComparator(\StandingObj.position)]
-    
-    @State private var date: Date = .init()
-    @State private var center: CGPoint = .zero
-    
-    func renderFeaturedGame(_ featured: Match) -> some View {
-        let content: some View = MatchOverview(
-            game: featured,
-            liveGame: viewModel.liveGame
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 12.0))
-        
-        return NavigationLink(destination: {
-            MatchView(featured, referrer: "home_featured")
-        }, label: {
+    @State private var viewModel: HomeFeedViewModel
+    @State private var gamesTab: Int = 0
+    @State private var favoriteGlow: Color? = nil
+
+    @MainActor
+    init(viewModel: HomeFeedViewModel? = nil) {
+        _viewModel = State(initialValue: viewModel ?? HomeFeedViewModel())
+    }
+
+    private var favoriteId: String? { Settings.shared.getFavoriteTeamId() }
+
+    var body: some View {
+        ZStack {
+            RinkAmbientBackground(ambientTheme)
             content
-        })
-        .buttonStyle(PlainButtonStyle())
-        .background(GeometryReader { geo in
-            Color(uiColor: .systemBackground)
-                .onAppear {
-                    center = .init(x: geo.size.width / 2, y: geo.size.height / 2)
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .task {
+            if viewModel.summary == nil { await viewModel.load() }
+            resolveFavoriteGlow()
+        }
+        .onChange(of: viewModel.summary?.favorite?.team.code) { _, _ in
+            resolveFavoriteGlow()
+        }
+        .onDisappear { viewModel.stop() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { Task { await viewModel.refresh() } }
+        }
+    }
+
+    /// A faint team-tinted glow when there's a favorite; cool arena otherwise.
+    private var ambientTheme: RinkAmbientBackground.Theme {
+        favoriteGlow.map { .team($0) } ?? .arena
+    }
+
+    private func resolveFavoriteGlow() {
+        guard let code = viewModel.summary?.favorite?.team.code else { return }
+        getCodeColor(teamKey: "Team/\(code.uppercased())") { favoriteGlow = $0 }
+    }
+
+    // MARK: - Top-level state
+
+    @ViewBuilder
+    private var content: some View {
+        if let summary = viewModel.summary {
+            ScrollView {
+                Group {
+                    if hSizeClass == .regular {
+                        regularLayout(summary)
+                    } else {
+                        compactLayout(summary)
+                    }
                 }
-        })
-        .simultaneousGesture(TapGesture().onEnded {
-            Task {
-                PostHogSDK.shared.capture(
-                    "featured_interaction",
-                    properties: [
-                        "game_id": featured.id,
-                        "is_interested_team": await FeaturedGameContainsInterestedTeam(),
-                    ],
-                    userProperties: [
-                        "interested_teams_count": Settings.shared.getInterestedTeamIds().count,
-                    ]
-                )
             }
-        })
-    }
-    
-    func FeaturedGameContainsInterestedTeam() async -> Bool {
-        let interestedTeams = Settings.shared.getInterestedTeams()
-        guard !interestedTeams.isEmpty else {
-            return false
+            .scrollIndicators(.hidden)
+            .refreshable { await viewModel.refresh() }
+        } else if viewModel.isLoading {
+            ProgressView().controlSize(.large)
+        } else {
+            ContentUnavailableView {
+                Label("Home Unavailable", systemImage: "wifi.exclamationmark")
+            } description: {
+                Text("We couldn't load the latest games right now.")
+            } actions: {
+                RinkPrimaryButton(title: "Try Again", icon: "arrow.clockwise") {
+                    Task { await viewModel.load() }
+                }
+                .frame(maxWidth: 240)
+            }
         }
+    }
 
-        guard let featuredGame = viewModel.featuredGame else {
-            return false
+    // MARK: - Layouts
+
+    private func compactLayout(_ summary: HomeSummary) -> some View {
+        VStack(spacing: .RinkSpace.section) {
+            HomeGreetingHeader()
+
+            if let fav = summary.favorite {
+                FavoriteSpotlightCard(favorite: fav, team: viewModel.favoriteTeam)
+            }
+            if let featured = summary.featured {
+                featuredHero(featured)
+            }
+            if !viewModel.secondaryLiveGames.isEmpty {
+                liveRail
+            }
+            if !summary.upcoming.isEmpty || !summary.recent.isEmpty {
+                gamesSection(summary)
+            }
+            if !viewModel.standings.isEmpty {
+                standingsSection
+            }
+            if let leaders = summary.leaders, !leaders.boards.isEmpty {
+                leadersSection(leaders)
+            }
         }
-
-        let interestedCodes = interestedTeams.map { $0.code.lowercased() }
-        return interestedCodes.contains(featuredGame.homeTeam.code.lowercased()) ||
-               interestedCodes.contains(featuredGame.awayTeam.code.lowercased())
-    }
-    
-    func getTimeLoop() -> Double {
-        let precision: Double = 10000
-        return Double(Int((date.timeIntervalSinceNow * -1)*precision)%(3*Int(precision))) / precision
-    }
-    
-    private var upcomingMatches: [Match] {
-        viewModel.latestMatches
-            .filter { !$0.concluded }
-            .sorted(by: { $0.date < $1.date })
+        .padding(.horizontal)
+        .padding(.top, .RinkSpace.sm)
+        .padding(.bottom, 32)
     }
 
-    var matchCalendar: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Text("Match Calendar")
-                    .font(.title)
-                    .fontWeight(.semibold)
-                    .padding(.horizontal)
-                Spacer()
+    private func regularLayout(_ summary: HomeSummary) -> some View {
+        VStack(spacing: .RinkSpace.section) {
+            HomeGreetingHeader()
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            // Hero row — favorite + featured side by side.
+            topRow(summary)
+
+            if !viewModel.secondaryLiveGames.isEmpty {
+                liveRail
             }
 
-            if upcomingMatches.isEmpty {
-                VStack(spacing: 8) {
-                    Image(systemName: "calendar")
-                        .font(.title2)
-                        .foregroundStyle(.secondary)
-                    Text("No upcoming matches")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+            // Two columns: games on the left, standings on the right.
+            HStack(alignment: .top, spacing: .RinkSpace.xl) {
+                VStack(spacing: .RinkSpace.section) {
+                    if !summary.upcoming.isEmpty || !summary.recent.isEmpty {
+                        gamesSection(summary)
+                    }
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 24)
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .padding(.horizontal)
-            } else {
-                VStack(spacing: 12) {
-                    MatchCalendar(
-                        matches: Array(upcomingMatches.prefix(5)),
-                        liveMatches: viewModel.calendarLiveMatches
-                    )
+
+                if !viewModel.standings.isEmpty {
+                    standingsSection.frame(maxWidth: .infinity)
                 }
-                .padding(.horizontal)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+
+            if let leaders = summary.leaders, !leaders.boards.isEmpty {
+                leadersSection(leaders)
+            }
+        }
+        .padding(.horizontal, .RinkSpace.xl)
+        .padding(.vertical, .RinkSpace.lg)
+        .frame(maxWidth: 1100)
+        .frame(maxWidth: .infinity)
+    }
+
+    @ViewBuilder
+    private func topRow(_ summary: HomeSummary) -> some View {
+        if let fav = summary.favorite, let featured = summary.featured {
+            HStack(alignment: .top, spacing: .RinkSpace.xl) {
+                FavoriteSpotlightCard(favorite: fav, team: viewModel.favoriteTeam)
+                    .frame(maxWidth: .infinity)
+                featuredHero(featured)
+                    .frame(maxWidth: .infinity)
+            }
+        } else if let fav = summary.favorite {
+            FavoriteSpotlightCard(favorite: fav, team: viewModel.favoriteTeam)
+        } else if let featured = summary.featured {
+            featuredHero(featured)
+        }
+    }
+
+    // MARK: - Sections
+
+    private func featuredHero(_ featured: Match) -> some View {
+        matchLink(featured, referrer: "home_featured") {
+            FeaturedHeroCard(match: featured, live: viewModel.live(for: featured))
+        }
+    }
+
+    /// "Live Now" reflows by count: one game fills the width, several lay out in
+    /// an adaptive grid (two-up on iPhone, more on iPad). No horizontal scroll,
+    /// so nothing clips at the edges.
+    private var liveRail: some View {
+        let games = viewModel.secondaryLiveGames
+        return VStack(alignment: .leading, spacing: .RinkSpace.md) {
+            RinkSectionHeader("Live Now",
+                              subtitle: liveSubtitle,
+                              icon: "dot.radiowaves.left.and.right",
+                              iconTint: Rink.goal)
+            if games.count == 1 {
+                liveCard(games[0])
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 165), spacing: .RinkSpace.md)],
+                          spacing: .RinkSpace.md) {
+                    ForEach(games, id: \.id) { liveCard($0) }
+                }
             }
         }
     }
-    
-    var leaderboard: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Text("Leaderboard")
-                    .font(.title)
-                    .fontWeight(.semibold)
-                    .padding(.horizontal)
-                Spacer()
+
+    private var liveSubtitle: String {
+        let n = viewModel.liveGames.count
+        return n == 1 ? "1 game in progress" : "\(n) games in progress"
+    }
+
+    private func liveCard(_ game: Match) -> some View {
+        matchLink(game, referrer: "home_live") {
+            LiveGameCard(match: game, live: viewModel.live(for: game))
+        }
+    }
+
+    /// Upcoming + Results consolidated into one card with a segmented toggle —
+    /// half the vertical footprint of two separate lists.
+    private func gamesSection(_ summary: HomeSummary) -> some View {
+        let matches = (gamesTab == 0 ? summary.upcoming : summary.recent)
+        return VStack(alignment: .leading, spacing: .RinkSpace.md) {
+            RinkSectionHeader("Games", icon: "sportscourt.fill") {
+                seeAll { MatchListView() }
             }
-            
-            if viewModel.standingsDisabled {
-                HStack {
-                    Text("Standings are temporarily unavailable\nWe apologize for the inconvenience")
-                        .font(.callout)
-                    Spacer()
+            VStack(spacing: .RinkSpace.md) {
+                Picker("", selection: $gamesTab) {
+                    Text("Upcoming").tag(0)
+                    Text("Results").tag(1)
                 }
-                .padding(.horizontal)
-            } else {
-                if let standings = viewModel.standings {
-                    StandingsTable(title: "Table", items: standings, favoriteTeamId: Settings.shared.getFavoriteTeamId())
+                .pickerStyle(.segmented)
+
+                if matches.isEmpty {
+                    Text(gamesTab == 0 ? "No upcoming games" : "No recent results")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity)
-                        .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .padding(.horizontal)
+                        .padding(.vertical, .RinkSpace.lg)
                 } else {
-                    ProgressView()
+                    VStack(spacing: .RinkSpace.sm) {
+                        ForEach(matches.prefix(4), id: \.id) { match in
+                            matchLink(match, referrer: gamesTab == 0 ? "home_upcoming" : "home_recent") {
+                                MatchCardCompact(game: match, liveGame: viewModel.live(for: match))
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-    
+
+    private var standingsSection: some View {
+        VStack(alignment: .leading, spacing: .RinkSpace.md) {
+            RinkSectionHeader("Standings", icon: "list.number") {
+                seeAll { AllStandingsView(items: viewModel.standings, favoriteId: favoriteId) }
+            }
+            RinkCard(.plain, padding: 0) {
+                StandingsTable(
+                    title: "",
+                    items: viewModel.standingsSnapshot(favoriteId: favoriteId),
+                    favoriteTeamId: favoriteId,
+                    showsHeader: false
+                )
+                .padding(.vertical, .RinkSpace.sm)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        }
+    }
+
+    /// Leaders as a peeking carousel — the next board's edge shows, so it reads as
+    /// scrollable, and it stays one row tall instead of three stacked cards.
+    private func leadersSection(_ leaders: LeagueLeaders) -> some View {
+        VStack(alignment: .leading, spacing: .RinkSpace.md) {
+            RinkSectionHeader("League Leaders", icon: "trophy.fill", iconTint: Rink.gold)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: .RinkSpace.md) {
+                    ForEach(leaders.boards) { board in
+                        LeaderBoardCard(board: board)
+                            .frame(width: 260)
+                    }
+                }
+                .padding(.vertical, 2)
+            }
+        }
+    }
+
+    // MARK: - Helpers
+
+    @ViewBuilder
+    private func matchLink<Label: View>(_ match: Match, referrer: String,
+                                        @ViewBuilder label: () -> Label) -> some View {
+        NavigationLink {
+            MatchView(match, referrer: referrer)
+        } label: {
+            label()
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func seeAll<D: View>(@ViewBuilder destination: @escaping () -> D) -> some View {
+        NavigationLink {
+            destination()
+        } label: {
+            HStack(spacing: 2) {
+                Text("See All")
+                Image(systemName: "chevron.right").font(.caption2.weight(.bold))
+            }
+            .font(.subheadline.weight(.semibold))
+        }
+        .tint(Rink.ice)
+    }
+}
+
+// MARK: - Full standings (See All destination)
+
+private struct AllStandingsView: View {
+    let items: [StandingObj]
+    let favoriteId: String?
+
     var body: some View {
         ScrollView {
-            if let featured = viewModel.featuredGame {
-                if #available(iOS 17.0, *) {
-                    if featured.isLive() || viewModel.liveGame?.gameState == .ongoing || viewModel.liveGame?.gameState == .paused {
-                        TimelineView(.animation) { _ in
-                            renderFeaturedGame(featured)
-                                .pulseShader(time: getTimeLoop(), center: center, speed: 150.0, amplitude: 0.1, decay: 5.0)
-                                .padding(.horizontal)
-                        }
-                    } else {
-                        renderFeaturedGame(featured)
-                            .padding(.horizontal)
-                    }
-                } else {
-                    renderFeaturedGame(featured)
-                        .padding(.horizontal)
-                }
-            } else {
-                HStack {}
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 96)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                    .padding(.horizontal)
-            }
-            
-            VStack(spacing: 24) {
-                matchCalendar
-
-                leaderboard
-            }
-            .padding(.top)
+            StandingsTable(title: "Standings", items: items, favoriteTeamId: favoriteId)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .padding()
         }
-        .onChange(of: viewModel.featuredGame) { _, _ in
-            guard let featured = viewModel.featuredGame else { return }
-            viewModel.selectListenedGame(featured)
-        }
-        .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .active {
-                Task {
-                    try? await viewModel.refresh(hard: true)
-                }
-            }
-        }
-        .refreshable {
-            do {
-                try await viewModel.refresh(hard: true)
-            } catch let err {
-                print("HomeView: Error refreshing: ", err)
-            }
-         }
-        .ignoresSafeArea(.container, edges: .horizontal)
-    }
-    
-    func remainingTimeUntil(_ targetDate: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm:ss"
-        
-        let estimatedEndTimeString = formatter.string(from: targetDate)
-        return estimatedEndTimeString
+        .background(Rink.canvas)
+        .navigationTitle("Standings")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
-extension HomeView {
-    enum LeaguePages: Int, CaseIterable {
-        case SHL
-        case SDHL
-    }
+// MARK: - Previews
+
+#Preview("Home · iPhone") {
+    NavigationStack { HomeView(viewModel: .preview()) }
 }
 
-#Preview {
-    HomeView()
+#Preview("Home · iPhone · Dark") {
+    NavigationStack { HomeView(viewModel: .preview()) }
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Home · No favorite") {
+    NavigationStack { HomeView(viewModel: .preview(.mockNoFavorite)) }
+}
+
+#Preview("Home · iPad", traits: .landscapeLeft) {
+    NavigationStack { HomeView(viewModel: .preview()) }
 }

@@ -58,23 +58,12 @@ struct Root: View {
                 TabView(selection: $selectedTab) {
                     Tab("Home", systemImage: "house", value: RootTabs.home) {
                         NavigationStack {
-                            if isIPad {
-                                iPadHomeContent(
-                                    viewModel: homeViewModel,
-                                    onSelectMatch: { match in
-                                        openedGame = MatchView(match, referrer: "home")
-                                        isGameOpen = true
-                                    }
-                                )
+                            // The redesigned HomeView is adaptive — it lays itself out as a
+                            // single column on iPhone and a multi-column dashboard on iPad.
+                            HomeView()
                                 .navigationDestination(isPresented: $isGameOpen) {
                                     openedGame
                                 }
-                            } else {
-                                HomeView()
-                                    .navigationDestination(isPresented: $isGameOpen) {
-                                        openedGame
-                                    }
-                            }
                         }
                     }
                     .customizationBehavior(.disabled, for: .sidebar, .tabBar)

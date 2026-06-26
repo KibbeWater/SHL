@@ -216,25 +216,29 @@ struct StandingsTable: View {
     public var items: [StandingObj]
     public var favoriteTeamId: String? = nil
     public var onRefresh: (() async -> Void)? = nil
+    /// Hide the built-in title + divider when the caller supplies its own section header.
+    public var showsHeader: Bool = true
 
     private let playoffCutoff = 6
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header
-            HStack {
-                Text(title)
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            if showsHeader {
+                // Header
+                HStack {
+                    Text(title)
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
 
-            // Divider
-            Rectangle()
-                .fill(.secondary.opacity(0.2))
-                .frame(height: 1)
+                // Divider
+                Rectangle()
+                    .fill(.secondary.opacity(0.2))
+                    .frame(height: 1)
+            }
 
             if items.isEmpty {
                 emptyState

@@ -82,6 +82,20 @@
 		804375AA2CAA09FC0041F46D /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804375A92CAA09FC0041F46D /* PlayerView.swift */; };
 		8044AB632FEE6EB40056D332 /* InterestedTeamRows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB622FEE6EB40056D332 /* InterestedTeamRows.swift */; };
 		8044AB652FEEC1FE0056D332 /* NotificationSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB642FEEC1FE0056D332 /* NotificationSettingsView.swift */; };
+		8044AB6C2FEED8690056D332 /* RinkPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB6B2FEED8690056D332 /* RinkPalette.swift */; };
+		8044AB6E2FEED8900056D332 /* RinkTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB6D2FEED8900056D332 /* RinkTypography.swift */; };
+		8044AB702FEED89D0056D332 /* RinkLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB6F2FEED89D0056D332 /* RinkLayout.swift */; };
+		8044AB722FEED8AC0056D332 /* RinkGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB712FEED8AC0056D332 /* RinkGlow.swift */; };
+		8044AB742FEED8C00056D332 /* RinkCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB732FEED8C00056D332 /* RinkCard.swift */; };
+		8044AB762FEED8D30056D332 /* RinkSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB752FEED8D30056D332 /* RinkSectionHeader.swift */; };
+		8044AB782FEED9020056D332 /* RinkChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB772FEED9020056D332 /* RinkChip.swift */; };
+		8044AB7A2FEED9120056D332 /* RinkButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB792FEED9120056D332 /* RinkButton.swift */; };
+		8044AB7C2FEED9540056D332 /* RinkBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB7B2FEED9530056D332 /* RinkBackground.swift */; };
+		8044AB7F2FEEDA080056D332 /* HomeSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB7E2FEEDA080056D332 /* HomeSummary.swift */; };
+		8044AB802FEEDA080056D332 /* HomeSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB7E2FEEDA080056D332 /* HomeSummary.swift */; };
+		8044AB822FEEDA370056D332 /* HomeSummary+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB812FEEDA370056D332 /* HomeSummary+Mock.swift */; };
+		8044AB832FEEDA370056D332 /* HomeSummary+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB812FEEDA370056D332 /* HomeSummary+Mock.swift */; };
+		8044AB882FEEDBA70056D332 /* HomeFeedSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB872FEEDBA70056D332 /* HomeFeedSections.swift */; };
 		804EC8232CFC02560096CA0D /* ActivityUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8212CFC02560096CA0D /* ActivityUpdater.swift */; };
 		804EC8242CFC02560096CA0D /* ActivityUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8212CFC02560096CA0D /* ActivityUpdater.swift */; };
 		8055E5172BD1739D0096DCBF /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8055E5162BD1739D0096DCBF /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -243,6 +257,18 @@
 		804375A92CAA09FC0041F46D /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		8044AB622FEE6EB40056D332 /* InterestedTeamRows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterestedTeamRows.swift; sourceTree = "<group>"; };
 		8044AB642FEEC1FE0056D332 /* NotificationSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsView.swift; sourceTree = "<group>"; };
+		8044AB6B2FEED8690056D332 /* RinkPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RinkPalette.swift; sourceTree = "<group>"; };
+		8044AB6D2FEED8900056D332 /* RinkTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RinkTypography.swift; sourceTree = "<group>"; };
+		8044AB6F2FEED89D0056D332 /* RinkLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RinkLayout.swift; sourceTree = "<group>"; };
+		8044AB712FEED8AC0056D332 /* RinkGlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RinkGlow.swift; sourceTree = "<group>"; };
+		8044AB732FEED8C00056D332 /* RinkCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RinkCard.swift; sourceTree = "<group>"; };
+		8044AB752FEED8D30056D332 /* RinkSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RinkSectionHeader.swift; sourceTree = "<group>"; };
+		8044AB772FEED9020056D332 /* RinkChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RinkChip.swift; sourceTree = "<group>"; };
+		8044AB792FEED9120056D332 /* RinkButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RinkButton.swift; sourceTree = "<group>"; };
+		8044AB7B2FEED9530056D332 /* RinkBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RinkBackground.swift; sourceTree = "<group>"; };
+		8044AB7E2FEEDA080056D332 /* HomeSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSummary.swift; sourceTree = "<group>"; };
+		8044AB812FEEDA370056D332 /* HomeSummary+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeSummary+Mock.swift"; sourceTree = "<group>"; };
+		8044AB872FEEDBA70056D332 /* HomeFeedSections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeFeedSections.swift; sourceTree = "<group>"; };
 		804EC8212CFC02560096CA0D /* ActivityUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityUpdater.swift; sourceTree = "<group>"; };
 		8055E5162BD1739D0096DCBF /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
 		8055E51B2BD187670096DCBF /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
@@ -485,6 +511,45 @@
 			path = Tools;
 			sourceTree = "<group>";
 		};
+		8044AB662FEED7740056D332 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		8044AB6A2FEED8690056D332 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				8044AB6B2FEED8690056D332 /* RinkPalette.swift */,
+				8044AB6D2FEED8900056D332 /* RinkTypography.swift */,
+				8044AB6F2FEED89D0056D332 /* RinkLayout.swift */,
+				8044AB712FEED8AC0056D332 /* RinkGlow.swift */,
+				8044AB732FEED8C00056D332 /* RinkCard.swift */,
+				8044AB752FEED8D30056D332 /* RinkSectionHeader.swift */,
+				8044AB772FEED9020056D332 /* RinkChip.swift */,
+				8044AB792FEED9120056D332 /* RinkButton.swift */,
+				8044AB7B2FEED9530056D332 /* RinkBackground.swift */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		8044AB7D2FEEDA080056D332 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				8044AB7E2FEEDA080056D332 /* HomeSummary.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		8044AB862FEEDBA70056D332 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				8044AB872FEEDBA70056D332 /* HomeFeedSections.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
 		806DBDF62EA401FA00E07695 /* API */ = {
 			isa = PBXGroup;
 			children = (
@@ -521,6 +586,7 @@
 			isa = PBXGroup;
 			children = (
 				806DBDFE2EA401FA00E07695 /* Match+Mock.swift */,
+				8044AB812FEEDA370056D332 /* HomeSummary+Mock.swift */,
 			);
 			path = Mock;
 			sourceTree = "<group>";
@@ -564,6 +630,7 @@
 				806DBE022EA401FA00E07695 /* Player */,
 				806DBE062EA401FA00E07695 /* Season */,
 				806DBE0A2EA401FA00E07695 /* Team */,
+				8044AB7D2FEEDA080056D332 /* Home */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -727,6 +794,7 @@
 				BCAFE2CB2B4095170044225A /* Products */,
 				BC9490742BB1AAF6009047E4 /* SHLWidgetExtension.entitlements */,
 				6BD7AA263289D7097A35F2B2 /* Frameworks */,
+				8044AB662FEED7740056D332 /* Design */,
 			);
 			sourceTree = "<group>";
 		};
@@ -758,6 +826,7 @@
 				BCAFE2D12B4095180044225A /* Assets.xcassets */,
 				BCAFE2D32B4095180044225A /* Preview Content */,
 				8055E51B2BD187670096DCBF /* Launch Screen.storyboard */,
+				8044AB6A2FEED8690056D332 /* Design */,
 			);
 			path = SHL;
 			sourceTree = "<group>";
@@ -804,6 +873,7 @@
 				802B98E72BD06C6800278A00 /* MatchCalendar.swift */,
 				8020C2602D7651A500F1FB5E /* GameTime.swift */,
 				8044AB622FEE6EB40056D332 /* InterestedTeamRows.swift */,
+				8044AB862FEEDBA70056D332 /* Home */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -955,6 +1025,7 @@
 				804EC8242CFC02560096CA0D /* ActivityUpdater.swift in Sources */,
 				802AD93C2EAE2C5300916E9F /* LiveMatch.swift in Sources */,
 				802AD93D2EAE2C8500916E9F /* Match.swift in Sources */,
+				8044AB822FEEDA370056D332 /* HomeSummary+Mock.swift in Sources */,
 				801A95F82EC8A9E400530970 /* Team.swift in Sources */,
 				801A960A2ED1EE1E00530970 /* SHLAPIError.swift in Sources */,
 				801A960B2ED1EE1E00530970 /* SHLAPIClient.swift in Sources */,
@@ -976,6 +1047,7 @@
 				801A96142ED1EE3600530970 /* UserModels.swift in Sources */,
 				801A961E2ED1EE8500530970 /* MatchStats.swift in Sources */,
 				801A96202ED1EE9D00530970 /* iCloudSyncManager.swift in Sources */,
+				8044AB802FEEDA080056D332 /* HomeSummary.swift in Sources */,
 				806BEB1A2CB052BB00CC4565 /* CloudStorage.swift in Sources */,
 				80A16D932EEDC213003F9911 /* WidgetSharedColorCache.swift in Sources */,
 				80DCA05F2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */,
@@ -999,18 +1071,21 @@
 				802AD9482EAE656C00916E9F /* PBPEventRowView.swift in Sources */,
 				802AD9432EAE654500916E9F /* PBPSupporting.swift in Sources */,
 				80C847CA2FA28B9D004B1D50 /* AdminPairingModels.swift in Sources */,
+				8044AB6C2FEED8690056D332 /* RinkPalette.swift in Sources */,
 				802AD9442EAE654500916E9F /* PBPEventDTO.swift in Sources */,
 				802AD9452EAE654500916E9F /* PBPEventData.swift in Sources */,
 				802AD9462EAE654500916E9F /* PBPController.swift in Sources */,
 				80DAAC8E2EE37D3D001E7506 /* NotificationReminderSheet.swift in Sources */,
 				8008FC7E2C9DCC4E00B23669 /* ReminderContext.swift in Sources */,
 				80E9ED8F2CB14DDC00D0E4E9 /* Settings.swift in Sources */,
+				8044AB832FEEDA370056D332 /* HomeSummary+Mock.swift in Sources */,
 				806DFACC2EE35C4600065FD2 /* MatchCardCompact.swift in Sources */,
 				8044AB652FEEC1FE0056D332 /* NotificationSettingsView.swift in Sources */,
 				BC369E1C2BBAF5CC00940F42 /* VersusBar.swift in Sources */,
 				804375AA2CAA09FC0041F46D /* PlayerView.swift in Sources */,
 				802AD96E2EB17EF100916E9F /* MatchSearch.swift in Sources */,
 				802AD9682EB176E200916E9F /* SeasonInfoResponse.swift in Sources */,
+				8044AB742FEED8C00056D332 /* RinkCard.swift in Sources */,
 				8020C2622D7651A500F1FB5E /* GameTime.swift in Sources */,
 				802B98E82BD06C6800278A00 /* MatchCalendar.swift in Sources */,
 				80C847CE2FA28BC8004B1D50 /* AdminPairingCoordinator.swift in Sources */,
@@ -1032,9 +1107,13 @@
 				806DBE122EA401FA00E07695 /* MatchStats.swift in Sources */,
 				800119FB2F8A56890017E45B /* iPadTeamContent.swift in Sources */,
 				800119F32F8A56660017E45B /* iPadRoot.swift in Sources */,
+				8044AB7C2FEED9540056D332 /* RinkBackground.swift in Sources */,
+				8044AB762FEED8D30056D332 /* RinkSectionHeader.swift in Sources */,
 				806DBE132EA401FA00E07695 /* SHLAPIService.swift in Sources */,
 				806DBE152EA401FA00E07695 /* Match+Mock.swift in Sources */,
+				8044AB7A2FEED9120056D332 /* RinkButton.swift in Sources */,
 				80C847D02FA28BEE004B1D50 /* AdminPairingSheet.swift in Sources */,
+				8044AB702FEED89D0056D332 /* RinkLayout.swift in Sources */,
 				802AD96A2EB17BB100916E9F /* PromptTeam.swift in Sources */,
 				806DBE162EA401FA00E07695 /* PlayerGameLog.swift in Sources */,
 				806DBE172EA401FA00E07695 /* Player.swift in Sources */,
@@ -1056,13 +1135,17 @@
 				806DFA342EE239FE00065FD2 /* TeamSelectionPageView.swift in Sources */,
 				806DFA352EE239FE00065FD2 /* WelcomePageView.swift in Sources */,
 				800119FD2F8A59030017E45B /* iPadFeaturedGame.swift in Sources */,
+				8044AB782FEED9020056D332 /* RinkChip.swift in Sources */,
 				806DFA362EE239FE00065FD2 /* OnlineFeaturesPageView.swift in Sources */,
 				806DBE1D2EA401FA00E07695 /* SHLAPIError.swift in Sources */,
 				800119F52F8A56710017E45B /* iPadHomeContent.swift in Sources */,
 				802AD9712EB1834900916E9F /* SearchView.swift in Sources */,
 				806DBE1E2EA401FA00E07695 /* NetworkLoggerPlugin.swift in Sources */,
+				8044AB7F2FEEDA080056D332 /* HomeSummary.swift in Sources */,
 				806DBE202EA401FA00E07695 /* Standings.swift in Sources */,
 				BC8C15112BAC787B0010AB59 /* MatchOverview.swift in Sources */,
+				8044AB882FEEDBA70056D332 /* HomeFeedSections.swift in Sources */,
+				8044AB722FEED8AC0056D332 /* RinkGlow.swift in Sources */,
 				BCD7BC182BAF6B9800E208B3 /* MatchListView.swift in Sources */,
 				800F320E2C00D1300069E436 /* Sequence.swift in Sources */,
 				80DCA05E2C9DBC3B0058B6F2 /* ColorCache.swift in Sources */,
@@ -1079,6 +1162,7 @@
 				BCFA44AB2B44C06700B4358C /* StandingsTable.swift in Sources */,
 				8044AB632FEE6EB40056D332 /* InterestedTeamRows.swift in Sources */,
 				BC6212E52BB05B81003CCB45 /* MatchView.swift in Sources */,
+				8044AB6E2FEED8900056D332 /* RinkTypography.swift in Sources */,
 				BC374DFA2BAD922000378412 /* UIImageExt.swift in Sources */,
 				80A16D912EEDC1BB003F9911 /* SharedTeamColorCache.swift in Sources */,
 				804EC8232CFC02560096CA0D /* ActivityUpdater.swift in Sources */,

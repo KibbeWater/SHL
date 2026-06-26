@@ -36,6 +36,9 @@ enum SHLAPIService {
     case allSeasons
     case standings(seasonId: String)
     case currentStandings
+
+    // Home (v2) — single compound "summary" response for the whole home screen
+    case home
 }
 
 extension SHLAPIService: TargetType {
@@ -89,6 +92,9 @@ extension SHLAPIService: TargetType {
             return "/api/v1/standings/\(seasonId)"
         case .currentStandings:
             return "/api/v1/standings"
+        // Home (v2)
+        case .home:
+            return "/api/v2/home"
         }
     }
 

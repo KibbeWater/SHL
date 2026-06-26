@@ -164,6 +164,14 @@ class SHLAPIClient {
         try await request(.currentStandings)
     }
 
+    // MARK: - Home (v2)
+
+    /// Fetch the compound home summary in a single request (`GET /api/v2/home`).
+    /// Replaces the v1 pattern of assembling the home screen from many calls.
+    func getHomeSummary() async throws -> HomeSummary {
+        try await request(.home)
+    }
+
     // MARK: - User Management Endpoints
 
     /// Generic authenticated request with automatic token refresh
