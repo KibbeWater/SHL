@@ -7,12 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		800119F12F8A56590017E45B /* iPadNavDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119F02F8A56590017E45B /* iPadNavDestination.swift */; };
-		800119F32F8A56660017E45B /* iPadRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119F22F8A56660017E45B /* iPadRoot.swift */; };
-		800119F52F8A56710017E45B /* iPadHomeContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119F42F8A56710017E45B /* iPadHomeContent.swift */; };
-		800119F72F8A567B0017E45B /* iPadScheduleContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119F62F8A567B0017E45B /* iPadScheduleContent.swift */; };
 		800119F92F8A567E0017E45B /* iPadStandingsContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119F82F8A567E0017E45B /* iPadStandingsContent.swift */; };
-		800119FB2F8A56890017E45B /* iPadTeamContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119FA2F8A56890017E45B /* iPadTeamContent.swift */; };
 		800119FD2F8A59030017E45B /* iPadFeaturedGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800119FC2F8A59030017E45B /* iPadFeaturedGame.swift */; };
 		8008FC7E2C9DCC4E00B23669 /* ReminderContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8008FC7D2C9DCC4E00B23669 /* ReminderContext.swift */; };
 		800F320E2C00D1300069E436 /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F320D2C00D1300069E436 /* Sequence.swift */; };
@@ -218,12 +213,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		800119F02F8A56590017E45B /* iPadNavDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadNavDestination.swift; sourceTree = "<group>"; };
-		800119F22F8A56660017E45B /* iPadRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadRoot.swift; sourceTree = "<group>"; };
-		800119F42F8A56710017E45B /* iPadHomeContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadHomeContent.swift; sourceTree = "<group>"; };
-		800119F62F8A567B0017E45B /* iPadScheduleContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadScheduleContent.swift; sourceTree = "<group>"; };
 		800119F82F8A567E0017E45B /* iPadStandingsContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadStandingsContent.swift; sourceTree = "<group>"; };
-		800119FA2F8A56890017E45B /* iPadTeamContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadTeamContent.swift; sourceTree = "<group>"; };
 		800119FC2F8A59030017E45B /* iPadFeaturedGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadFeaturedGame.swift; sourceTree = "<group>"; };
 		8008FC7D2C9DCC4E00B23669 /* ReminderContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderContext.swift; sourceTree = "<group>"; };
 		800F320D2C00D1300069E436 /* Sequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequence.swift; sourceTree = "<group>"; };
@@ -430,12 +420,7 @@
 		800119EF2F8A55580017E45B /* iPad */ = {
 			isa = PBXGroup;
 			children = (
-				800119F02F8A56590017E45B /* iPadNavDestination.swift */,
-				800119F22F8A56660017E45B /* iPadRoot.swift */,
-				800119F42F8A56710017E45B /* iPadHomeContent.swift */,
-				800119F62F8A567B0017E45B /* iPadScheduleContent.swift */,
 				800119F82F8A567E0017E45B /* iPadStandingsContent.swift */,
-				800119FA2F8A56890017E45B /* iPadTeamContent.swift */,
 			);
 			path = iPad;
 			sourceTree = "<group>";
@@ -1119,11 +1104,8 @@
 				8044AB8D2FEEF2C60056D332 /* ScheduleSummary.swift in Sources */,
 				800119F92F8A567E0017E45B /* iPadStandingsContent.swift in Sources */,
 				802AD96C2EB17BB300916E9F /* PromptSeason.swift in Sources */,
-				800119F12F8A56590017E45B /* iPadNavDestination.swift in Sources */,
 				806DBE112EA401FA00E07695 /* LiveMatchListener.swift in Sources */,
 				806DBE122EA401FA00E07695 /* MatchStats.swift in Sources */,
-				800119FB2F8A56890017E45B /* iPadTeamContent.swift in Sources */,
-				800119F32F8A56660017E45B /* iPadRoot.swift in Sources */,
 				8044AB7C2FEED9540056D332 /* RinkBackground.swift in Sources */,
 				8044AB762FEED8D30056D332 /* RinkSectionHeader.swift in Sources */,
 				806DBE132EA401FA00E07695 /* SHLAPIService.swift in Sources */,
@@ -1147,7 +1129,6 @@
 				806DBE1B2EA401FA00E07695 /* SHLAPIClient.swift in Sources */,
 				801A96312ED30D8900530970 /* SHLAPIDebug.swift in Sources */,
 				806DBE1C2EA401FA00E07695 /* Match.swift in Sources */,
-				800119F72F8A567B0017E45B /* iPadScheduleContent.swift in Sources */,
 				806DFA322EE239FE00065FD2 /* OnboardingContainerView.swift in Sources */,
 				806DFA332EE239FE00065FD2 /* FavoriteTeamPageView.swift in Sources */,
 				806DFA342EE239FE00065FD2 /* TeamSelectionPageView.swift in Sources */,
@@ -1156,7 +1137,6 @@
 				8044AB782FEED9020056D332 /* RinkChip.swift in Sources */,
 				806DFA362EE239FE00065FD2 /* OnlineFeaturesPageView.swift in Sources */,
 				806DBE1D2EA401FA00E07695 /* SHLAPIError.swift in Sources */,
-				800119F52F8A56710017E45B /* iPadHomeContent.swift in Sources */,
 				802AD9712EB1834900916E9F /* SearchView.swift in Sources */,
 				806DBE1E2EA401FA00E07695 /* NetworkLoggerPlugin.swift in Sources */,
 				8044AB7F2FEEDA080056D332 /* HomeSummary.swift in Sources */,
