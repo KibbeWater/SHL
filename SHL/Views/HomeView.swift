@@ -180,9 +180,11 @@ struct HomeView: View {
 
     // MARK: - Pre-season variant
 
-    /// The opener date: the season's official start, else the first scheduled game.
+    /// "Opening night" — the soonest scheduled game (the season's actual first game).
+    /// `season.startDate` is unreliable (it can predate the published schedule), so
+    /// it's only a last resort.
     private func openingDate(_ summary: HomeSummary) -> Date? {
-        summary.season?.startDate ?? summary.upcoming.first?.date ?? summary.favorite?.nextMatch?.date
+        summary.upcoming.first?.date ?? summary.favorite?.nextMatch?.date ?? summary.season?.startDate
     }
 
     /// Anticipation home: a countdown to opening night, the user's opener, the

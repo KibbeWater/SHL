@@ -53,8 +53,8 @@ extension HomeSummary {
                 code: "2026/27", name: "2026/27",
                 startDate: Calendar.current.date(byAdding: .day, value: 84, to: Date())
             ),
-            featured: MockHome.upcoming.first,
-            live: [], upcoming: MockHome.upcoming, recent: [], standings: [],
+            featured: MockHome.preseasonUpcoming.first,
+            live: [], upcoming: MockHome.preseasonUpcoming, recent: [], standings: [],
             leaders: nil, favorite: MockHome.preseasonFavorite,
             champion: nil, previousStandings: MockHome.standings
         )
@@ -186,11 +186,20 @@ private enum MockHome {
         lastMatch: recent.first
     )
 
+    /// Opening fixtures for a new season — a couple of months out.
+    static let preseasonUpcoming: [Match] = [
+        match("p-up1", ("FHC", "Frölunda HC"), ("FBK", "Färjestad BK"), hs: 0, aws: 0, state: .scheduled, inHours: 85 * 24, venue: "Frölundaborg"),
+        match("p-up2", ("LHF", "Luleå HF"), ("MODO", "MoDo Hockey"), hs: 0, aws: 0, state: .scheduled, inHours: 85 * 24 + 3),
+        match("p-up3", ("RBK", "Rögle BK"), ("LIF", "Leksands IF"), hs: 0, aws: 0, state: .scheduled, inHours: 87 * 24),
+        match("p-up4", ("VLH", "Växjö Lakers"), ("SAIK", "Skellefteå AIK"), hs: 0, aws: 0, state: .scheduled, inHours: 87 * 24 + 3),
+        match("p-up5", ("SAIK", "Skellefteå AIK"), ("FHC", "Frölunda HC"), hs: 0, aws: 0, state: .scheduled, inHours: 89 * 24)
+    ]
+
     /// Pre-season favorite: no standing yet, just the opener.
     static let preseasonFavorite = FavoriteTeamSummary(
         team: basic("FHC", "Frölunda HC"), teamId: "team-FHC",
         rank: nil, points: nil, gamesPlayed: nil, form: [],
-        nextMatch: upcoming.first, lastMatch: nil
+        nextMatch: preseasonUpcoming.first, lastMatch: nil
     )
 
     /// Concluded favorite: final standing + form, no upcoming game.
