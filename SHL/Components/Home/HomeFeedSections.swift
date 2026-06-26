@@ -91,57 +91,63 @@ struct FavoriteSpotlightCard: View {
         .onAppear { getCodeColor(teamKey: "Team/\(favorite.team.code.uppercased())") { teamColor = $0 } }
     }
 
-    // Identity + standing — taps through to the team page.
+    // Identity + standing. Taps through to the team page when we have the full team
+    // (resolved from standings); otherwise it stays a plain, full-opacity panel —
+    // never a dimmed, disabled button (which greys out the white type).
+    @ViewBuilder
     private var identity: some View {
-        NavigationLink {
-            if let team { TeamView(team: team) }
-        } label: {
-            VStack(alignment: .leading, spacing: .RinkSpace.lg) {
-                HStack(alignment: .top) {
-                    Label("Your Team", systemImage: "star.fill")
-                        .labelStyle(.titleAndIcon)
-                        .font(.caption2.weight(.bold))
-                        .textCase(.uppercase)
-                        .tracking(1.1)
-                        .foregroundStyle(.white.opacity(0.85))
-                    Spacer()
-                    if let rank = favorite.rank {
-                        Text(ordinal(rank))
-                            .font(.title3.weight(.heavy))
-                            .foregroundStyle(.white)
-                    }
-                }
+        if let team {
+            NavigationLink { TeamView(team: team) } label: { identityContent }
+                .buttonStyle(.plain)
+        } else {
+            identityContent
+        }
+    }
 
-                HStack(alignment: .center, spacing: .RinkSpace.md) {
-                    TeamLogoView(teamCode: favorite.team.code, size: .custom(50))
-                        .padding(7)
-                        .background(.white.opacity(0.16), in: Circle())
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(favorite.team.name)
-                            .font(.title2.weight(.bold))
-                            .foregroundStyle(.white)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.7)
-                        HStack(spacing: .RinkSpace.md) {
-                            if let pts = favorite.points {
-                                Text("\(pts) PTS")
-                                    .font(.caption.weight(.bold).monospacedDigit())
-                                    .foregroundStyle(.white.opacity(0.9))
-                            }
-                            if !pips.isEmpty {
-                                RinkFormPips(results: pips, size: 8)
-                            }
-                        }
-                    }
-                    Spacer(minLength: 0)
+    private var identityContent: some View {
+        VStack(alignment: .leading, spacing: .RinkSpace.lg) {
+            HStack(alignment: .top) {
+                Label("Your Team", systemImage: "star.fill")
+                    .labelStyle(.titleAndIcon)
+                    .font(.caption2.weight(.bold))
+                    .textCase(.uppercase)
+                    .tracking(1.1)
+                    .foregroundStyle(.white.opacity(0.85))
+                Spacer()
+                if let rank = favorite.rank {
+                    Text(ordinal(rank))
+                        .font(.title3.weight(.heavy))
+                        .foregroundStyle(.white)
                 }
             }
-            .padding(.RinkSpace.lg)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
+
+            HStack(alignment: .center, spacing: .RinkSpace.md) {
+                TeamLogoView(teamCode: favorite.team.code, size: .custom(50))
+                    .padding(7)
+                    .background(.white.opacity(0.16), in: Circle())
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(favorite.team.name)
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    HStack(spacing: .RinkSpace.md) {
+                        if let pts = favorite.points {
+                            Text("\(pts) PTS")
+                                .font(.caption.weight(.bold).monospacedDigit())
+                                .foregroundStyle(.white.opacity(0.9))
+                        }
+                        if !pips.isEmpty {
+                            RinkFormPips(results: pips, size: 8)
+                        }
+                    }
+                }
+                Spacer(minLength: 0)
+            }
         }
-        .buttonStyle(.plain)
-        .disabled(team == nil)
+        .padding(.RinkSpace.lg)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
     }
 
     // Next game — a translucent footer bar that taps through to the match.

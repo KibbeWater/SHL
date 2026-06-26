@@ -75,16 +75,7 @@ struct HomeView: View {
         } else if viewModel.isLoading {
             ProgressView().controlSize(.large)
         } else {
-            ContentUnavailableView {
-                Label("Home Unavailable", systemImage: "wifi.exclamationmark")
-            } description: {
-                Text("We couldn't load the latest games right now.")
-            } actions: {
-                RinkPrimaryButton(title: "Try Again", icon: "arrow.clockwise") {
-                    Task { await viewModel.load() }
-                }
-                .frame(maxWidth: 240)
-            }
+            HomeUnavailableView { Task { await viewModel.load() } }
         }
     }
 
@@ -306,6 +297,30 @@ struct HomeView: View {
     }
 }
 
+// MARK: - Error state
+
+/// Shown when the home summary can't load and there's nothing cached to fall back
+/// on. Uses the native `ContentUnavailableView` with a system button so the retry
+/// action sizes correctly and stays legible at every Dynamic Type size.
+private struct HomeUnavailableView: View {
+    let retry: () -> Void
+
+    var body: some View {
+        ContentUnavailableView {
+            Label("Home Unavailable", systemImage: "wifi.exclamationmark")
+        } description: {
+            Text("We couldn't load the latest games right now.")
+        } actions: {
+            Button(action: retry) {
+                Label("Try Again", systemImage: "arrow.clockwise")
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .tint(Rink.ice)
+        }
+    }
+}
+
 // MARK: - Full standings (See All destination)
 
 private struct AllStandingsView: View {
@@ -342,4 +357,19 @@ private struct AllStandingsView: View {
 
 #Preview("Home · iPad", traits: .landscapeLeft) {
     NavigationStack { HomeView(viewModel: .preview()) }
+}
+
+#Preview("Home · Unavailable") {
+    ZStack {
+        RinkAmbientBackground(.arena)
+        HomeUnavailableView(retry: {})
+    }
+}
+
+#Preview("Home · Unavailable · Dark") {
+    ZStack {
+        RinkAmbientBackground(.arena)
+        HomeUnavailableView(retry: {})
+    }
+    .preferredColorScheme(.dark)
 }
