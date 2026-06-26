@@ -2,14 +2,13 @@
 //  OnlineFeaturesPageView.swift
 //  SHL
 //
-//  Created by Claude Code
+//  Final onboarding page: primes and requests notification permission.
 //
 
 import SwiftUI
 
 struct OnlineFeaturesPageView: View {
-    @Binding var enableOnlineFeatures: Bool
-    let onFinish: () -> Void
+    let onEnable: () -> Void
     let onSkip: () -> Void
 
     var body: some View {
@@ -24,15 +23,20 @@ struct OnlineFeaturesPageView: View {
 
             // Header
             VStack(spacing: 12) {
-                Text("Enable Sync & Notifications")
+                Text("Stay in the Game")
                     .font(.title.bold())
                     .multilineTextAlignment(.center)
 
+                Text("Get alerts for your favourite team. You can fine-tune what each team notifies you about anytime.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+
                 VStack(alignment: .leading, spacing: 12) {
-                    FeatureRow(icon: "bell.fill", text: "Get notified about match starts, live goals, and final scores for your teams")
-                    FeatureRow(icon: "sportscourt.fill", text: "Track live games on your Lock Screen with Live Activities")
-                    FeatureRow(icon: "arrow.triangle.2.circlepath", text: "Sync your team preferences and settings across all your devices")
-                    FeatureRow(icon: "lock.shield.fill", text: "Your data is encrypted and stored securely via iCloud")
+                    FeatureRow(icon: "bell.fill", text: "Goal alerts the moment your team scores")
+                    FeatureRow(icon: "clock.fill", text: "A heads-up when the game is about to start")
+                    FeatureRow(icon: "sportscourt.fill", text: "Follow live scores on your Lock Screen")
                 }
                 .padding(.horizontal, 32)
                 .padding(.top, 8)
@@ -44,10 +48,9 @@ struct OnlineFeaturesPageView: View {
             // Buttons
             VStack(spacing: 12) {
                 Button {
-                    enableOnlineFeatures = true
-                    onFinish()
+                    onEnable()
                 } label: {
-                    Text("Enable Sync & Notifications")
+                    Text("Turn On Notifications")
                         .font(.headline)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -57,7 +60,6 @@ struct OnlineFeaturesPageView: View {
                 }
 
                 Button {
-                    enableOnlineFeatures = false
                     onSkip()
                 } label: {
                     Text("Not Now")
@@ -96,9 +98,10 @@ struct FeatureRow: View {
 }
 
 #Preview {
-    OnlineFeaturesPageView(
-        enableOnlineFeatures: .constant(false),
-        onFinish: {},
-        onSkip: {}
-    )
+    OnlineFeaturesPageView(onEnable: {}, onSkip: {})
+}
+
+#Preview("Dark") {
+    OnlineFeaturesPageView(onEnable: {}, onSkip: {})
+        .preferredColorScheme(.dark)
 }

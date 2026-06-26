@@ -30,6 +30,7 @@ enum RootTabs: Equatable, Hashable, Identifiable {
 struct Root: View {
     @State private var loggedIn = false
     @State private var showOnboarding = false
+    @State private var showNotificationPrompt = false
 
     private let api = SHLAPIClient.shared
 
@@ -212,6 +213,13 @@ struct Root: View {
                     // Check if onboarding needed (after splash)
                     if !Settings.shared.hasCompletedOnboarding {
                         showOnboarding = true
+                    } else if !Settings.shared.hasPromptedExistingUserNotifications {
+                        // Existing user updating to this version: offer notifications once.
+                        let status = await PushNotificationManager.shared.checkNotificationPermission()
+                        if status == .notDetermined {
+                            showNotificationPrompt = true
+                        }
+                        Settings.shared.hasPromptedExistingUserNotifications = true
                     }
                 }
             }
@@ -248,6 +256,17 @@ struct Root: View {
         }
         .fullScreenCover(isPresented: $showOnboarding) {
             OnboardingContainerView()
+        }
+        .sheet(isPresented: $showNotificationPrompt) {
+            NotificationReminderSheet(
+                onEnable: {
+                    Task { await PushNotificationManager.shared.requestPermissionsAndRegister() }
+                    showNotificationPrompt = false
+                },
+                onSkip: {
+                    showNotificationPrompt = false
+                }
+            )
         }
         .sheet(isPresented: $adminPairingCoordinator.isPresented) {
             AdminPairingSheet()

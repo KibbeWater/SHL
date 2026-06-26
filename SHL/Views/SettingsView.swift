@@ -22,7 +22,6 @@ struct SettingsView: View {
     @State private var devices: [Device] = []
     @State private var isLoadingDevices = false
     @State private var showResetOnboardingAlert = false
-    @State private var showNotificationReminderSheet = false
 
     private let api = SHLAPIClient.shared
     
@@ -163,211 +162,75 @@ struct SettingsView: View {
             }
 
 
-            // MARK: - User Management Section
+            // MARK: - Notifications
 
             Section {
-                Toggle("Enable Account Features", isOn: settings.binding_userManagementEnabled())
-                    .tint(.accentColor)
-
-                if settings.userManagementEnabled {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Account Features Enabled")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text("Push notifications, cross-device sync, and personalized features are now available.")
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                    }
-                } else {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Account Features Disabled")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text("Enable to unlock push notifications, settings sync across devices, and personalized features.")
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                    }
+                NavigationLink {
+                    NotificationSettingsView()
+                } label: {
+                    Label("Notifications", systemImage: "bell.badge")
                 }
-            } header: {
-                Text("Account")
             } footer: {
-                Text("Account features are optional. The app works fully without them. When enabled, your settings sync across devices via iCloud.")
+                Text("Choose which teams notify you about game starts, goals, and final scores.")
             }
 
-            // MARK: - Notification Settings (only if user management enabled)
+            // MARK: - Account Management
 
-            if settings.userManagementEnabled {
-                Section {
-                    Toggle("Match Reminders", isOn: Binding(
-                        get: { settings.notificationSettings.matchReminders },
-                        set: { newValue in
-                            var updated = settings.notificationSettings
-                            updated.matchReminders = newValue
-                            settings.notificationSettings = updated
+            Section("Account") {
+                if authManager.isAuthenticated {
+                    if let userId = authManager.currentUserId {
+                        VStack(alignment: .leading) {
+                            Text("User ID")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Text(userId)
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                                .textSelection(.enabled)
                         }
-                    ))
-
-                    Toggle("Match Results", isOn: Binding(
-                        get: { settings.notificationSettings.matchResults },
-                        set: { newValue in
-                            var updated = settings.notificationSettings
-                            updated.matchResults = newValue
-                            settings.notificationSettings = updated
-                        }
-                    ))
-
-                    Toggle("Live Goals", isOn: Binding(
-                        get: { settings.notificationSettings.liveGoals },
-                        set: { newValue in
-                            var updated = settings.notificationSettings
-                            updated.liveGoals = newValue
-                            settings.notificationSettings = updated
-                        }
-                    ))
-
-                    Toggle("Period Updates", isOn: Binding(
-                        get: { settings.notificationSettings.periodUpdates },
-                        set: { newValue in
-                            var updated = settings.notificationSettings
-                            updated.periodUpdates = newValue
-                            settings.notificationSettings = updated
-                        }
-                    ))
-
-                    if #available(iOS 17.2, *) {
-                        Toggle("Auto-start Live Activity", isOn: Binding(
-                            get: { settings.notificationSettings.autoStartLiveActivity },
-                            set: { newValue in
-                                var updated = settings.notificationSettings
-                                updated.autoStartLiveActivity = newValue
-                                settings.notificationSettings = updated
-                            }
-                        ))
                     }
-                } header: {
-                    Text("Notification Preferences")
-                } footer: {
-                    if #available(iOS 17.2, *) {
-                        Text("Auto-start Live Activity will automatically show a Live Activity on your Lock Screen 15 minutes before your interested teams play.")
+
+                    Button("View Devices") {
+                        loadDevices()
                     }
-                }
 
-                // MARK: - Push Notification Status
-
-                Section("Push Notifications") {
+                    Button("Delete Account", role: .destructive) {
+                        showDeleteAccountAlert = true
+                    }
+                } else {
                     HStack {
-                        Text("Permission Status")
-                        Spacer()
-                        switch pushManager.permissionStatus {
-                        case .authorized:
-                            Label("Authorized", systemImage: "checkmark.circle.fill")
-                                .foregroundStyle(.green)
-                        case .denied:
-                            Label("Denied", systemImage: "xmark.circle.fill")
-                                .foregroundStyle(.red)
-                        case .notDetermined:
-                            Label("Not Set", systemImage: "questionmark.circle.fill")
-                                .foregroundStyle(.orange)
-                        case .provisional, .ephemeral:
-                            Label("Provisional", systemImage: "clock.circle.fill")
-                                .foregroundStyle(.orange)
-                        @unknown default:
-                            Label("Unknown", systemImage: "exclamationmark.circle.fill")
-                                .foregroundStyle(.gray)
-                        }
-                    }
-                    .font(.caption)
-
-                    if pushManager.permissionStatus != .authorized {
-                        Button {
-                            Task {
-                                _ = await pushManager.requestPermissionsAndRegister()
-                            }
-                        } label: {
-                            Label("Enable Push Notifications", systemImage: "bell.badge.fill")
-                        }
-                    } else {
-                        HStack {
-                            Text("Backend Registration")
-                            Spacer()
-                            if pushManager.isTokenRegisteredWithBackend {
-                                Label("Registered", systemImage: "checkmark.circle.fill")
-                                    .foregroundStyle(.green)
-                            } else if pushManager.pushToken != nil {
-                                Button("Register Token") {
-                                    Task {
-                                        try? await pushManager.registerTokenWithBackend()
-                                    }
-                                }
-                            } else {
-                                Label("No Token", systemImage: "xmark.circle.fill")
-                                    .foregroundStyle(.red)
-                            }
-                        }
-                        .font(.caption)
-                    }
-                }
-
-                // MARK: - Account Management
-
-                Section("Account Management") {
-                    if authManager.isAuthenticated {
-                        if let userId = authManager.currentUserId {
-                            VStack(alignment: .leading) {
-                                Text("User ID")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Text(userId)
-                                    .font(.caption2)
-                                    .foregroundStyle(.tertiary)
-                                    .textSelection(.enabled)
-                            }
-                        }
-
-                        Button("View Devices") {
-                            loadDevices()
-                        }
-
-                        Button("Logout", role: .destructive) {
-                            Task {
-                                try? await authManager.logout()
-                            }
-                        }
-
-                        Button("Delete Account", role: .destructive) {
-                            showDeleteAccountAlert = true
-                        }
-                    } else {
-                        Text("Not authenticated")
+                        Text("Setting up your account…")
                             .foregroundStyle(.secondary)
+                        Spacer()
+                        ProgressView()
                     }
                 }
-                .alert("Delete Account", isPresented: $showDeleteAccountAlert) {
-                    Button("Cancel", role: .cancel) {}
-                    Button("Delete", role: .destructive) {
-                        deleteAccount()
-                    }
-                } message: {
-                    Text("Are you sure you want to delete your account? This action cannot be undone and will remove all your data from our servers.")
+            }
+            .alert("Delete Account", isPresented: $showDeleteAccountAlert) {
+                Button("Cancel", role: .cancel) {}
+                Button("Delete", role: .destructive) {
+                    deleteAccount()
                 }
+            } message: {
+                Text("Are you sure you want to delete your account? This action cannot be undone and will remove all your data from our servers.")
+            }
 
-                // MARK: - Security Settings
+            // MARK: - Security Settings
 
-                Section {
-                    Toggle("Sync Authentication Across Devices", isOn: settings.binding_keychainSyncEnabled())
-                        .tint(.accentColor)
-                } header: {
-                    Text("Security")
-                } footer: {
-                    Text("When enabled, your login will sync to other devices signed into iCloud. This allows you to stay logged in across all your devices. You can disable this if you prefer to manage authentication separately on each device.")
-                }
+            Section {
+                Toggle("Sync Authentication Across Devices", isOn: settings.binding_keychainSyncEnabled())
+                    .tint(.accentColor)
+            } header: {
+                Text("Security")
+            } footer: {
+                Text("When enabled, your login will sync to other devices signed into iCloud. This allows you to stay logged in across all your devices. You can disable this if you prefer to manage authentication separately on each device.")
             }
 
             // MARK: - Debug Tools Section
 
 #if DEBUG
-            Section {
-                if settings.userManagementEnabled && authManager.isAuthenticated {
+            Section("Debug Tools") {
+                if authManager.isAuthenticated {
                     NavigationLink {
                         NotificationTestView()
                     } label: {
@@ -375,34 +238,9 @@ struct SettingsView: View {
                     }
                 }
 
-                Button {
-                    showNotificationReminderSheet = true
-                } label: {
-                    Label("Show Notification Reminder", systemImage: "bell.badge")
-                }
-
-                Button {
-                    settings.objectWillChange.send()
-                    settings.hasSeenNotificationReminder = false
-                    settings.matchViewInteractionCount = 10 // Set to 10 to trigger on next match view
-                } label: {
-                    Label("Reset Reminder State", systemImage: "arrow.counterclockwise")
-                }
-
-                HStack {
-                    Text("Match View Count")
-                    Spacer()
-                    Text("\(settings.matchViewInteractionCount)")
-                        .foregroundStyle(.secondary)
-                }
-
                 Button("Reset Onboarding") {
                     showResetOnboardingAlert = true
                 }
-            } header: {
-                Text("Debug Tools")
-            } footer: {
-                Text("Notification reminder shows after 10 match views if notifications aren't enabled.")
             }
 #endif
 
@@ -508,27 +346,6 @@ struct SettingsView: View {
         } message: {
             Text("This will reset the onboarding flow. You'll need to restart the app to see it again.")
         }
-        #if DEBUG
-        .sheet(isPresented: $showNotificationReminderSheet) {
-            NotificationReminderSheet(
-                onEnable: {
-                    Task {
-                        // Only enable user management if not already enabled
-                        if !Settings.shared.userManagementEnabled {
-                            Settings.shared.userManagementEnabled = true
-                        }
-                        await PushNotificationManager.shared.requestPermissionsAndRegister()
-                    }
-                    Settings.shared.markNotificationReminderSeen()
-                    showNotificationReminderSheet = false
-                },
-                onSkip: {
-                    Settings.shared.markNotificationReminderSeen()
-                    showNotificationReminderSheet = false
-                }
-            )
-        }
-        #endif
     }
 }
 

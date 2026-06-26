@@ -17,6 +17,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Migrate from old single preferredTeam to new interestedTeams array (one-time migration)
         Settings.shared.migratePreferredTeamIfNeeded()
 
+        // Account features are now always on; flip any user who previously opted out.
+        Settings.shared.forceEnableAccountFeaturesIfNeeded()
+
         // Populate team color cache for widgets
         Self.populateTeamColorCache()
 
@@ -49,6 +52,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
                     // Fetch team code before registering push tokens
                     await Self.fetchAndCacheInterestedTeams()
+
+                    // Pull per-team notification levels from the backend (source of truth).
+                    await Settings.shared.hydrateInterestedTeamsFromBackend()
 
                     // Register for push notifications on launch
                     await PushNotificationManager.shared.registerForRemoteNotifications()

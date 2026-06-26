@@ -14,7 +14,6 @@ struct OnboardingContainerView: View {
     @State private var currentPage = 0
     @State private var selectedTeamIds: Set<String> = []
     @State private var favoriteTeamId: String? = nil
-    @State private var enableOnlineFeatures = false  // User chooses via buttons
     @State private var allTeams: [Team] = []
     @State private var isLoadingTeams = true
     @State private var loadError: Error?
@@ -145,14 +144,16 @@ struct OnboardingContainerView: View {
                     .tag(2)
 
                     OnlineFeaturesPageView(
-                        enableOnlineFeatures: $enableOnlineFeatures,
-                        onFinish: {
-                            trackPageView(page: 3, pageName: "online_features")
+                        onEnable: {
+                            trackPageView(page: 3, pageName: "notifications")
                             trackOnlineFeaturesSelection(enabled: true)
-                            completeOnboarding()
+                            Task {
+                                _ = await PushNotificationManager.shared.requestPermissionsAndRegister()
+                                await MainActor.run { completeOnboarding() }
+                            }
                         },
                         onSkip: {
-                            trackPageView(page: 3, pageName: "online_features")
+                            trackPageView(page: 3, pageName: "notifications")
                             trackOnlineFeaturesSelection(enabled: false)
                             completeOnboarding()
                         }
@@ -201,18 +202,19 @@ struct OnboardingContainerView: View {
             settings.setInterestedTeams(interestedTeams)
         }
 
-        // Save favorite team
+        // Save favorite team and default it to full alerts (other teams stay off).
         if let favoriteTeamId = favoriteTeamId, selectedTeamIds.contains(favoriteTeamId) {
             settings.setFavoriteTeamId(favoriteTeamId)
+            settings.setNotificationLevel(.all, for: favoriteTeamId)
         }
 
-        // Enable online features if toggled
-        if enableOnlineFeatures {
-            settings.userManagementEnabled = true
-        }
-
-        // Mark onboarding as complete
+        // Mark onboarding complete. New users have seen the notifications step, so the
+        // one-time existing-user prompt should never fire for them.
         settings.completeOnboarding()
+        settings.hasPromptedExistingUserNotifications = true
+
+        // Push the chosen teams + levels to the backend once registration is ready.
+        Task { await settings.syncAllPreferencesToBackend() }
 
         // Track onboarding completion
         trackOnboardingCompleted()
@@ -295,7 +297,7 @@ struct OnboardingContainerView: View {
                 "duration_seconds": duration,
                 "teams_selected_count": selectedTeamIds.count,
                 "has_favorite_team": favoriteTeamId != nil,
-                "sync_enabled": enableOnlineFeatures,
+                "sync_enabled": true,
                 "skipped_team_selection": skippedTeamSelection,
                 "skipped_favorite_team": skippedFavoriteTeam,
                 "teams_selected": Array(selectedTeamIds),

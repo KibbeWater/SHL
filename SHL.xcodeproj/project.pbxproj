@@ -81,6 +81,7 @@
 		804316272BDD05E8007D1D9A /* UIImageExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC374DF92BAD922000378412 /* UIImageExt.swift */; };
 		804375AA2CAA09FC0041F46D /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804375A92CAA09FC0041F46D /* PlayerView.swift */; };
 		8044AB632FEE6EB40056D332 /* InterestedTeamRows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB622FEE6EB40056D332 /* InterestedTeamRows.swift */; };
+		8044AB652FEEC1FE0056D332 /* NotificationSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8044AB642FEEC1FE0056D332 /* NotificationSettingsView.swift */; };
 		804EC8232CFC02560096CA0D /* ActivityUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8212CFC02560096CA0D /* ActivityUpdater.swift */; };
 		804EC8242CFC02560096CA0D /* ActivityUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804EC8212CFC02560096CA0D /* ActivityUpdater.swift */; };
 		8055E5172BD1739D0096DCBF /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8055E5162BD1739D0096DCBF /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -241,6 +242,7 @@
 		804316252BDCFFC3007D1D9A /* SHLWidgetUpcoming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHLWidgetUpcoming.swift; sourceTree = "<group>"; };
 		804375A92CAA09FC0041F46D /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		8044AB622FEE6EB40056D332 /* InterestedTeamRows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterestedTeamRows.swift; sourceTree = "<group>"; };
+		8044AB642FEEC1FE0056D332 /* NotificationSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsView.swift; sourceTree = "<group>"; };
 		804EC8212CFC02560096CA0D /* ActivityUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityUpdater.swift; sourceTree = "<group>"; };
 		8055E5162BD1739D0096DCBF /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
 		8055E51B2BD187670096DCBF /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
@@ -783,6 +785,7 @@
 				802AD9702EB1834900916E9F /* SearchView.swift */,
 				800119EF2F8A55580017E45B /* iPad */,
 				80C847CF2FA28BEE004B1D50 /* AdminPairingSheet.swift */,
+				8044AB642FEEC1FE0056D332 /* NotificationSettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1003,6 +1006,7 @@
 				8008FC7E2C9DCC4E00B23669 /* ReminderContext.swift in Sources */,
 				80E9ED8F2CB14DDC00D0E4E9 /* Settings.swift in Sources */,
 				806DFACC2EE35C4600065FD2 /* MatchCardCompact.swift in Sources */,
+				8044AB652FEEC1FE0056D332 /* NotificationSettingsView.swift in Sources */,
 				BC369E1C2BBAF5CC00940F42 /* VersusBar.swift in Sources */,
 				804375AA2CAA09FC0041F46D /* PlayerView.swift in Sources */,
 				802AD96E2EB17EF100916E9F /* MatchSearch.swift in Sources */,

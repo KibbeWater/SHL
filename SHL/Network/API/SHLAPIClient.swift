@@ -359,7 +359,7 @@ class SHLAPIClient {
 
     // MARK: - Interested Teams
 
-    /// Get user's interested teams
+    /// Get user's interested teams (response includes per-team notification levels)
     func getInterestedTeams() async throws -> InterestedTeamsResponse {
         try await request(
             endpoint: "/user/interested-teams",
@@ -368,11 +368,12 @@ class SHLAPIClient {
         )
     }
 
-    /// Add a team to interested teams
-    func addInterestedTeam(teamId: String) async throws {
+    /// Add a team to interested teams at the given notification level
+    func addInterestedTeam(teamId: String, level: TeamNotificationLevel) async throws {
         let _: EmptyResponse = try await request(
             endpoint: "/user/interested-teams/\(teamId)",
             method: .post,
+            body: UpdateTeamLevelRequest(level: level.rawValue),
             requiresAuth: true
         )
     }
@@ -386,12 +387,22 @@ class SHLAPIClient {
         )
     }
 
-    /// Set all interested teams at once (replaces existing)
-    func setInterestedTeams(teamIds: [String]) async throws -> InterestedTeamsResponse {
+    /// Update a single team's notification level
+    func updateTeamNotificationLevel(teamId: String, level: TeamNotificationLevel) async throws -> InterestedTeamsResponse {
+        try await request(
+            endpoint: "/user/interested-teams/\(teamId)",
+            method: .patch,
+            body: UpdateTeamLevelRequest(level: level.rawValue),
+            requiresAuth: true
+        )
+    }
+
+    /// Set all interested teams at once with their levels (replaces existing)
+    func setInterestedTeams(_ teams: [InterestedTeamLevelPayload]) async throws -> InterestedTeamsResponse {
         try await request(
             endpoint: "/user/interested-teams",
             method: .put,
-            body: SetInterestedTeamsRequest(teamIds: teamIds),
+            body: SetInterestedTeamsRequest(teams: teams),
             requiresAuth: true
         )
     }

@@ -45,17 +45,29 @@ class Settings: ObservableObject {
         return _cachedInterestedTeams
     }
 
-    /// Sets all interested teams at once
+    /// Sets all interested teams at once. Existing per-team notification levels are
+    /// preserved; newly added teams default to `.off` (onboarding raises the favourite
+    /// to `.all`).
     public func setInterestedTeams(_ teams: [InterestedTeam]) {
         objectWillChange.send()
         _interestedTeamIds = teams.map { $0.id }
         _cachedInterestedTeams = teams
+
+        // Reconcile local levels to the new team set, preserving existing choices.
+        var levels: [String: String] = [:]
+        for team in teams {
+            levels[team.id] = _interestedTeamLevels[team.id] ?? TeamNotificationLevel.off.rawValue
+        }
+        _interestedTeamLevels = levels
         syncTeamCodesToWidgets()
 
         // Sync with backend if user management is enabled
         if userManagementEnabled {
+            let payload = teams.map { team in
+                InterestedTeamLevelPayload(teamId: team.id, level: levels[team.id] ?? TeamNotificationLevel.off.rawValue)
+            }
             Task {
-                try? await SHLAPIClient.shared.setInterestedTeams(teamIds: _interestedTeamIds)
+                _ = try? await SHLAPIClient.shared.setInterestedTeams(payload)
             }
         }
 
@@ -63,19 +75,21 @@ class Settings: ObservableObject {
         NotificationCenter.default.post(name: .interestedTeamsDidChange, object: nil)
     }
 
-    /// Add a team to interested teams
+    /// Add a team to interested teams (defaults to its current level, or `.off`)
     public func addInterestedTeam(_ team: InterestedTeam) {
         guard !_interestedTeamIds.contains(team.id) else { return }
 
         objectWillChange.send()
         _interestedTeamIds.append(team.id)
         _cachedInterestedTeams.append(team)
+        let level = _interestedTeamLevels[team.id].flatMap { TeamNotificationLevel(rawValue: $0) } ?? .off
+        _interestedTeamLevels[team.id] = level.rawValue
         syncTeamCodesToWidgets()
 
         // Sync with backend if user management is enabled
         if userManagementEnabled {
             Task {
-                try? await SHLAPIClient.shared.addInterestedTeam(teamId: team.id)
+                try? await SHLAPIClient.shared.addInterestedTeam(teamId: team.id, level: level)
             }
         }
 
@@ -88,6 +102,7 @@ class Settings: ObservableObject {
         objectWillChange.send()
         _interestedTeamIds.removeAll { $0 == id }
         _cachedInterestedTeams.removeAll { $0.id == id }
+        _interestedTeamLevels[id] = nil
 
         // Clear favorite if it was this team
         if _favoriteTeamId == id {
@@ -145,6 +160,68 @@ class Settings: ObservableObject {
     /// Check if a specific team is in interested teams
     public func isTeamInterested(teamId: String) -> Bool {
         return _interestedTeamIds.contains(teamId)
+    }
+
+    // MARK: - Per-Team Notification Levels
+
+    /// Per-team notification level keyed by team id (raw `TeamNotificationLevel` value).
+    /// Mirrors the backend's `notify_level`; hydrated from the backend on launch.
+    @CloudStorage(key: "interestedTeamLevels", default: [:])
+    private var _interestedTeamLevels: [String: String]
+
+    /// The notification level for a team (`.off` if unset).
+    public func notificationLevel(for teamId: String) -> TeamNotificationLevel {
+        guard let raw = _interestedTeamLevels[teamId],
+              let level = TeamNotificationLevel(rawValue: raw) else {
+            return .off
+        }
+        return level
+    }
+
+    /// Sets a team's notification level locally and syncs it to the backend.
+    public func setNotificationLevel(_ level: TeamNotificationLevel, for teamId: String) {
+        objectWillChange.send()
+        _interestedTeamLevels[teamId] = level.rawValue
+
+        if userManagementEnabled {
+            Task {
+                _ = try? await SHLAPIClient.shared.updateTeamNotificationLevel(teamId: teamId, level: level)
+            }
+        }
+    }
+
+    /// Merges backend-provided levels into local storage (backend is the source of truth).
+    public func cacheInterestedTeamLevels(_ levels: [String: String]) {
+        guard !levels.isEmpty else { return }
+        objectWillChange.send()
+        var merged = _interestedTeamLevels
+        for (teamId, raw) in levels {
+            merged[teamId] = raw
+        }
+        _interestedTeamLevels = merged
+    }
+
+    /// Assigns default levels to any interested team that doesn't have one yet:
+    /// the favourite team gets `.all`, everything else `.off`. Used when first
+    /// enabling account features for a previously opted-out user.
+    private func ensureDefaultLevelsForCurrentTeams() {
+        var levels = _interestedTeamLevels
+        for id in _interestedTeamIds where levels[id] == nil {
+            levels[id] = (id == _favoriteTeamId ? TeamNotificationLevel.all : .off).rawValue
+        }
+        _interestedTeamLevels = levels
+    }
+
+    /// Pulls interested teams and their levels from the backend into the local cache.
+    /// Backend is authoritative for levels (it holds the migration backfill), so this
+    /// must run before the UI lets the user edit teams/levels.
+    public func hydrateInterestedTeamsFromBackend() async {
+        guard userManagementEnabled else { return }
+        guard let response = try? await SHLAPIClient.shared.getInterestedTeams() else { return }
+        await MainActor.run {
+            self.cacheInterestedTeams(response.teamsWithLevels)
+            self.cacheInterestedTeamLevels(response.levels ?? [:])
+        }
     }
 
     // MARK: - Favorite Team
@@ -233,24 +310,34 @@ class Settings: ObservableObject {
 
     // MARK: - User Management Settings
 
-    @CloudStorage(key: "userManagementEnabled", default: false)
+    /// Account features (anonymous device account, cross-device sync, push notifications)
+    /// are always on. Defaults to `true`; `forceEnableAccountFeaturesIfNeeded()` also
+    /// flips any user who previously opted out.
+    @CloudStorage(key: "userManagementEnabled", default: true)
     public var userManagementEnabled: Bool {
         didSet {
             objectWillChange.send()
 
-            // Handle opt-in
+            // Register + sync when turned on (e.g. the one-time migration for older users).
             if userManagementEnabled && !oldValue {
                 Task {
                     await handleUserManagementOptIn()
                 }
             }
+        }
+    }
 
-            // Handle opt-out
-            if !userManagementEnabled && oldValue {
-                Task {
-                    await handleUserManagementOptOut()
-                }
-            }
+    /// Guards the one-time migration that makes account features always-on.
+    @CloudStorage(key: "didForceEnableAccountFeatures", default: false)
+    private var didForceEnableAccountFeatures: Bool
+
+    /// One-time migration: account features are now mandatory. Flip any user who was
+    /// previously opted out (stored `false`) to `true`, registering them via `didSet`.
+    public func forceEnableAccountFeaturesIfNeeded() {
+        guard !didForceEnableAccountFeatures else { return }
+        didForceEnableAccountFeatures = true
+        if !userManagementEnabled {
+            userManagementEnabled = true
         }
     }
 
@@ -276,10 +363,15 @@ class Settings: ObservableObject {
             let userId = try await AuthenticationManager.shared.register()
             print("User registered successfully: \(userId)")
 
-            // Sync current interested teams to backend
+            // This path runs for previously opted-out users (backend has no teams for
+            // them yet), so apply the favourite-only defaults and push local teams up.
+            await MainActor.run { self.ensureDefaultLevelsForCurrentTeams() }
             let teamIds = getInterestedTeamIds()
             if !teamIds.isEmpty {
-                try? await SHLAPIClient.shared.setInterestedTeams(teamIds: teamIds)
+                let payload = teamIds.map { id in
+                    InterestedTeamLevelPayload(teamId: id, level: notificationLevel(for: id).rawValue)
+                }
+                _ = try? await SHLAPIClient.shared.setInterestedTeams(payload)
             }
 
             // Sync notification settings
@@ -288,60 +380,44 @@ class Settings: ObservableObject {
             // Fetch user profile
             try? await AuthenticationManager.shared.fetchUserProfile()
 
-            print("User management opt-in completed")
+            print("Account features initialized")
         } catch {
-            print("Failed to opt-in to user management: \(error)")
-            // Revert the toggle if registration failed
-            await MainActor.run {
-                self.userManagementEnabled = false
+            // Account features are always-on; if registration fails we keep the flag set
+            // and AppDelegate retries registration on the next launch / activation.
+            print("Failed to initialize account features: \(error)")
+        }
+    }
+
+    // MARK: - Existing-User Notification Prompt
+
+    /// Whether the one-time "turn on notifications" prompt has been shown to a user who
+    /// updated from a version without the notifications onboarding step. New users go
+    /// through onboarding and have this set on completion.
+    @CloudStorage(key: "hasPromptedExistingUserNotifications", default: false)
+    public var hasPromptedExistingUserNotifications: Bool {
+        didSet {
+            objectWillChange.send()
+        }
+    }
+
+    // MARK: - Backend Sync
+
+    /// Ensures the device is registered, then pushes the local interested teams (with
+    /// their levels) and notification settings to the backend. Used after onboarding so a
+    /// brand-new user's choices reach the server once authentication is ready.
+    public func syncAllPreferencesToBackend() async {
+        guard userManagementEnabled else { return }
+        if !AuthenticationManager.shared.hasValidToken {
+            _ = try? await AuthenticationManager.shared.register()
+        }
+        let teamIds = getInterestedTeamIds()
+        if !teamIds.isEmpty {
+            let payload = teamIds.map { id in
+                InterestedTeamLevelPayload(teamId: id, level: notificationLevel(for: id).rawValue)
             }
+            _ = try? await SHLAPIClient.shared.setInterestedTeams(payload)
         }
-    }
-
-    private func handleUserManagementOptOut() async {
-        do {
-            // Logout (invalidates token but keeps local device ID)
-            try await AuthenticationManager.shared.logout()
-            print("User management opt-out completed")
-        } catch {
-            print("Failed to opt-out of user management: \(error)")
-        }
-    }
-
-    // MARK: - Notification Reminder Tracking
-
-    /// Tracks how many times the user has viewed match details
-    @CloudStorage(key: "matchViewInteractionCount", default: 0)
-    public var matchViewInteractionCount: Int {
-        didSet {
-            objectWillChange.send()
-        }
-    }
-
-    /// Tracks if the user has dismissed the notification reminder
-    @CloudStorage(key: "hasSeenNotificationReminder", default: false)
-    public var hasSeenNotificationReminder: Bool {
-        didSet {
-            objectWillChange.send()
-        }
-    }
-
-    /// Increment match view interaction count
-    public func incrementMatchViewCount() {
-        matchViewInteractionCount += 1
-    }
-
-    /// Check if we should show the notification reminder
-    /// Shows after 10 match views if user hasn't seen it
-    /// Actual notification permission status is checked separately
-    public func shouldShowNotificationReminder() -> Bool {
-        return matchViewInteractionCount >= 10
-            && !hasSeenNotificationReminder
-    }
-
-    /// Mark notification reminder as seen
-    public func markNotificationReminderSeen() {
-        hasSeenNotificationReminder = true
+        _ = try? await SHLAPIClient.shared.updateNotificationSettings(notificationSettings)
     }
 
     // MARK: - Binding Helpers

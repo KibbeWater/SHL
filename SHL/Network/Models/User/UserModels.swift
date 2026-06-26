@@ -40,6 +40,8 @@ struct UserProfile: Codable {
     let appVersion: String?
     let notificationSettings: NotificationSettings
     let interestedTeams: [InterestedTeam]
+    /// Per-team level keyed by team id (added by the backend; optional for old responses).
+    let interestedTeamLevels: [String: String]?
     let createdAt: String
     let lastSeenAt: String
 
@@ -50,33 +52,55 @@ struct UserProfile: Codable {
     var lastSeenDate: Date? {
         return ISO8601DateFormatter().date(from: lastSeenAt)
     }
+
+    /// Interested teams with their `notifyLevel` resolved from `interestedTeamLevels`.
+    var interestedTeamsWithLevels: [InterestedTeam] {
+        interestedTeams.map { team in
+            var resolved = team
+            if let raw = interestedTeamLevels?[team.id], let level = TeamNotificationLevel(rawValue: raw) {
+                resolved.notifyLevel = level
+            }
+            return resolved
+        }
+    }
 }
 
 // MARK: - Notification Settings
 
+/// Per-team notification level. Raw values match the backend's `notify_level` column.
+enum TeamNotificationLevel: String, Codable, CaseIterable, Identifiable, Sendable {
+    /// No notifications for this team
+    case off
+    /// Only the final score when the match ends
+    case finalOnly = "final_only"
+    /// All game alerts: game start, goals, and final score
+    case all
+
+    var id: String { rawValue }
+}
+
+/// App-wide notification settings synced to the backend.
+/// Per-team alert levels now live on each `InterestedTeam`; this only carries the
+/// global Live Activity preference.
 struct NotificationSettings: Codable, Equatable {
-    /// Receive notifications 30 minutes before match starts
-    var matchReminders: Bool
-
-    /// Receive notifications when match ends with final score
-    var matchResults: Bool
-
-    /// Receive real-time goal notifications during live matches
-    var liveGoals: Bool
-
-    /// Receive notifications at period end (1st, 2nd, 3rd)
-    var periodUpdates: Bool
-
-    /// Automatically start Live Activity before interested team's matches
+    /// Automatically start a Live Activity before your favourite team's matches (iOS 17.2+)
     var autoStartLiveActivity: Bool
 
-    static let `default` = NotificationSettings(
-        matchReminders: true,
-        matchResults: true,
-        liveGoals: true,
-        periodUpdates: false,
-        autoStartLiveActivity: true
-    )
+    static let `default` = NotificationSettings(autoStartLiveActivity: true)
+
+    init(autoStartLiveActivity: Bool = true) {
+        self.autoStartLiveActivity = autoStartLiveActivity
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case autoStartLiveActivity
+    }
+
+    /// Tolerant decode so legacy stored values (which had extra fields) still load.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.autoStartLiveActivity = try container.decodeIfPresent(Bool.self, forKey: .autoStartLiveActivity) ?? true
+    }
 }
 
 struct NotificationSettingsResponse: Codable {
@@ -91,14 +115,45 @@ struct InterestedTeam: Codable, Identifiable, Equatable {
     let name: String
     let code: String
     let city: String?
+    /// Per-team notification level. Not part of the team wire object — populated from
+    /// the response's `levels` map (see `InterestedTeamsResponse.teamsWithLevels`).
+    var notifyLevel: TeamNotificationLevel = .off
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, code, city
+    }
 }
 
 struct InterestedTeamsResponse: Codable {
     let teams: [InterestedTeam]
+    /// Per-team level keyed by team id (added by the backend; optional for old responses).
+    let levels: [String: String]?
+
+    /// Teams with their `notifyLevel` resolved from the `levels` map.
+    var teamsWithLevels: [InterestedTeam] {
+        teams.map { team in
+            var resolved = team
+            if let raw = levels?[team.id], let level = TeamNotificationLevel(rawValue: raw) {
+                resolved.notifyLevel = level
+            }
+            return resolved
+        }
+    }
+}
+
+/// One team + its notification level, for the level-aware "set interested teams" request.
+struct InterestedTeamLevelPayload: Codable {
+    let teamId: String
+    let level: String
 }
 
 struct SetInterestedTeamsRequest: Codable {
-    let teamIds: [String]
+    let teams: [InterestedTeamLevelPayload]
+}
+
+/// Body for PATCH /user/interested-teams/:teamId
+struct UpdateTeamLevelRequest: Codable {
+    let level: String
 }
 
 // MARK: - Device Management
