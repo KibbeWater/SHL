@@ -31,13 +31,11 @@ struct OnboardingContainerView: View {
 
     init() {}
 
-    #if DEBUG
     init(previewTeams: [Team]) {
         _allTeams = State(initialValue: previewTeams)
         _isLoadingTeams = State(initialValue: false)
         _skipAutoLoad = State(initialValue: true)
     }
-    #endif
 
     var body: some View {
         ZStack {

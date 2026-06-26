@@ -296,7 +296,6 @@ final class ScheduleViewModel {
     }()
 }
 
-#if DEBUG
 extension ScheduleViewModel {
     /// A view model preloaded with a week of mock games for previews (no network).
     static func preview() -> ScheduleViewModel {
@@ -340,4 +339,3 @@ extension ScheduleViewModel {
         return vm
     }
 }
-#endif

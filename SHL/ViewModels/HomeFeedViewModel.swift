@@ -124,7 +124,6 @@ final class HomeFeedViewModel {
         pollTimer = nil
     }
 
-    #if DEBUG
     /// Preset with a payload for previews — bypasses the network entirely.
     func preload(_ summary: HomeSummary) {
         self.summary = summary
@@ -137,7 +136,6 @@ final class HomeFeedViewModel {
         vm.preload(summary)
         return vm
     }
-    #endif
 
     // MARK: - Live wiring
 

@@ -183,7 +183,6 @@ struct OnboardingFooter: View {
     }
 }
 
-#if DEBUG
 extension Team {
     static var onboardingPreviewTeams: [Team] {
         func t(_ code: String, _ name: String) -> Team {
@@ -197,7 +196,6 @@ extension Team {
         ]
     }
 }
-#endif
 
 #Preview {
     ZStack {
