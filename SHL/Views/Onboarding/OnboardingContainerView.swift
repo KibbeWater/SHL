@@ -2,7 +2,9 @@
 //  OnboardingContainerView.swift
 //  SHL
 //
-//  Created by Claude Code
+//  Paged onboarding over the Rink ambient background. Visual shell only — all
+//  behavior (team follow, favorite, notification permission, persistence, sync,
+//  analytics) is unchanged.
 //
 
 import PostHog
@@ -26,147 +28,144 @@ struct OnboardingContainerView: View {
     private let api = SHLAPIClient.shared
     private let settings = Settings.shared
 
+    @State private var skipAutoLoad = false
+
+    init() {}
+
+    #if DEBUG
+    init(previewTeams: [Team]) {
+        _allTeams = State(initialValue: previewTeams)
+        _isLoadingTeams = State(initialValue: false)
+        _skipAutoLoad = State(initialValue: true)
+    }
+    #endif
+
     var body: some View {
         ZStack {
-            if isLoadingTeams {
-                // Loading state
-                VStack {
-                    Spacer()
+            RinkAmbientBackground(.arena)
+            content
+        }
+        .task { if !skipAutoLoad { await loadTeams() } }
+    }
 
-                    ProgressView()
-                        .scaleEffect(1.5)
-
-                    Text("Loading teams...")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .padding(.top, 16)
-
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color(uiColor: .systemBackground))
-            } else if loadError != nil {
-                // Error state
-                VStack(spacing: 16) {
-                    Spacer()
-
-                    Image(systemName: "exclamationmark.triangle")
-                        .font(.system(size: 48))
-                        .foregroundStyle(.red)
-
-                    Text("Failed to load teams")
-                        .font(.headline)
-
-                    Text("Please check your connection and try again")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-
-                    Button("Retry") {
-                        Task {
-                            await loadTeams()
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .padding(.top, 8)
-
-                    Button("Skip Setup") {
-                        completeOnboarding()
-                    }
-                    .font(.caption)
+    @ViewBuilder
+    private var content: some View {
+        if isLoadingTeams {
+            VStack(spacing: .RinkSpace.md) {
+                ProgressView().controlSize(.large)
+                Text("Loading teams…")
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
-                    .padding(.top, 8)
-
-                    Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if loadError != nil {
+            ContentUnavailableView {
+                Label("Couldn't Load Teams", systemImage: "wifi.exclamationmark")
+            } description: {
+                Text("Check your connection and try again.")
+            } actions: {
+                Button {
+                    Task { await loadTeams() }
+                } label: {
+                    Label("Try Again", systemImage: "arrow.clockwise")
                 }
-                .padding(.horizontal, 32)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color(uiColor: .systemBackground))
-            } else {
-                // Onboarding pages
-                TabView(selection: $currentPage) {
-                    WelcomePageView(
-                        onContinue: {
-                            withAnimation {
-                                currentPage = 1
-                            }
-                            trackPageView(page: 0, pageName: "welcome")
-                        }
-                    )
-                    .tag(0)
-                    .onAppear {
-                        if currentPage == 0 {
-                            trackOnboardingStarted()
-                        }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .tint(Rink.ice)
+
+                Button("Skip Setup") { completeOnboarding() }
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, .RinkSpace.xs)
+            }
+            .padding()
+        } else {
+            pages
+        }
+    }
+
+    private var pages: some View {
+        VStack(spacing: 0) {
+            progressBar
+            TabView(selection: $currentPage) {
+            WelcomePageView(
+                onContinue: {
+                    withAnimation { currentPage = 1 }
+                    trackPageView(page: 0, pageName: "welcome")
+                }
+            )
+            .tag(0)
+            .onAppear {
+                if currentPage == 0 { trackOnboardingStarted() }
+            }
+
+            TeamSelectionPageView(
+                allTeams: allTeams,
+                selectedTeamIds: $selectedTeamIds,
+                onContinue: {
+                    withAnimation { currentPage = 2 }
+                    trackPageView(page: 1, pageName: "team_selection")
+                    trackTeamSelection(skipped: false)
+                },
+                onSkip: {
+                    withAnimation { currentPage = 2 }
+                    skippedTeamSelection = true
+                    trackPageView(page: 1, pageName: "team_selection")
+                    trackTeamSelection(skipped: true)
+                }
+            )
+            .tag(1)
+
+            FavoriteTeamPageView(
+                allTeams: allTeams,
+                selectedTeamIds: selectedTeamIds,
+                favoriteTeamId: $favoriteTeamId,
+                onContinue: {
+                    withAnimation { currentPage = 3 }
+                    trackPageView(page: 2, pageName: "favorite_team")
+                    trackFavoriteTeamSelection(skipped: false)
+                },
+                onSkip: {
+                    withAnimation { currentPage = 3 }
+                    skippedFavoriteTeam = true
+                    trackPageView(page: 2, pageName: "favorite_team")
+                    trackFavoriteTeamSelection(skipped: true)
+                }
+            )
+            .tag(2)
+
+            OnlineFeaturesPageView(
+                onEnable: {
+                    trackPageView(page: 3, pageName: "notifications")
+                    trackOnlineFeaturesSelection(enabled: true)
+                    Task {
+                        _ = await PushNotificationManager.shared.requestPermissionsAndRegister()
+                        await MainActor.run { completeOnboarding() }
                     }
-
-                    TeamSelectionPageView(
-                        allTeams: allTeams,
-                        selectedTeamIds: $selectedTeamIds,
-                        onContinue: {
-                            withAnimation {
-                                currentPage = 2
-                            }
-                            trackPageView(page: 1, pageName: "team_selection")
-                            trackTeamSelection(skipped: false)
-                        },
-                        onSkip: {
-                            withAnimation {
-                                currentPage = 2
-                            }
-                            skippedTeamSelection = true
-                            trackPageView(page: 1, pageName: "team_selection")
-                            trackTeamSelection(skipped: true)
-                        }
-                    )
-                    .tag(1)
-
-                    FavoriteTeamPageView(
-                        allTeams: allTeams,
-                        selectedTeamIds: selectedTeamIds,
-                        favoriteTeamId: $favoriteTeamId,
-                        onContinue: {
-                            withAnimation {
-                                currentPage = 3
-                            }
-                            trackPageView(page: 2, pageName: "favorite_team")
-                            trackFavoriteTeamSelection(skipped: false)
-                        },
-                        onSkip: {
-                            withAnimation {
-                                currentPage = 3
-                            }
-                            skippedFavoriteTeam = true
-                            trackPageView(page: 2, pageName: "favorite_team")
-                            trackFavoriteTeamSelection(skipped: true)
-                        }
-                    )
-                    .tag(2)
-
-                    OnlineFeaturesPageView(
-                        onEnable: {
-                            trackPageView(page: 3, pageName: "notifications")
-                            trackOnlineFeaturesSelection(enabled: true)
-                            Task {
-                                _ = await PushNotificationManager.shared.requestPermissionsAndRegister()
-                                await MainActor.run { completeOnboarding() }
-                            }
-                        },
-                        onSkip: {
-                            trackPageView(page: 3, pageName: "notifications")
-                            trackOnlineFeaturesSelection(enabled: false)
-                            completeOnboarding()
-                        }
-                    )
-                    .tag(3)
+                },
+                onSkip: {
+                    trackPageView(page: 3, pageName: "notifications")
+                    trackOnlineFeaturesSelection(enabled: false)
+                    completeOnboarding()
                 }
-                .tabViewStyle(.page(indexDisplayMode: .always))
-                .indexViewStyle(.page(backgroundDisplayMode: .always))
+            )
+            .tag(3)
+        }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+        }
+    }
+
+    private var progressBar: some View {
+        HStack(spacing: 6) {
+            ForEach(0..<4, id: \.self) { index in
+                Capsule()
+                    .fill(index == currentPage ? AnyShapeStyle(Rink.ice) : AnyShapeStyle(Color.primary.opacity(0.18)))
+                    .frame(width: index == currentPage ? 22 : 7, height: 7)
             }
         }
-        .task {
-            await loadTeams()
-        }
+        .animation(.snappy, value: currentPage)
+        .padding(.vertical, .RinkSpace.md)
+        .accessibilityHidden(true)
     }
 
     private func loadTeams() async {
@@ -309,5 +308,5 @@ struct OnboardingContainerView: View {
 }
 
 #Preview {
-    OnboardingContainerView()
+    OnboardingContainerView(previewTeams: Team.onboardingPreviewTeams)
 }

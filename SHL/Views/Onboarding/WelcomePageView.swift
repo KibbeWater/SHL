@@ -2,7 +2,7 @@
 //  WelcomePageView.swift
 //  SHL
 //
-//  Created by Claude Code
+//  Onboarding step 1 — branded welcome on the Rink ambient background.
 //
 
 import SwiftUI
@@ -11,47 +11,53 @@ struct WelcomePageView: View {
     let onContinue: () -> Void
 
     var body: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: .RinkSpace.xl) {
             Spacer()
 
-            // App branding
-            Text("SHL")
-                .font(.system(size: 72, weight: .heavy))
-                .foregroundStyle(.primary)
+            VStack(spacing: .RinkSpace.lg) {
+                Image(systemName: "hockey.puck.fill")
+                    .font(.system(size: 52))
+                    .foregroundStyle(Rink.iceGradient)
+                    .accessibilityHidden(true)
 
-            VStack(spacing: 16) {
-                Text("Welcome to SHL")
-                    .font(.title.bold())
+                Text("SHL")
+                    .font(.system(size: 76, weight: .heavy))
+                    .foregroundStyle(Rink.iceGradient)
 
-                Text("Follow your favorite teams and never miss a moment")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
+                VStack(spacing: .RinkSpace.sm) {
+                    Text("Welcome")
+                        .font(.rinkTitle)
+                    Text("Follow your teams, catch every goal, and never miss a moment.")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, .RinkSpace.xl)
+                }
             }
+            .accessibilityElement(children: .combine)
 
             Spacer()
 
-            // Get Started button
-            Button {
-                onContinue()
-            } label: {
-                Text("Get Started")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.accentColor)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
-            .padding(.horizontal, 32)
-            .padding(.bottom, 48)
+            RinkPrimaryButton(title: "Get Started", icon: "arrow.right", action: onContinue)
+                .frame(maxWidth: 520)
+                .padding(.horizontal, .RinkSpace.xl)
+                .padding(.bottom, 32)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(uiColor: .systemBackground))
     }
 }
 
 #Preview {
-    WelcomePageView(onContinue: {})
+    ZStack {
+        RinkAmbientBackground(.arena)
+        WelcomePageView(onContinue: {})
+    }
+}
+
+#Preview("Dark") {
+    ZStack {
+        RinkAmbientBackground(.arena)
+        WelcomePageView(onContinue: {})
+    }
+    .preferredColorScheme(.dark)
 }

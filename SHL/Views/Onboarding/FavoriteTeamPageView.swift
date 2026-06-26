@@ -2,7 +2,7 @@
 //  FavoriteTeamPageView.swift
 //  SHL
 //
-//  Created by Claude Code
+//  Onboarding step 3 — pick one favorite team from the followed set.
 //
 
 import SwiftUI
@@ -24,113 +24,63 @@ struct FavoriteTeamPageView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header
-            VStack(spacing: 8) {
-                Text("Pick Your Favorite")
-                    .font(.title.bold())
-                    .multilineTextAlignment(.center)
+            OnboardingHeader(
+                title: "Pick Your Favorite",
+                subtitle: "We'll put this team front and center on your home screen."
+            )
 
-                Text("We'll prioritize this team on your home screen")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+            if selectedTeamIds.isEmpty {
+                Label("Select teams in the previous step to choose a favorite", systemImage: "info.circle")
+                    .font(.caption)
+                    .foregroundStyle(Rink.gold)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
-
-                if selectedTeamIds.isEmpty {
-                    Text("Tip: Select teams in the previous step to choose a favorite")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                        .padding(.top, 8)
-                        .padding(.horizontal, 32)
-                }
+                    .padding(.horizontal, .RinkSpace.xl)
+                    .padding(.bottom, .RinkSpace.sm)
             }
-            .padding(.horizontal, 32)
-            .padding(.vertical, 24)
 
-            // Team list
             ScrollView {
-                LazyVStack(spacing: 0) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: .RinkSpace.md)], spacing: .RinkSpace.md) {
                     ForEach(availableTeams) { team in
-                        Button {
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                if favoriteTeamId == team.id {
-                                    favoriteTeamId = nil
-                                } else {
-                                    favoriteTeamId = team.id
-                                }
+                        OnboardingTeamCell(
+                            team: team,
+                            isSelected: favoriteTeamId == team.id,
+                            accent: Rink.gold,
+                            badge: "star.fill"
+                        ) {
+                            withAnimation(.snappy) {
+                                favoriteTeamId = (favoriteTeamId == team.id) ? nil : team.id
                             }
-                        } label: {
-                            HStack(spacing: 12) {
-                                Text(team.name)
-                                    .foregroundStyle(.primary)
-
-                                Spacer()
-
-                                Text(team.code)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-
-                                if favoriteTeamId == team.id {
-                                    Image(systemName: "star.circle.fill")
-                                        .foregroundStyle(.yellow)
-                                        .fontWeight(.semibold)
-                                } else {
-                                    Image(systemName: "circle")
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                            .padding(.horizontal, 32)
-                            .padding(.vertical, 16)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-
-                        if team.id != availableTeams.last?.id {
-                            Divider()
-                                .padding(.leading, 32)
                         }
                     }
                 }
+                .padding(.horizontal)
+                .padding(.bottom, .RinkSpace.lg)
+                .frame(maxWidth: 640)
+                .frame(maxWidth: .infinity)
             }
+            .scrollIndicators(.hidden)
 
-            // Buttons
-            VStack(spacing: 12) {
-                Button {
-                    onContinue()
-                } label: {
-                    Text("Continue")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.accentColor)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-
-                Button {
-                    onSkip()
-                } label: {
-                    Text("Skip this step")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding(.vertical, 8)
-                }
-            }
-            .padding(.horizontal, 32)
-            .padding(.top, 24)
-            .padding(.bottom, 48)  // Extra padding for page indicator
+            OnboardingFooter(
+                primaryTitle: "Continue",
+                onPrimary: onContinue,
+                secondaryTitle: "Skip this step",
+                onSecondary: onSkip
+            )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(uiColor: .systemBackground))
     }
 }
 
 #Preview {
-    FavoriteTeamPageView(
-        allTeams: [],
-        selectedTeamIds: [],
-        favoriteTeamId: .constant(nil),
-        onContinue: {},
-        onSkip: {}
-    )
+    ZStack {
+        RinkAmbientBackground(.arena)
+        FavoriteTeamPageView(
+            allTeams: Team.onboardingPreviewTeams,
+            selectedTeamIds: ["t-FHC", "t-LHF", "t-SAIK", "t-RBK"],
+            favoriteTeamId: .constant("t-FHC"),
+            onContinue: {},
+            onSkip: {}
+        )
+    }
+    .preferredColorScheme(.dark)
 }

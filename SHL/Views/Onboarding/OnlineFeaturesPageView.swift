@@ -2,7 +2,7 @@
 //  OnlineFeaturesPageView.swift
 //  SHL
 //
-//  Final onboarding page: primes and requests notification permission.
+//  Onboarding step 4 — primes and requests notification permission.
 //
 
 import SwiftUI
@@ -15,65 +15,47 @@ struct OnlineFeaturesPageView: View {
         VStack(spacing: 0) {
             Spacer()
 
-            // Icon
             Image(systemName: "bell.badge.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(.accent)
-                .padding(.bottom, 24)
+                .font(.system(size: 44))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(Rink.ice)
+                .frame(width: 96, height: 96)
+                .background(Rink.ice.opacity(0.12), in: Circle())
+                .overlay(Circle().stroke(Rink.ice.opacity(0.25), lineWidth: 1))
+                .padding(.bottom, .RinkSpace.lg)
+                .accessibilityHidden(true)
 
-            // Header
-            VStack(spacing: 12) {
+            VStack(spacing: .RinkSpace.md) {
                 Text("Stay in the Game")
-                    .font(.title.bold())
+                    .font(.rinkTitle)
                     .multilineTextAlignment(.center)
 
-                Text("Get alerts for your favourite team. You can fine-tune what each team notifies you about anytime.")
+                Text("Get alerts for your team. You can fine-tune what each team notifies you about anytime.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-
-                VStack(alignment: .leading, spacing: 12) {
-                    FeatureRow(icon: "bell.fill", text: "Goal alerts the moment your team scores")
-                    FeatureRow(icon: "clock.fill", text: "A heads-up when the game is about to start")
-                    FeatureRow(icon: "sportscourt.fill", text: "Follow live scores on your Lock Screen")
-                }
-                .padding(.horizontal, 32)
-                .padding(.top, 8)
+                    .padding(.horizontal, .RinkSpace.xl)
             }
-            .padding(.bottom, 32)
+
+            VStack(alignment: .leading, spacing: .RinkSpace.md) {
+                FeatureRow(icon: "hockey.puck.fill", text: "Goal alerts the moment your team scores")
+                FeatureRow(icon: "clock.fill", text: "A heads-up when the game is about to start")
+                FeatureRow(icon: "sportscourt.fill", text: "Live scores on your Lock Screen")
+            }
+            .padding(.horizontal, .RinkSpace.xl)
+            .padding(.top, .RinkSpace.xl)
+            .frame(maxWidth: 520)
 
             Spacer()
 
-            // Buttons
-            VStack(spacing: 12) {
-                Button {
-                    onEnable()
-                } label: {
-                    Text("Turn On Notifications")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.accentColor)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-
-                Button {
-                    onSkip()
-                } label: {
-                    Text("Not Now")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding(.vertical, 8)
-                }
-            }
-            .padding(.horizontal, 32)
-            .padding(.top, 24)
-            .padding(.bottom, 48)
+            OnboardingFooter(
+                primaryTitle: "Turn On Notifications",
+                onPrimary: onEnable,
+                secondaryTitle: "Not Now",
+                onSecondary: onSkip
+            )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(uiColor: .systemBackground))
     }
 }
 
@@ -82,26 +64,36 @@ struct FeatureRow: View {
     let text: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(spacing: .RinkSpace.md) {
             Image(systemName: icon)
-                .font(.system(size: 16))
-                .foregroundStyle(.accent)
-                .frame(width: 24, height: 24)
+                .font(.subheadline.weight(.semibold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(Rink.ice)
+                .frame(width: 36, height: 36)
+                .background(Rink.ice.opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
 
             Text(text)
                 .font(.subheadline)
                 .foregroundStyle(.primary)
-                .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
+
+            Spacer(minLength: 0)
         }
+        .accessibilityElement(children: .combine)
     }
 }
 
 #Preview {
-    OnlineFeaturesPageView(onEnable: {}, onSkip: {})
+    ZStack {
+        RinkAmbientBackground(.arena)
+        OnlineFeaturesPageView(onEnable: {}, onSkip: {})
+    }
 }
 
 #Preview("Dark") {
-    OnlineFeaturesPageView(onEnable: {}, onSkip: {})
-        .preferredColorScheme(.dark)
+    ZStack {
+        RinkAmbientBackground(.arena)
+        OnlineFeaturesPageView(onEnable: {}, onSkip: {})
+    }
+    .preferredColorScheme(.dark)
 }
