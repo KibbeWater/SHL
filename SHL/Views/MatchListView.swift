@@ -16,6 +16,9 @@ struct MatchListView: View {
 
     @State private var viewModel: ScheduleViewModel
     @State private var showDatePicker = false
+    /// Direction the day's content slides in from when the date changes (later date
+    /// slides in from the trailing edge, earlier from the leading edge).
+    @State private var slideEdge: Edge = .trailing
 
     @MainActor
     init(viewModel: ScheduleViewModel? = nil) {
@@ -145,33 +148,49 @@ struct MatchListView: View {
 
     private var dayContent: some View {
         ScrollView {
-            let games = viewModel.selectedGames
-            let live = viewModel.liveSelectedGames
-            let rest = games.filter { g in !live.contains(where: { $0.id == g.id }) }
+            daySlate
+                // Re-keyed per day so a date change is an insert/remove SwiftUI can
+                // animate as a directional slide rather than an in-place swap.
+                .id(viewModel.selectedDate)
+                .transition(.asymmetric(
+                    insertion: .move(edge: slideEdge).combined(with: .opacity),
+                    removal: .move(edge: slideEdge == .trailing ? .leading : .trailing)
+                        .combined(with: .opacity)
+                ))
+                .padding(.horizontal)
+                .padding(.vertical, .RinkSpace.md)
+                .frame(maxWidth: 760)
+                .frame(maxWidth: .infinity)
+        }
+        .scrollIndicators(.hidden)
+        .refreshable { await viewModel.loadWeek(force: true) }
+        .onChange(of: viewModel.selectedDate) { old, new in
+            slideEdge = new >= old ? .trailing : .leading
+        }
+    }
 
-            LazyVStack(alignment: .leading, spacing: .RinkSpace.lg) {
-                dayHeader(count: games.count)
+    @ViewBuilder
+    private var daySlate: some View {
+        let games = viewModel.selectedGames
+        let live = viewModel.liveSelectedGames
+        let rest = games.filter { g in !live.contains(where: { $0.id == g.id }) }
 
-                if games.isEmpty {
-                    emptyState
-                } else {
-                    if !live.isEmpty { liveNowSection(live) }
-                    if !rest.isEmpty {
-                        VStack(spacing: .RinkSpace.sm) {
-                            ForEach(rest, id: \.id) { match in
-                                rowLink(match)
-                            }
+        LazyVStack(alignment: .leading, spacing: .RinkSpace.lg) {
+            dayHeader(count: games.count)
+
+            if games.isEmpty {
+                emptyState
+            } else {
+                if !live.isEmpty { liveNowSection(live) }
+                if !rest.isEmpty {
+                    VStack(spacing: .RinkSpace.sm) {
+                        ForEach(rest, id: \.id) { match in
+                            rowLink(match)
                         }
                     }
                 }
             }
-            .padding(.horizontal)
-            .padding(.vertical, .RinkSpace.md)
-            .frame(maxWidth: 760)
-            .frame(maxWidth: .infinity)
         }
-        .scrollIndicators(.hidden)
-        .refreshable { await viewModel.loadWeek(force: true) }
     }
 
     private func dayHeader(count: Int) -> some View {
