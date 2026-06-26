@@ -167,9 +167,9 @@ class SHLAPIClient {
     // MARK: - Home (v2)
 
     /// Fetch the compound home summary in a single request (`GET /api/v2/home`).
-    /// Replaces the v1 pattern of assembling the home screen from many calls.
-    func getHomeSummary() async throws -> HomeSummary {
-        try await request(.home)
+    /// Pass the user's favorite team code so the server can build the personalized block.
+    func getHomeSummary(team: String? = nil) async throws -> HomeSummary {
+        try await request(.home(team: team))
     }
 
     /// Fetch the schedule for a date range (`GET /api/v2/schedule?from=&to=&team=`),

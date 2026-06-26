@@ -66,12 +66,21 @@ final class HomeFeedViewModel {
         return snapshot
     }
 
-    /// The favorite team's full `Team` (for navigation), resolved from the table.
+    /// The favorite team's full `Team` (for navigation). Prefer the standings row
+    /// (richest data); otherwise synthesize a minimal team from the favorite block
+    /// so the hero still navigates — `TeamView` loads full detail from the id/code.
     var favoriteTeam: Team? {
         guard let fav = summary?.favorite else { return nil }
-        return (summary?.standings ?? []).first {
+        if let resolved = (summary?.standings ?? []).first(where: {
             $0.team.id == fav.teamId || $0.team.code.caseInsensitiveCompare(fav.team.code) == .orderedSame
-        }?.team
+        })?.team {
+            return resolved
+        }
+        return Team(
+            id: fav.teamId ?? fav.team.id ?? fav.team.code, name: fav.team.name, code: fav.team.code,
+            city: nil, founded: nil, venue: nil, golds: nil, goldYears: nil,
+            finals: nil, finalYears: nil, iconURL: nil, isActive: true
+        )
     }
 
     /// Live data for a given game, if any.
@@ -83,25 +92,15 @@ final class HomeFeedViewModel {
         isLoading = true
         defer { isLoading = false }
         do {
-            summary = try await api.getHomeSummary()
+            summary = try await api.getHomeSummary(team: Settings.shared.getFavoriteTeam()?.code)
             loadFailed = false
             await refreshLiveData()
             subscribeLive()
             startPolling()
         } catch {
-            #if DEBUG
-            // The v2 endpoint isn't live yet — in development, fall back to mock data
-            // so the redesign is fully visible. Release builds surface the error state.
-            if summary == nil {
-                summary = .mock
-                loadFailed = false
-                await refreshLiveData()
-            } else {
-                loadFailed = true
-            }
-            #else
+            // Use real data only — on failure keep any prior data and surface the
+            // error/retry state when we have nothing to show.
             loadFailed = (summary == nil)
-            #endif
         }
     }
 

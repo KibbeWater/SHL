@@ -37,8 +37,8 @@ enum SHLAPIService {
     case standings(seasonId: String)
     case currentStandings
 
-    // Home (v2) — single compound "summary" response for the whole home screen
-    case home
+    // Home (v2) — compound "summary" response; optional favorite team code for the personalized block
+    case home(team: String?)
     // Schedule (v2) — matches within a date range, optionally filtered by team
     case schedule(from: String, to: String, team: String?)
 }
@@ -137,6 +137,9 @@ extension SHLAPIService: TargetType {
             )
         case let .recentMatches(limit):
             return .requestParameters(parameters: ["upcoming": limit], encoding: URLEncoding.queryString)
+        case let .home(team):
+            guard let team = team else { return .requestPlain }
+            return .requestParameters(parameters: ["team": team], encoding: URLEncoding.queryString)
         case let .schedule(from, to, team):
             var parameters: [String: Any] = ["from": from, "to": to]
             if let team = team { parameters["team"] = team }
