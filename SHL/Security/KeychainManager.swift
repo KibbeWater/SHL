@@ -15,6 +15,10 @@ final class KeychainManager {
 
     private init() {}
 
+    /// Serializes device-id read-generate-save so concurrent callers at launch can't
+    /// each mint a different UUID (the keychain save isn't atomic on its own).
+    private let deviceIdLock = NSLock()
+
     // MARK: - Keychain Keys
 
     private enum Keys {
@@ -81,18 +85,32 @@ final class KeychainManager {
 
     /// Get or create a persistent device ID (IDFV)
     func getDeviceId() -> String {
-        if let existingId = retrieve(forKey: Keys.deviceId) {
+        deviceIdLock.lock()
+        defer { deviceIdLock.unlock() }
+
+        if let existingId = retrieve(forKey: Keys.deviceId), !Self.isZeroUUID(existingId) {
             return existingId
         }
 
-        // Use IDFV as primary device identifier
-        let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString
+        // `identifierForVendor` is the all-zeros UUID on the Simulator (and nil in rare
+        // cases on device) — the backend rejects "all zeros", so fall back to a
+        // persistent random UUID stored in the keychain instead.
+        let vendorId = UIDevice.current.identifierForVendor?.uuidString
+        let deviceId = (vendorId.flatMap { Self.isZeroUUID($0) ? nil : $0 }) ?? UUID().uuidString
         save(deviceId, forKey: Keys.deviceId, syncWithiCloud: false)
         return deviceId
     }
 
+    /// The reserved "nil" UUID, which the backend rejects as a device identifier.
+    private static func isZeroUUID(_ value: String) -> Bool {
+        value == "00000000-0000-0000-0000-000000000000"
+    }
+
     /// Get or create a fallback device ID that persists across app reinstalls
     func getFallbackDeviceId() -> String {
+        deviceIdLock.lock()
+        defer { deviceIdLock.unlock() }
+
         if let existingId = retrieve(forKey: Keys.fallbackDeviceId) {
             return existingId
         }
